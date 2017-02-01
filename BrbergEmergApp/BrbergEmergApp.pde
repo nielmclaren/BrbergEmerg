@@ -57,8 +57,8 @@ void draw() {
     Vehicle vehicle = vehicles.get(i);
 
     pushMatrix();
-    translate(vehicle.x, vehicle.y);
-    rotate(vehicle.rotation);
+    translate(vehicle.x(), vehicle.y());
+    rotate(vehicle.rotation());
     imageMode(CENTER);
     image(chargeImage, 0, 0);
     popMatrix();
