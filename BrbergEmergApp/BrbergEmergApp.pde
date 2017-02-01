@@ -1,60 +1,32 @@
 
 PImage chargeImage;
-ArrayList<Vehicle> vehicles;
+World world;
 
 void setup() {
   size(800, 800);
 
   chargeImage = loadImage("charge-t.png");
-  vehicles = new ArrayList<Vehicle>();
+  world = new World(width, height);
 
   reset();
 }
 
 void reset() {
-  clearVehicles();
-  setupVehicles();
+  world.clearVehicles();
+  world.setupVehicles();
+  world.calculateNeighborhoods();
+
+  redraw();
 }
 
-void clearVehicles() {
-  vehicles = new ArrayList<Vehicle>();
-}
-
-void setupVehicles() {
-  int maxVehicles = 100000;
-  int numAttempts = 0;
-  int maxAttempts = 100000;
-
-  while (vehicles.size() < maxVehicles && numAttempts < maxAttempts) {
-    Vehicle vehicle = new Vehicle(random(width), random(height), random(2 * PI));
-
-    if (hasVehicleCollision(vehicle)) {
-      numAttempts++;
-      continue;
-    }
-
-    vehicles.add(vehicle);
-    numAttempts = 0;
-  }
-
-  println("Resulting number of vehicles: " + vehicles.size());
-}
-
-boolean hasVehicleCollision(Vehicle vehicle) {
-  for (int i = 0; i < vehicles.size(); i++) {
-    Vehicle v = vehicles.get(i);
-    if (vehicle.isColliding(v)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-void draw() {
+void redraw() {
   background(0);
+  ArrayList<Vehicle> vehicles = world.vehiclesRef();
 
   for (int i = 0; i < vehicles.size(); i++) {
     Vehicle vehicle = vehicles.get(i);
+
+    vehicle.rotation(vehicle.neighborhoodRef().getAveragePrevRotation());
 
     pushMatrix();
     translate(vehicle.x(), vehicle.y());
@@ -63,6 +35,11 @@ void draw() {
     image(chargeImage, 0, 0);
     popMatrix();
   }
+
+  world.update();
+}
+
+void draw() {
 }
 
 void keyReleased() {
@@ -75,3 +52,4 @@ void keyReleased() {
       break;
   }
 }
+
