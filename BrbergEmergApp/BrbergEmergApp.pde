@@ -3,12 +3,16 @@ PImage chargeImage;
 World world;
 boolean isPaused;
 
+FileNamer fileNamer;
+
 void setup() {
   size(800, 800);
 
   chargeImage = loadImage("charge-t.png");
   world = new World(width, height);
   isPaused = false;
+
+  fileNamer = new FileNamer("output/export", "png");
 
   reset();
 }
@@ -70,10 +74,11 @@ void keyReleased() {
       reset();
       break;
     case 'r':
-      save("render.png");
+      save(fileNamer.next());
       break;
     case ' ':
       isPaused = !isPaused;
       break;
   }
 }
+
