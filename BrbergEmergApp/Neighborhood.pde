@@ -1,9 +1,11 @@
 
 class Neighborhood {
   private ArrayList<Vehicle> _vehicles;
+  private Vehicle _nearestVehicle;
 
   Neighborhood() {
     _vehicles = new ArrayList<Vehicle>();
+    _nearestVehicle = null;
   }
 
   ArrayList<Vehicle> vehiclesRef() {
@@ -12,6 +14,15 @@ class Neighborhood {
 
   Neighborhood vehiclesRef(ArrayList<Vehicle> v) {
     _vehicles = v;
+    return this;
+  }
+
+  Vehicle nearestVehicle() {
+    return _nearestVehicle;
+  }
+
+  Neighborhood nearestVehicle(Vehicle v) {
+    _nearestVehicle = v;
     return this;
   }
 

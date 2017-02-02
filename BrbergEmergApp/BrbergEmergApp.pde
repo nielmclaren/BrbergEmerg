@@ -15,7 +15,7 @@ void setup() {
 
 void reset() {
   world.clearVehicles();
-  world.setupVehicles();
+  world.setupVehicles(10000);
   world.calculateNeighborhoods();
 }
 
@@ -32,8 +32,6 @@ void redraw() {
   for (int i = 0; i < vehicles.size(); i++) {
     Vehicle vehicle = vehicles.get(i);
 
-    float neighborhoodRotation = vehicle.neighborhoodRef().getAveragePrevRotation();
-    vehicle.rotation(getRotationToward(vehicle.rotation(), neighborhoodRotation));
 
     colorMode(HSB);
     tint(vehicle.rotation() * 255 / (2 * PI), 128, 255);
@@ -44,34 +42,22 @@ void redraw() {
     imageMode(CENTER);
     image(chargeImage, 0, 0);
     popMatrix();
+/*
+    strokeWeight(2);
+    stroke(255);
+    line(vehicle.x(), vehicle.y(),
+        vehicle.x() + 20 * cos(vehicle.rotation()),
+        vehicle.y() + 20 * sin(vehicle.rotation()));
+
+    strokeWeight(1);
+    stroke(64);
+    noFill();
+    ellipseMode(CENTER);
+    ellipse(vehicle.x(), vehicle.y(), Vehicle.MIN_NEIGHBOR_DIST, Vehicle.MIN_NEIGHBOR_DIST);
+*/
   }
 
-  world.update();
-}
-
-float getRotationToward(float current, float target) {
-  float factor = 0.1;
-  float originalDelta = target - current;
-  float result;
-
-  float delta = originalDelta;
-  if (abs(delta) > PI) {
-    if (delta > 0) {
-      delta = -2 * PI + delta;
-    } else {
-      delta = 2 * PI + delta;
-    }
-  }
-  result = current + delta * factor;
-
-  return normalizeAngle(result);
-}
-
-float normalizeAngle(float v) {
-  while (v < 0) {
-    v += 2 * PI;
-  }
-  return v % (2 * PI);
+  world.step();
 }
 
 int deg(float v) {
