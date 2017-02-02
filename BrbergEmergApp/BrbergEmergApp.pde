@@ -35,6 +35,9 @@ void redraw() {
     float neighborhoodRotation = vehicle.neighborhoodRef().getAveragePrevRotation();
     vehicle.rotation(getRotationToward(vehicle.rotation(), neighborhoodRotation));
 
+    colorMode(HSB);
+    tint(vehicle.rotation() * 255 / (2 * PI), 128, 255);
+
     pushMatrix();
     translate(vehicle.x(), vehicle.y());
     rotate(vehicle.rotation());
