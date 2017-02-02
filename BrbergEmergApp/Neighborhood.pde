@@ -20,11 +20,15 @@ class Neighborhood {
       return 0;
     }
 
-    float result = 0;
+    float sum = 0;
     for (int i = 0; i < _vehicles.size(); i++) {
-      result += _vehicles.get(i).prevRotation();
+      sum += _vehicles.get(i).prevRotation();
     }
 
-    return (result / _vehicles.size()) % (2 * PI);
+    float result = sum / _vehicles.size();
+    while (result < 0) {
+      result += 2 * PI;
+    }
+    return result % (2 * PI);
   }
 }

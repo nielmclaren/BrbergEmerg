@@ -10,7 +10,7 @@ class World {
     _width = width;
     _height = height;
 
-    _neighborhoodSizeSq = 200 * 200;
+    _neighborhoodSizeSq = 50 * 50;
   }
 
   ArrayList<Vehicle> vehiclesRef() {
