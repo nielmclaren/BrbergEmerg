@@ -18,7 +18,9 @@ void setup() {
 }
 
 void reset() {
+  world.clearAttractors();
   world.clearVehicles();
+  world.setupAttractors(5);
   world.setupVehicles(10000);
   world.calculateNeighborhoods();
 }
@@ -31,11 +33,22 @@ void draw() {
 
 void redraw() {
   background(0);
+
+  ArrayList<Attractor> attractors = world.attractorsRef();
+  for (int i = 0; i < attractors.size(); i++) {
+    Attractor attractor = attractors.get(i);
+
+    colorMode(RGB);
+    stroke(64);
+    fill(16);
+    ellipseMode(RADIUS);
+    ellipse(attractor.x(), attractor.y(), attractor.radius(), attractor.radius());
+  }
+
   ArrayList<Vehicle> vehicles = world.vehiclesRef();
 
   for (int i = 0; i < vehicles.size(); i++) {
     Vehicle vehicle = vehicles.get(i);
-
 
     colorMode(HSB);
     tint(vehicle.rotation() * 255 / (2 * PI), 128, 255);

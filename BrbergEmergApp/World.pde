@@ -1,16 +1,27 @@
 
 class World {
+  private ArrayList<Attractor> _attractors;
   private ArrayList<Vehicle> _vehicles;
   private int _width;
   private int _height;
   private int _neighborhoodSizeSq;
 
   World(int width, int height) {
+    _attractors = new ArrayList<Attractor>();
     _vehicles = new ArrayList<Vehicle>();
     _width = width;
     _height = height;
 
     _neighborhoodSizeSq = 50 * 50;
+  }
+
+  ArrayList<Attractor> attractorsRef() {
+    return _attractors;
+  }
+
+  World attractorsRef(ArrayList<Attractor> v) {
+    _attractors = v;
+    return this;
   }
 
   ArrayList<Vehicle> vehiclesRef() {
@@ -22,9 +33,44 @@ class World {
     return this;
   }
 
+  World clearAttractors() {
+    _attractors = new ArrayList<Attractor>();
+    return this;
+  }
+
   World clearVehicles() {
     _vehicles = new ArrayList<Vehicle>();
     return this;
+  }
+
+  World setupAttractors(int numAttractors) {
+    int numAttempts = 0;
+    int maxAttempts = 100000;
+
+    while (_attractors.size() < numAttractors && numAttempts < maxAttempts) {
+      Attractor attractor = new Attractor(random(width), random(height), 150);
+
+      if (hasAttractorCollision(attractor)) {
+        numAttempts++;
+        continue;
+      }
+
+      _attractors.add(attractor);
+      numAttempts = 0;
+    }
+
+    println("Resulting number of attractors: " + _attractors.size());
+    return this;
+  }
+
+  private boolean hasAttractorCollision(Attractor attractor) {
+    for (int i = 0; i < _attractors.size(); i++) {
+      Attractor a = _attractors.get(i);
+      if (attractor.isColliding(a)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   World setupVehicles(int numVehicles) {
