@@ -45,9 +45,7 @@ void redraw() {
 void drawAttractors() {
   if (isDebugMode) {
     ArrayList<Attractor> attractors = world.attractorsRef();
-    for (int i = 0; i < attractors.size(); i++) {
-      Attractor attractor = attractors.get(i);
-
+    for (Attractor attractor : attractors) {
       colorMode(RGB);
       stroke(64);
       fill(16);
@@ -60,9 +58,7 @@ void drawAttractors() {
 void drawVehicles() {
   ArrayList<Vehicle> vehicles = world.vehiclesRef();
 
-  for (int i = 0; i < vehicles.size(); i++) {
-    Vehicle vehicle = vehicles.get(i);
-
+  for (Vehicle vehicle : vehicles) {
     if (isDebugMode) {
       drawDebugVehicle(vehicle);
     } else {
@@ -119,8 +115,7 @@ PVector getAveragePosition(ArrayList<? extends IPositioned> items) {
   }
 
   PVector result = new PVector();
-  for (int i = 0; i < items.size(); i++) {
-    IPositioned item = items.get(i);
+  for (IPositioned item : items) {
     result.x += item.x();
     result.y += item.y();
   }
@@ -132,8 +127,7 @@ IPositioned getNearestTo(ArrayList<? extends IPositioned> items, IPositioned tar
   float nearestDist = Float.MAX_VALUE;
   IPositioned nearest = null;
 
-  for (int i = 0; i < items.size(); i++) {
-    IPositioned item = items.get(i);
+  for (IPositioned item : items) {
     float dist = getDistanceBetween(item, target);
 
     if (dist < nearestDist) {

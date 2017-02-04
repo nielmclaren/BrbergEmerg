@@ -63,8 +63,7 @@ class World {
   }
 
   private boolean hasAttractorCollision(Attractor attractor) {
-    for (int i = 0; i < _attractors.size(); i++) {
-      Attractor a = _attractors.get(i);
+    for (Attractor a : _attractors) {
       if (attractor.isColliding(a)) {
         return true;
       }
@@ -86,8 +85,7 @@ class World {
   }
 
   private boolean hasVehicleCollision(Vehicle vehicle) {
-    for (int i = 0; i < _vehicles.size(); i++) {
-      Vehicle v = _vehicles.get(i);
+    for (Vehicle v : _vehicles) {
       if (vehicle.isColliding(v)) {
         return true;
       }
@@ -97,8 +95,7 @@ class World {
 
   private Neighborhood getNeighborhood(ArrayList<Vehicle> vehicles, Vehicle vehicle) {
     ArrayList<Vehicle> neighborhoodVehicles = new ArrayList<Vehicle>();
-    for (int i = 0; i < vehicles.size(); i++) {
-      Vehicle v = vehicles.get(i);
+    for (Vehicle v : _vehicles) {
       if (vehicle != v && areNeighbors(vehicle, v)) {
         neighborhoodVehicles.add(v);
       }
@@ -121,30 +118,26 @@ class World {
   }
 
   private void calculateNearestAttractors() {
-    for (int i = 0; i < _vehicles.size(); i++) {
-      Vehicle vehicle = _vehicles.get(i);
+    for (Vehicle vehicle : _vehicles) {
       vehicle.nearestAttractor((Attractor)getNearestTo(_attractors, vehicle));
     }
   }
 
   private void calculateNeighborhoods() {
-    for (int i = 0; i < _vehicles.size(); i++) {
-      Vehicle vehicle = _vehicles.get(i);
+    for (Vehicle vehicle : _vehicles) {
       Neighborhood neighborhood = getNeighborhood(_vehicles, vehicle);
       vehicle.neighborhoodRef(neighborhood);
     }
   }
 
   private void prepVehicles() {
-    for (int i = 0; i < _vehicles.size(); i++) {
-      Vehicle vehicle = _vehicles.get(i);
+    for (Vehicle vehicle : _vehicles) {
       vehicle.prep();
     }
   }
 
   private void stepVehicles() {
-    for (int i = 0; i < _vehicles.size(); i++) {
-      Vehicle vehicle = _vehicles.get(i);
+    for (Vehicle vehicle : _vehicles) {
       vehicle.step();
     }
   }

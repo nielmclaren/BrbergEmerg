@@ -32,8 +32,8 @@ class Neighborhood {
     }
 
     float sum = 0;
-    for (int i = 0; i < _vehicles.size(); i++) {
-      sum += _vehicles.get(i).rotation();
+    for (Vehicle vehicle : _vehicles) {
+      sum += vehicle.rotation();
     }
 
     return normalizeAngle(sum / _vehicles.size());
@@ -41,8 +41,7 @@ class Neighborhood {
 
   ArrayList<Vehicle> getTooCloseVehicles(Vehicle vehicle) {
     ArrayList<Vehicle> result = new ArrayList<Vehicle>();
-    for (int i = 0; i < _vehicles.size(); i++) {
-      Vehicle v = _vehicles.get(i);
+    for (Vehicle v : _vehicles) {
       if (getDistanceBetween(vehicle, v) < Vehicle.MIN_DISTANCE) {
         result.add(v);
       }
