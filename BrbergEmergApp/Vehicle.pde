@@ -1,6 +1,7 @@
 
 class Vehicle implements IPositioned {
   public static final float MIN_DISTANCE = 30;
+  public static final float MAX_DISTANCE = 60;
 
   private float _x;
   private float _y;
@@ -21,7 +22,7 @@ class Vehicle implements IPositioned {
     _nextY = y;
     _rotation = rotation;
     _nextRotation = rotation;
-    _velocity = 1;
+    _velocity = 3;
     _neighborhood = new Neighborhood();
     _nearestAttractor = null;
 
@@ -114,22 +115,31 @@ class Vehicle implements IPositioned {
     if (tooCloseVehicles.size() > 0) {
       PVector averagePos = getAveragePosition(tooCloseVehicles);
       float tooCloseDirection = getAngleTo(this, averagePos);
-      _nextRotation = getRotationToward(_rotation, tooCloseDirection, -0.1, 0.01);
+      _nextRotation = getScaledRotationToward(_rotation, tooCloseDirection, -0.1, 0.02);
     } else {
-      //float neighborhoodRotation = _neighborhood.getAverageRotation();
-      //_nextRotation = getRotationToward(_rotation, neighborhoodRotation, -0.1);
+      Vehicle nearestVehicle = _neighborhood.getNearestVehicle(this);
+      if (nearestVehicle != null && getDistanceBetween(this, nearestVehicle) > MAX_DISTANCE) {
+        float tooFarDirection = getAngleTo(this, nearestVehicle);
+        _nextRotation = getScaledRotationToward(_rotation, tooFarDirection, 0.1, 0.02);
+      } else if (_neighborhood.vehiclesRef().size() > 0) {
+        float neighborhoodRotation = _neighborhood.getAverageRotation();
+        _nextRotation = getScaledRotationToward(_rotation, neighborhoodRotation, -0.1, 0.01);
+      }
     }
-
-    //if (_nearestAttractor != null) {
-      //float attractorDirection = getAngleTo(this, _nearestAttractor);
-      //_nextRotation = getRotationToward(_rotation, attractorDirection, 0.02);
-    //}
 
 
     _nextX += _velocity * cos(_nextRotation);
     _nextY += _velocity * sin(_nextRotation);
 
     return this;
+  }
+
+  private float getScaledRotationToward(float current, float target, float factor) {
+    return getRotationToward(current, target, factor * _velocity, 0);
+  }
+
+  private float getScaledRotationToward(float current, float target, float factor, float maxDelta) {
+    return getRotationToward(current, target, factor * _velocity, maxDelta * _velocity);
   }
 
   Vehicle step() {

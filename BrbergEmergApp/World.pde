@@ -1,18 +1,17 @@
 
 class World {
+  public static final int NEIGHBORHOOD_RADIUS = 200;
+
   private ArrayList<Attractor> _attractors;
   private ArrayList<Vehicle> _vehicles;
   private int _width;
   private int _height;
-  private int _neighborhoodSizeSq;
 
   World(int width, int height) {
     _attractors = new ArrayList<Attractor>();
     _vehicles = new ArrayList<Vehicle>();
     _width = width;
     _height = height;
-
-    _neighborhoodSizeSq = 50 * 50;
   }
 
   ArrayList<Attractor> attractorsRef() {
@@ -76,8 +75,9 @@ class World {
   World setupVehicles(int numVehicles) {
     for (int i = 0; i < numVehicles; i++) {
       Vehicle vehicle = new Vehicle(
-          (width - numVehicles * 10) / 2 + i * 10, 600,
-          normalizeAngle(PI * 3/2));
+          random(width),
+          random(height),
+          random(2 * PI));
 
       _vehicles.add(vehicle);
     }
@@ -109,10 +109,7 @@ class World {
   }
 
   private boolean areNeighbors(Vehicle a, Vehicle b) {
-    float dx = b.x() - a.x();
-    float dy = b.y() - a.y();
-    float dSq = dx * dx + dy * dy;
-    return dSq < _neighborhoodSizeSq;
+    return getDistanceBetween(a, b) < NEIGHBORHOOD_RADIUS;
   }
 
   World step() {

@@ -2,6 +2,7 @@
 PImage chargeImage;
 World world;
 boolean isPaused;
+boolean isDebugMode;
 
 FileNamer fileNamer;
 
@@ -11,6 +12,7 @@ void setup() {
   chargeImage = loadImage("charge-t.png");
   world = new World(width, height);
   isPaused = false;
+  isDebugMode = true;
 
   fileNamer = new FileNamer("output/export", "png");
 
@@ -21,7 +23,7 @@ void reset() {
   world.clearAttractors();
   world.clearVehicles();
   world.setupAttractors(5);
-  world.setupVehicles(20);
+  world.setupVehicles(100);
   world.calculateNeighborhoods();
 }
 
@@ -34,9 +36,14 @@ void draw() {
 void redraw() {
   background(0);
 
-  int selectedIndex = 0;
+  drawAttractors();
+  drawVehicles();
 
-  if (true) {
+  world.step();
+}
+
+void drawAttractors() {
+  if (isDebugMode) {
     ArrayList<Attractor> attractors = world.attractorsRef();
     for (int i = 0; i < attractors.size(); i++) {
       Attractor attractor = attractors.get(i);
@@ -48,68 +55,41 @@ void redraw() {
       ellipse(attractor.x(), attractor.y(), attractor.radius(), attractor.radius());
     }
   }
+}
 
+void drawVehicles() {
   ArrayList<Vehicle> vehicles = world.vehiclesRef();
 
-  blendMode(LIGHTEST);
   for (int i = 0; i < vehicles.size(); i++) {
     Vehicle vehicle = vehicles.get(i);
 
-    colorMode(HSB);
-    tint(vehicle.rotation() * 255 / (2 * PI), 128, 255);
-
-    if (false) {
-      pushMatrix();
-      translate(vehicle.x(), vehicle.y());
-      rotate(vehicle.rotation() + 80 * PI / 180);
-      imageMode(CENTER);
-      image(chargeImage, 0, 0);
-      popMatrix();
+    if (isDebugMode) {
+      drawDebugVehicle(vehicle);
     } else {
-      if (i == selectedIndex) {
-        strokeWeight(8);
-        stroke(255);
-      } else {
-        strokeWeight(2);
-        stroke(255);
-      }
-
-      line(vehicle.x(), vehicle.y(),
-          vehicle.x() + 20 * cos(vehicle.rotation()),
-          vehicle.y() + 20 * sin(vehicle.rotation()));
-
-      //strokeWeight(1);
-      //stroke(64);
-      //noFill();
-      //ellipseMode(CENTER);
-      //ellipse(vehicle.x(), vehicle.y(), Vehicle.MIN_NEIGHBOR_DIST, Vehicle.MIN_NEIGHBOR_DIST);
-    }
-
-    if (i == selectedIndex) {
-      // Draw minimum distance circle
-      strokeWeight(1);
-      stroke(64);
-      fill(16);
-      ellipseMode(RADIUS);
-      ellipse(vehicle.x(), vehicle.y(), Vehicle.MIN_DISTANCE, Vehicle.MIN_DISTANCE);
-
-      ArrayList<Vehicle> tooCloseVehicles = vehicle.neighborhoodRef().getTooCloseVehicles(vehicle);
-      if (tooCloseVehicles.size() > 0) {
-        PVector averagePos = getAveragePosition(tooCloseVehicles);
-        if (getDistanceBetween(vehicle, averagePos) > 0) {
-          float tooCloseDirection = getAngleTo(vehicle, averagePos);
-          println(vehicle.x(), vehicle.y(), averagePos);
-
-          fill(255);
-          stroke(0);
-          ellipseMode(RADIUS);
-          ellipse(averagePos.x, averagePos.y, 5, 5);
-        }
-      }
+      drawVehicle(vehicle);
     }
   }
+}
 
-  world.step();
+void drawDebugVehicle(Vehicle vehicle) {
+  stroke(255);
+  strokeWeight(2);
+  line(vehicle.x(), vehicle.y(),
+      vehicle.x() + 10 * cos(vehicle.rotation()),
+      vehicle.y() + 10 * sin(vehicle.rotation()));
+}
+
+void drawVehicle(Vehicle vehicle) {
+  blendMode(LIGHTEST);
+  colorMode(HSB);
+  tint(vehicle.rotation() * 255 / (2 * PI), 128, 255);
+
+  pushMatrix();
+  translate(vehicle.x(), vehicle.y());
+  rotate(vehicle.rotation() + 80 * PI / 180);
+  imageMode(CENTER);
+  image(chargeImage, 0, 0);
+  popMatrix();
 }
 
 int deg(float v) {
@@ -123,6 +103,9 @@ void keyReleased() {
       break;
     case 'r':
       save(fileNamer.next());
+      break;
+    case 't':
+      isDebugMode = !isDebugMode;
       break;
     case ' ':
       isPaused = !isPaused;

@@ -49,4 +49,8 @@ class Neighborhood {
     }
     return result;
   }
+
+  Vehicle getNearestVehicle(Vehicle vehicle) {
+    return (Vehicle)getNearestTo(_vehicles, vehicle);
+  }
 }
