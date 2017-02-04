@@ -44,25 +44,15 @@ class World {
   }
 
   World setupAttractors(int numAttractors) {
-    int numAttempts = 0;
-    int maxAttempts = 100000;
+    int size = 50;
+    _attractors.add(new Attractor(321, 234, size));
+    _attractors.add(new Attractor(455, 341, size));
+    _attractors.add(new Attractor(125, 502, size));
+    _attractors.add(new Attractor(380, 543, size));
+    _attractors.add(new Attractor(436, 725, size));
+    _attractors.add(new Attractor(724, 609, size));
+    _attractors.add(new Attractor(673, 486, size));
 
-    while (_attractors.size() < numAttractors && numAttempts < maxAttempts) {
-      Attractor attractor = new Attractor(
-          random(width*0.2, width*0.8),
-          random(height*0.2, height*0.8),
-          50);
-
-      if (hasAttractorCollision(attractor)) {
-        numAttempts++;
-        continue;
-      }
-
-      _attractors.add(attractor);
-      numAttempts = 0;
-    }
-
-    println("Resulting number of attractors: " + _attractors.size());
     return this;
   }
 

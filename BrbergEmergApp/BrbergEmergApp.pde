@@ -4,31 +4,50 @@ World world;
 boolean isPaused;
 boolean isDebugMode;
 
-FileNamer fileNamer;
+PImage backgroundImage;
+ArrayList<PImage> appIcons;
+
+FileNamer animationFolderNamer, fileNamer;
 
 void setup() {
   size(800, 800);
 
-  chargeImage = loadImage("charge-t.png");
   world = new World(width, height);
   isPaused = false;
   isDebugMode = true;
 
+  animationFolderNamer = new FileNamer("output/anim", "/");
   fileNamer = new FileNamer("output/export", "png");
 
+  backgroundImage = loadImage("attention/background.png");
+  appIcons = getAppIcons();
+
   reset();
+}
+
+ArrayList<PImage> getAppIcons() {
+  ArrayList<PImage> result = new ArrayList<PImage>();
+  result.add(loadImage("attention/facebook-128.png"));
+  result.add(loadImage("attention/gmail-128.png"));
+  result.add(loadImage("attention/instagram-128.png"));
+  result.add(loadImage("attention/snapchat-128.png"));
+  result.add(loadImage("attention/tumblr-128.png"));
+  result.add(loadImage("attention/twitter-128.png"));
+  result.add(loadImage("attention/youtube-128.png"));
+  return result;
 }
 
 void reset() {
   world.clearAttractors();
   world.clearVehicles();
-  world.setupAttractors(5);
-  world.setupVehicles(100);
+  world.setupAttractors(appIcons.size());
+  world.setupVehicles(500);
   world.calculateNearestAttractors();
 }
 
 void draw() {
   if (!isPaused) {
+    world.step();
     redraw();
   }
 }
@@ -36,10 +55,12 @@ void draw() {
 void redraw() {
   background(0);
 
+  imageMode(CORNER);
+  image(backgroundImage, 0, 0);
+
   drawAttractors();
   drawVehicles();
-
-  world.step();
+  drawAppIcons();
 }
 
 void drawAttractors() {
@@ -68,38 +89,49 @@ void drawVehicles() {
 }
 
 void drawDebugVehicle(Vehicle vehicle) {
-  stroke(255);
-  strokeWeight(2);
-  line(vehicle.x(), vehicle.y(),
-      vehicle.x() + 5 * cos(vehicle.rotation()),
-      vehicle.y() + 5 * sin(vehicle.rotation()));
-
   stroke(32);
   strokeWeight(1);
   line(vehicle.x(), vehicle.y(),
       vehicle.nearestAttractor().x(),
       vehicle.nearestAttractor().y());
+
+  stroke(255);
+  strokeWeight(2);
+  line(vehicle.x(), vehicle.y(),
+      vehicle.x() + 5 * cos(vehicle.rotation()),
+      vehicle.y() + 5 * sin(vehicle.rotation()));
 }
 
 void drawVehicle(Vehicle vehicle) {
-  blendMode(LIGHTEST);
-  colorMode(HSB);
-  tint(vehicle.rotation() * 255 / (2 * PI), 128, 255);
+  stroke(255);
+  strokeWeight(2);
+  line(vehicle.x(), vehicle.y(),
+      vehicle.x() - 5 * cos(vehicle.rotation()),
+      vehicle.y() - 5 * sin(vehicle.rotation()));
 
-  pushMatrix();
-  translate(vehicle.x(), vehicle.y());
-  rotate(vehicle.rotation() + 80 * PI / 180);
-  imageMode(CENTER);
-  image(chargeImage, 0, 0);
-  popMatrix();
+  noStroke();
+  fill(255);
+  ellipseMode(CENTER);
+  ellipse(vehicle.x(), vehicle.y(), 4, 4);
 }
 
-int deg(float v) {
-  return floor(v * 180/PI);
+void drawAppIcons() {
+  if (!isDebugMode) {
+    ArrayList<Attractor> attractors = world.attractorsRef();
+    for (int i = 0; i < attractors.size(); i++) {
+      Attractor attractor = attractors.get(i);
+
+      imageMode(CENTER);
+      image(appIcons.get(i % appIcons.size()), attractor.x(), attractor.y(), 48, 48);
+    }
+  }
 }
 
 void keyReleased() {
   switch (key) {
+    case 'a':
+      saveAnimation(100);
+      break;
     case 'e':
       reset();
       break;
@@ -113,6 +145,32 @@ void keyReleased() {
       isPaused = !isPaused;
       break;
   }
+}
+
+void saveAnimation(int numFrames) {
+  isPaused = true;
+
+  boolean wasDebugMode = isDebugMode;
+  isDebugMode = false;
+
+  FileNamer frameNamer = new FileNamer(animationFolderNamer.next() + "frame", "png");
+  for (int i = 0; i < numFrames; i++) {
+    world.step();
+    world.step();
+    redraw();
+    save(frameNamer.next());
+  }
+
+  isPaused = false;
+
+  isDebugMode = wasDebugMode;
+}
+
+void mouseReleased() {
+}
+
+int deg(float v) {
+  return floor(v * 180/PI);
 }
 
 PVector getAveragePosition(ArrayList<? extends IPositioned> items) {
