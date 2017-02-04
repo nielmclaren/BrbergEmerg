@@ -1,5 +1,7 @@
 
 class Vehicle implements IPositioned {
+  public static final float MIN_DISTANCE = 30;
+
   private float _x;
   private float _y;
   private float _nextX;
@@ -19,7 +21,7 @@ class Vehicle implements IPositioned {
     _nextY = y;
     _rotation = rotation;
     _nextRotation = rotation;
-    _velocity = 3;
+    _velocity = 1;
     _neighborhood = new Neighborhood();
     _nearestAttractor = null;
 
@@ -108,13 +110,21 @@ class Vehicle implements IPositioned {
   }
 
   Vehicle prep() {
-    if (_nearestAttractor != null) {
-      float attractorDirection = getAngleTo(this, _nearestAttractor);
-      _rotation = getRotationToward(_rotation, attractorDirection, -0.02);
+    ArrayList<Vehicle> tooCloseVehicles = _neighborhood.getTooCloseVehicles(this);
+    if (tooCloseVehicles.size() > 0) {
+      PVector averagePos = getAveragePosition(tooCloseVehicles);
+      float tooCloseDirection = getAngleTo(this, averagePos);
+      _nextRotation = getRotationToward(_rotation, tooCloseDirection, -0.1, 0.01);
+    } else {
+      //float neighborhoodRotation = _neighborhood.getAverageRotation();
+      //_nextRotation = getRotationToward(_rotation, neighborhoodRotation, -0.1);
     }
 
-    float neighborhoodRotation = _neighborhood.getAverageRotation();
-    _nextRotation = getRotationToward(_rotation, neighborhoodRotation, 0.1);
+    //if (_nearestAttractor != null) {
+      //float attractorDirection = getAngleTo(this, _nearestAttractor);
+      //_nextRotation = getRotationToward(_rotation, attractorDirection, 0.02);
+    //}
+
 
     _nextX += _velocity * cos(_nextRotation);
     _nextY += _velocity * sin(_nextRotation);
@@ -122,26 +132,15 @@ class Vehicle implements IPositioned {
     return this;
   }
 
-  private float getRotationToward(float current, float target, float factor) {
-    float delta = target - current;
-    float result;
-
-    if (abs(delta) > PI) {
-      if (delta > 0) {
-        delta = -2 * PI + delta;
-      } else {
-        delta = 2 * PI + delta;
-      }
-    }
-    result = current + delta * factor;
-
-    return normalizeAngle(result);
-  }
-
   Vehicle step() {
     _x = _nextX;
     _y = _nextY;
     _rotation = _nextRotation;
+
+    while (_x < 0) _x += width;
+    while (_x > width) _x -= width;
+    while (_y < 0) _y += height;
+    while (_y > height) _y -= height;
     return this;
   }
 

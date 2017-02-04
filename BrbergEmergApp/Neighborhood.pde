@@ -38,4 +38,15 @@ class Neighborhood {
 
     return normalizeAngle(sum / _vehicles.size());
   }
+
+  ArrayList<Vehicle> getTooCloseVehicles(Vehicle vehicle) {
+    ArrayList<Vehicle> result = new ArrayList<Vehicle>();
+    for (int i = 0; i < _vehicles.size(); i++) {
+      Vehicle v = _vehicles.get(i);
+      if (getDistanceBetween(vehicle, v) < Vehicle.MIN_DISTANCE) {
+        result.add(v);
+      }
+    }
+    return result;
+  }
 }

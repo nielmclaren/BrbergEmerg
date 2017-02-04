@@ -74,22 +74,14 @@ class World {
   }
 
   World setupVehicles(int numVehicles) {
-    int numAttempts = 0;
-    int maxAttempts = 100000;
-
-    while (_vehicles.size() < numVehicles && numAttempts < maxAttempts) {
-      Vehicle vehicle = new Vehicle(random(width), random(height), random(2 * PI));
-
-      if (hasVehicleCollision(vehicle)) {
-        numAttempts++;
-        continue;
-      }
+    for (int i = 0; i < numVehicles; i++) {
+      Vehicle vehicle = new Vehicle(
+          (width - numVehicles * 10) / 2 + i * 10, 600,
+          normalizeAngle(PI * 3/2));
 
       _vehicles.add(vehicle);
-      numAttempts = 0;
     }
 
-    println("Resulting number of vehicles: " + _vehicles.size());
     return this;
   }
 
