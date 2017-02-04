@@ -8,6 +8,7 @@ class Vehicle {
   private float _prevRotation;
   private float _rotation;
   private Neighborhood _neighborhood;
+  private Attractor _nearestAttractor;
 
   private float _vehicleSizeSq;
 
@@ -20,6 +21,7 @@ class Vehicle {
     _rotation = rotation;
     _velocity = 3;
     _neighborhood = new Neighborhood();
+    _nearestAttractor = null;
 
     _vehicleSizeSq = 20 * 20;
   }
@@ -96,7 +98,21 @@ class Vehicle {
     return this;
   }
 
+  Attractor nearestAttractor() {
+    return _nearestAttractor.clone();
+  }
+
+  Vehicle nearestAttractor(Attractor v) {
+    _nearestAttractor = v;
+    return this;
+  }
+
   Vehicle step() {
+    if (_nearestAttractor != null) {
+      float attractorDirection = getAngleTo(_nearestAttractor);
+      _rotation = getRotationToward(_rotation, attractorDirection, -0.02);
+    }
+
     float neighborhoodRotation = _neighborhood.getAveragePrevRotation();
     _rotation = getRotationToward(_rotation, neighborhoodRotation, 0.1);
 
@@ -106,10 +122,9 @@ class Vehicle {
   }
 
   private float getRotationToward(float current, float target, float factor) {
-    float originalDelta = target - current;
+    float delta = target - current;
     float result;
 
-    float delta = originalDelta;
     if (abs(delta) > PI) {
       if (delta > 0) {
         delta = -2 * PI + delta;
@@ -157,6 +172,12 @@ class Vehicle {
   float getAngleTo(Vehicle v) {
     float dx = _x - v.x();
     float dy = _y - v.y();
+    return normalizeAngle(atan2(dy, dx));
+  }
+
+  float getAngleTo(Attractor a) {
+    float dx = _x - a.x();
+    float dy = _y - a.y();
     return normalizeAngle(atan2(dy, dx));
   }
 }

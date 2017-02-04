@@ -141,10 +141,41 @@ class World {
   }
 
   World step() {
+    calculateNearestAttractors();
     calculateNeighborhoods();
     stepVehicles();
     updateVehicles();
     return this;
+  }
+
+  private void calculateNearestAttractors() {
+    for (int i = 0; i < _vehicles.size(); i++) {
+      Vehicle vehicle = _vehicles.get(i);
+      vehicle.nearestAttractor(getNearestAttractor(vehicle));
+    }
+  }
+
+  private Attractor getNearestAttractor(Vehicle vehicle) {
+    float nearestDist = Float.MAX_VALUE;
+    Attractor nearestAttractor = null;
+
+    for (int i = 0; i < _attractors.size(); i++) {
+      Attractor attractor = _attractors.get(i);
+      float dist = distanceBetween(vehicle, attractor);
+
+      if (dist < nearestDist) {
+        nearestDist = dist;
+        nearestAttractor = attractor;
+      }
+    }
+
+    return nearestAttractor;
+  }
+
+  private float distanceBetween(Vehicle v, Attractor a) {
+    float dx = v.x() - a.x();
+    float dy = v.y() - a.y();
+    return sqrt(dx * dx + dy * dy);
   }
 
   private void calculateNeighborhoods() {

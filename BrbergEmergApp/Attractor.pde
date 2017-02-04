@@ -4,6 +4,9 @@ class Attractor {
   private float _y;
   private float _radius;
 
+  Attractor() {
+  }
+
   Attractor(float x, float y, float radius) {
     _x = x;
     _y = y;
@@ -42,5 +45,12 @@ class Attractor {
     float dy = _y - a.y();
     float r = _radius + a.radius();
     return dx * dx + dy * dy < r * r;
+  }
+
+  public Attractor clone() {
+    return new Attractor()
+      .x(_x)
+      .y(_y)
+      .radius(_radius);
   }
 }

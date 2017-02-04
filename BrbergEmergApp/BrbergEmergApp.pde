@@ -53,25 +53,26 @@ void redraw() {
     colorMode(HSB);
     tint(vehicle.rotation() * 255 / (2 * PI), 128, 255);
 
-    pushMatrix();
-    translate(vehicle.x(), vehicle.y());
-    rotate(vehicle.rotation());
-    imageMode(CENTER);
-    image(chargeImage, 0, 0);
-    popMatrix();
-/*
-    strokeWeight(2);
-    stroke(255);
-    line(vehicle.x(), vehicle.y(),
-        vehicle.x() + 20 * cos(vehicle.rotation()),
-        vehicle.y() + 20 * sin(vehicle.rotation()));
+    if (false) {
+      pushMatrix();
+      translate(vehicle.x(), vehicle.y());
+      rotate(vehicle.rotation());
+      imageMode(CENTER);
+      image(chargeImage, 0, 0);
+      popMatrix();
+    } else {
+      strokeWeight(2);
+      stroke(255);
+      line(vehicle.x(), vehicle.y(),
+          vehicle.x() + 20 * cos(vehicle.rotation()),
+          vehicle.y() + 20 * sin(vehicle.rotation()));
 
-    strokeWeight(1);
-    stroke(64);
-    noFill();
-    ellipseMode(CENTER);
-    ellipse(vehicle.x(), vehicle.y(), Vehicle.MIN_NEIGHBOR_DIST, Vehicle.MIN_NEIGHBOR_DIST);
-*/
+      //strokeWeight(1);
+      //stroke(64);
+      //noFill();
+      //ellipseMode(CENTER);
+      //ellipse(vehicle.x(), vehicle.y(), Vehicle.MIN_NEIGHBOR_DIST, Vehicle.MIN_NEIGHBOR_DIST);
+    }
   }
 
   world.step();
