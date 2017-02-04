@@ -1,7 +1,8 @@
 
 class World {
-  public static final int NEIGHBORHOOD_RADIUS = 30;
+  public static final int NEIGHBORHOOD_RADIUS = 40;
   public static final int MIN_DISTANCE = 10;
+  public static final int ATTRACTOR_VISIT_THRESHOLD = 10;
 
   private ArrayList<Attractor> _attractors;
   private ArrayList<Vehicle> _vehicles;
@@ -105,8 +106,9 @@ class World {
 
   World step() {
     calculateNeighborhoods();
-    stepVehicles();
     prepVehicles();
+    stepVehicles();
+    updateAttractorVisits();
     return this;
   }
 
@@ -132,6 +134,31 @@ class World {
   private void stepVehicles() {
     for (Vehicle vehicle : _vehicles) {
       vehicle.step();
+    }
+  }
+
+  private void updateAttractorVisits() {
+    for (Attractor attractor : _attractors) {
+      int numVisits = 0;
+      for (Vehicle vehicle : _vehicles) {
+        if (getDistanceBetween(attractor, vehicle) < attractor.radius()) {
+          numVisits++;
+        }
+      }
+
+      if (numVisits > ATTRACTOR_VISIT_THRESHOLD) {
+        attractor.age(0);
+        attractor.badgeCount(0);
+      } else {
+        if (attractor.age() > 100) {
+          if (random(1) < 0.004) {
+            attractor.badgeCount(attractor.badgeCount() + 1);
+          }
+        } else if (attractor.age() == 100) {
+          attractor.badgeCount(attractor.badgeCount() + 1);
+        }
+        attractor.step();
+      }
     }
   }
 }

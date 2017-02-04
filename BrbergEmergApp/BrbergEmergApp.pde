@@ -6,6 +6,8 @@ boolean isDebugMode;
 
 PImage backgroundImage;
 ArrayList<PImage> appIcons;
+ArrayList<Integer> appIconBadgeCounts;
+PFont badgeFont;
 
 FileNamer animationFolderNamer, fileNamer;
 
@@ -14,13 +16,19 @@ void setup() {
 
   world = new World(width, height);
   isPaused = false;
-  isDebugMode = true;
+  isDebugMode = false;
 
   animationFolderNamer = new FileNamer("output/anim", "/");
   fileNamer = new FileNamer("output/export", "png");
 
   backgroundImage = loadImage("attention/background.png");
   appIcons = getAppIcons();
+  appIconBadgeCounts = new ArrayList<Integer>();
+  for (int i = 0; i < appIcons.size(); i++) {
+    appIconBadgeCounts.add(0);
+  }
+
+  badgeFont = loadFont("HelveticaNeue-Bold-16.vlw");
 
   reset();
 }
@@ -89,12 +97,6 @@ void drawVehicles() {
 }
 
 void drawDebugVehicle(Vehicle vehicle) {
-  stroke(32);
-  strokeWeight(1);
-  line(vehicle.x(), vehicle.y(),
-      vehicle.nearestAttractor().x(),
-      vehicle.nearestAttractor().y());
-
   stroke(255);
   strokeWeight(2);
   line(vehicle.x(), vehicle.y(),
@@ -123,6 +125,18 @@ void drawAppIcons() {
 
       imageMode(CENTER);
       image(appIcons.get(i % appIcons.size()), attractor.x(), attractor.y(), 48, 48);
+
+      int badgeCount = attractor.badgeCount();
+      if (badgeCount > 0) {
+        noStroke();
+        fill(253, 39, 5);
+        ellipseMode(CENTER);
+        ellipse(attractor.x() + 22, attractor.y() - 20, 22, 22);
+
+        fill(255);
+        textFont(badgeFont);
+        text(badgeCount, attractor.x() + 18, attractor.y() - 14);
+      }
     }
   }
 }
