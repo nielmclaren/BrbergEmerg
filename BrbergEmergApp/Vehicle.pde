@@ -1,5 +1,5 @@
 
-class Vehicle {
+class Vehicle implements IPositioned {
   private float _prevX;
   private float _prevY;
   private float _x;
@@ -109,7 +109,7 @@ class Vehicle {
 
   Vehicle step() {
     if (_nearestAttractor != null) {
-      float attractorDirection = getAngleTo(_nearestAttractor);
+      float attractorDirection = getAngleTo(this, _nearestAttractor);
       _rotation = getRotationToward(_rotation, attractorDirection, -0.02);
     }
 
@@ -137,13 +137,6 @@ class Vehicle {
     return normalizeAngle(result);
   }
 
-  private float normalizeAngle(float v) {
-    while (v < 0) {
-      v += 2 * PI;
-    }
-    return v % (2 * PI);
-  }
-
   Vehicle update() {
     _prevX = _x;
     _prevY = _y;
@@ -161,23 +154,5 @@ class Vehicle {
     float dx = _x - x;
     float dy = _y - y;
     return dx * dx + dy * dy < _vehicleSizeSq / 4;
-  }
-
-  float getDistanceTo(Vehicle v) {
-    float dx = _x - v.x();
-    float dy = _y - v.y();
-    return sqrt(dx * dx + dy * dy);
-  }
-
-  float getAngleTo(Vehicle v) {
-    float dx = _x - v.x();
-    float dy = _y - v.y();
-    return normalizeAngle(atan2(dy, dx));
-  }
-
-  float getAngleTo(Attractor a) {
-    float dx = _x - a.x();
-    float dy = _y - a.y();
-    return normalizeAngle(atan2(dy, dx));
   }
 }

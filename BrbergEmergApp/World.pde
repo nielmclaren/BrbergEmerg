@@ -130,7 +130,7 @@ class World {
     for (int i = 0; i < vehicles.size(); i++) {
       Vehicle v = vehicles.get(i);
 
-      float dist = v.getDistanceTo(v);
+      float dist = distanceBetween(vehicle, v);
       if (dist < nearestDist) {
         nearestVehicle = v;
         nearestDist = dist;
@@ -170,12 +170,6 @@ class World {
     }
 
     return nearestAttractor;
-  }
-
-  private float distanceBetween(Vehicle v, Attractor a) {
-    float dx = v.x() - a.x();
-    float dy = v.y() - a.y();
-    return sqrt(dx * dx + dy * dy);
   }
 
   private void calculateNeighborhoods() {

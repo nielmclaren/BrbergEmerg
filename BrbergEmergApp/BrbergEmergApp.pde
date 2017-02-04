@@ -96,3 +96,24 @@ void keyReleased() {
   }
 }
 
+
+
+float distanceBetween(IPositioned a, IPositioned b) {
+  float dx = b.x() - a.x();
+  float dy = b.y() - a.y();
+  return sqrt(dx * dx + dy * dy);
+}
+
+float getAngleTo(IPositioned a, IPositioned b) {
+  float dx = a.x() - b.x();
+  float dy = a.y() - b.y();
+  return normalizeAngle(atan2(dy, dx));
+}
+
+float normalizeAngle(float v) {
+  while (v < 0) {
+    v += 2 * PI;
+  }
+  return v % (2 * PI);
+}
+
