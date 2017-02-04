@@ -1,6 +1,6 @@
 
 class World {
-  public static final int NEIGHBORHOOD_RADIUS = 100;
+  public static final int NEIGHBORHOOD_RADIUS = 30;
   public static final int MIN_DISTANCE = 10;
 
   private ArrayList<Attractor> _attractors;
