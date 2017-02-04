@@ -144,7 +144,7 @@ class World {
     calculateNearestAttractors();
     calculateNeighborhoods();
     stepVehicles();
-    updateVehicles();
+    prepVehicles();
     return this;
   }
 
@@ -180,17 +180,17 @@ class World {
     }
   }
 
+  private void prepVehicles() {
+    for (int i = 0; i < _vehicles.size(); i++) {
+      Vehicle vehicle = _vehicles.get(i);
+      vehicle.prep();
+    }
+  }
+
   private void stepVehicles() {
     for (int i = 0; i < _vehicles.size(); i++) {
       Vehicle vehicle = _vehicles.get(i);
       vehicle.step();
-    }
-  }
-
-  private void updateVehicles() {
-    for (int i = 0; i < _vehicles.size(); i++) {
-      Vehicle vehicle = _vehicles.get(i);
-      vehicle.update();
     }
   }
 }

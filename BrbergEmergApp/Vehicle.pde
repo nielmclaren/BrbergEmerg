@@ -1,47 +1,29 @@
 
 class Vehicle implements IPositioned {
-  private float _prevX;
-  private float _prevY;
   private float _x;
   private float _y;
+  private float _nextX;
+  private float _nextY;
   private float _velocity;
-  private float _prevRotation;
   private float _rotation;
+  private float _nextRotation;
   private Neighborhood _neighborhood;
   private Attractor _nearestAttractor;
 
   private float _vehicleSizeSq;
 
   Vehicle(float x, float y, float rotation) {
-    _prevX = x;
-    _prevY = y;
     _x = x;
     _y = y;
-    _prevRotation = rotation;
+    _nextX = x;
+    _nextY = y;
     _rotation = rotation;
+    _nextRotation = rotation;
     _velocity = 3;
     _neighborhood = new Neighborhood();
     _nearestAttractor = null;
 
     _vehicleSizeSq = 20 * 20;
-  }
-
-  float prevX() {
-    return _prevX;
-  }
-
-  Vehicle prevX(float v) {
-    _prevX = v;
-    return this;
-  }
-
-  float prevY() {
-    return _prevY;
-  }
-
-  Vehicle prevY(float v) {
-    _prevY = v;
-    return this;
   }
 
   float x() {
@@ -62,12 +44,21 @@ class Vehicle implements IPositioned {
     return this;
   }
 
-  float prevRotation() {
-    return _prevRotation;
+  float nextX() {
+    return _nextX;
   }
 
-  Vehicle prevRotation(float v) {
-    _prevRotation = v;
+  Vehicle nextX(float v) {
+    _nextX = v;
+    return this;
+  }
+
+  float nextY() {
+    return _nextY;
+  }
+
+  Vehicle nextY(float v) {
+    _nextY = v;
     return this;
   }
 
@@ -77,6 +68,15 @@ class Vehicle implements IPositioned {
 
   Vehicle rotation(float v) {
     _rotation = v;
+    return this;
+  }
+
+  float nextRotation() {
+    return _nextRotation;
+  }
+
+  Vehicle nextRotation(float v) {
+    _nextRotation = v;
     return this;
   }
 
@@ -107,17 +107,20 @@ class Vehicle implements IPositioned {
     return this;
   }
 
-  Vehicle step() {
+  Vehicle prep() {
+    float averageAngleFrom = _neighborhood.getAverageAngleFrom(this);
+
     if (_nearestAttractor != null) {
       float attractorDirection = getAngleTo(this, _nearestAttractor);
       _rotation = getRotationToward(_rotation, attractorDirection, -0.02);
     }
 
-    float neighborhoodRotation = _neighborhood.getAveragePrevRotation();
-    _rotation = getRotationToward(_rotation, neighborhoodRotation, 0.1);
+    float neighborhoodRotation = _neighborhood.getAverageRotation();
+    _nextRotation = getRotationToward(_rotation, neighborhoodRotation, 0.1);
 
-    _x += _velocity * cos(_rotation);
-    _y += _velocity * sin(_rotation);
+    _nextX += _velocity * cos(_nextRotation);
+    _nextY += _velocity * sin(_nextRotation);
+
     return this;
   }
 
@@ -137,10 +140,10 @@ class Vehicle implements IPositioned {
     return normalizeAngle(result);
   }
 
-  Vehicle update() {
-    _prevX = _x;
-    _prevY = _y;
-    _prevRotation = _rotation;
+  Vehicle step() {
+    _x = _nextX;
+    _y = _nextY;
+    _rotation = _nextRotation;
     return this;
   }
 

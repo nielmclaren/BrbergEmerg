@@ -26,20 +26,16 @@ class Neighborhood {
     return this;
   }
 
-  float getAveragePrevRotation() {
+  float getAverageRotation() {
     if (_vehicles.size() <= 0) {
       return 0;
     }
 
     float sum = 0;
     for (int i = 0; i < _vehicles.size(); i++) {
-      sum += _vehicles.get(i).prevRotation();
+      sum += _vehicles.get(i).rotation();
     }
 
-    float result = sum / _vehicles.size();
-    while (result < 0) {
-      result += 2 * PI;
-    }
-    return result % (2 * PI);
+    return normalizeAngle(sum / _vehicles.size());
   }
 }
