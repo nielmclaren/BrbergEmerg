@@ -34,29 +34,32 @@ void draw() {
 void redraw() {
   background(0);
 
-  ArrayList<Attractor> attractors = world.attractorsRef();
-  for (int i = 0; i < attractors.size(); i++) {
-    Attractor attractor = attractors.get(i);
+  if (false) {
+    ArrayList<Attractor> attractors = world.attractorsRef();
+    for (int i = 0; i < attractors.size(); i++) {
+      Attractor attractor = attractors.get(i);
 
-    colorMode(RGB);
-    stroke(64);
-    fill(16);
-    ellipseMode(RADIUS);
-    ellipse(attractor.x(), attractor.y(), attractor.radius(), attractor.radius());
+      colorMode(RGB);
+      stroke(64);
+      fill(16);
+      ellipseMode(RADIUS);
+      ellipse(attractor.x(), attractor.y(), attractor.radius(), attractor.radius());
+    }
   }
 
   ArrayList<Vehicle> vehicles = world.vehiclesRef();
 
+  blendMode(LIGHTEST);
   for (int i = 0; i < vehicles.size(); i++) {
     Vehicle vehicle = vehicles.get(i);
 
     colorMode(HSB);
     tint(vehicle.rotation() * 255 / (2 * PI), 128, 255);
 
-    if (false) {
+    if (true) {
       pushMatrix();
       translate(vehicle.x(), vehicle.y());
-      rotate(vehicle.rotation());
+      rotate(vehicle.rotation() + 80 * PI / 180);
       imageMode(CENTER);
       image(chargeImage, 0, 0);
       popMatrix();
