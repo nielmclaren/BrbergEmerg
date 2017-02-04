@@ -112,7 +112,7 @@ class World {
       }
     }
     return new Neighborhood()
-      .nearestVehicle(getNearestVehicle(vehicles, vehicle))
+      .nearestVehicle((Vehicle)getNearestTo(vehicles, vehicle))
       .vehiclesRef(neighborhoodVehicles);
   }
 
@@ -121,23 +121,6 @@ class World {
     float dy = b.y() - a.y();
     float dSq = dx * dx + dy * dy;
     return dSq < _neighborhoodSizeSq;
-  }
-
-  private Vehicle getNearestVehicle(ArrayList<Vehicle> vehicles, Vehicle vehicle) {
-    float nearestDist = Float.MAX_VALUE;
-    Vehicle nearestVehicle = null;
-
-    for (int i = 0; i < vehicles.size(); i++) {
-      Vehicle v = vehicles.get(i);
-
-      float dist = distanceBetween(vehicle, v);
-      if (dist < nearestDist) {
-        nearestVehicle = v;
-        nearestDist = dist;
-      }
-    }
-
-    return nearestVehicle;
   }
 
   World step() {
@@ -151,25 +134,8 @@ class World {
   private void calculateNearestAttractors() {
     for (int i = 0; i < _vehicles.size(); i++) {
       Vehicle vehicle = _vehicles.get(i);
-      vehicle.nearestAttractor(getNearestAttractor(vehicle));
+      vehicle.nearestAttractor((Attractor)getNearestTo(_attractors, vehicle));
     }
-  }
-
-  private Attractor getNearestAttractor(Vehicle vehicle) {
-    float nearestDist = Float.MAX_VALUE;
-    Attractor nearestAttractor = null;
-
-    for (int i = 0; i < _attractors.size(); i++) {
-      Attractor attractor = _attractors.get(i);
-      float dist = distanceBetween(vehicle, attractor);
-
-      if (dist < nearestDist) {
-        nearestDist = dist;
-        nearestAttractor = attractor;
-      }
-    }
-
-    return nearestAttractor;
   }
 
   private void calculateNeighborhoods() {

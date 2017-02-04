@@ -96,7 +96,22 @@ void keyReleased() {
   }
 }
 
+IPositioned getNearestTo(ArrayList<? extends IPositioned> items, IPositioned target) {
+  float nearestDist = Float.MAX_VALUE;
+  IPositioned nearest = null;
 
+  for (int i = 0; i < items.size(); i++) {
+    IPositioned item = items.get(i);
+    float dist = distanceBetween(item, target);
+
+    if (dist < nearestDist) {
+      nearestDist = dist;
+      nearest = item;
+    }
+  }
+
+  return nearest;
+}
 
 float distanceBetween(IPositioned a, IPositioned b) {
   float dx = b.x() - a.x();
