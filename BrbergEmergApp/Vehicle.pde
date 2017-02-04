@@ -111,22 +111,15 @@ class Vehicle implements IPositioned {
   }
 
   Vehicle prep() {
-    ArrayList<Vehicle> tooCloseVehicles = _neighborhood.getTooCloseVehicles(this);
-    if (tooCloseVehicles.size() > 0) {
-      PVector averagePos = getAveragePosition(tooCloseVehicles);
-      float tooCloseDirection = getAngleTo(this, averagePos);
-      _nextRotation = getScaledRotationToward(_rotation, tooCloseDirection, -0.1, 0.02);
-    } else {
-      Vehicle nearestVehicle = _neighborhood.getNearestVehicle(this);
-      if (nearestVehicle != null && getDistanceBetween(this, nearestVehicle) > MAX_DISTANCE) {
-        float tooFarDirection = getAngleTo(this, nearestVehicle);
-        _nextRotation = getScaledRotationToward(_rotation, tooFarDirection, 0.1, 0.02);
-      } else if (_neighborhood.vehiclesRef().size() > 0) {
-        float neighborhoodRotation = _neighborhood.getAverageRotation();
-        _nextRotation = getScaledRotationToward(_rotation, neighborhoodRotation, -0.1, 0.01);
-      }
-    }
+    float separation = getSeparationRotationDelta();
+    float alignment = getAlignmentRotationDelta();
+    float cohesion = getCohesionRotationDelta();
 
+    separation *= 1;
+    alignment *= 1;
+    cohesion *= 1;
+
+    _nextRotation = normalizeAngle(_rotation + separation + alignment + cohesion);
 
     _nextX += _velocity * cos(_nextRotation);
     _nextY += _velocity * sin(_nextRotation);
@@ -134,12 +127,42 @@ class Vehicle implements IPositioned {
     return this;
   }
 
-  private float getScaledRotationToward(float current, float target, float factor) {
-    return getRotationToward(current, target, factor * _velocity, 0);
+  // Steer away from vehicles that are too close.
+  private float getSeparationRotationDelta() {
+    ArrayList<Vehicle> tooCloseVehicles = _neighborhood.getTooCloseVehicles(this);
+    if (tooCloseVehicles.size() > 0) {
+      PVector averagePos = getAveragePosition(tooCloseVehicles);
+      float tooCloseDirection = getAngleTo(this, averagePos);
+      return getScaledRotationDeltaToward(_rotation, tooCloseDirection, -0.1, 0.02);
+    }
+    return 0;
   }
 
-  private float getScaledRotationToward(float current, float target, float factor, float maxDelta) {
-    return getRotationToward(current, target, factor * _velocity, maxDelta * _velocity);
+  // Steer toward the average direction that nearby vehicles are going.
+  private float getAlignmentRotationDelta() {
+    if (_neighborhood.vehiclesRef().size() > 0) {
+      float neighborhoodRotation = _neighborhood.getAverageRotation();
+      return getScaledRotationDeltaToward(_rotation, neighborhoodRotation, -0.1, 0.02);
+    }
+    return 0;
+  }
+
+  // Steer toward the average position of nearby vehicles.
+  private float getCohesionRotationDelta() {
+    if (_neighborhood.vehiclesRef().size() > 0) {
+      PVector averagePos = getAveragePosition(_neighborhood.vehiclesRef());
+      float neighborsDirection = getAngleTo(this, averagePos);
+      return getScaledRotationDeltaToward(_rotation, neighborsDirection, 0.1, 0.02);
+    }
+    return 0;
+  }
+
+  private float getScaledRotationDeltaToward(float current, float target, float factor) {
+    return getRotationDeltaToward(current, target, factor * _velocity, 0);
+  }
+
+  private float getScaledRotationDeltaToward(float current, float target, float factor, float maxDelta) {
+    return getRotationDeltaToward(current, target, factor * _velocity, maxDelta * _velocity);
   }
 
   Vehicle step() {

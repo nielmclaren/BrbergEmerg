@@ -188,6 +188,10 @@ float getRotationToward(float current, float target, float factor) {
 }
 
 float getRotationToward(float current, float target, float factor, float maxDelta) {
+  return normalizeAngle(current + getRotationDeltaToward(current, target, factor, maxDelta));
+}
+
+float getRotationDeltaToward(float current, float target, float factor, float maxDelta) {
   float delta = target - current;
   float result;
 
@@ -199,12 +203,10 @@ float getRotationToward(float current, float target, float factor, float maxDelt
     }
   }
   delta = delta * factor;
-  if (maxDelta > 0) {
+  if (maxDelta != 0) {
     delta = constrain(delta, -maxDelta, maxDelta);
   }
-  result = current - delta;
-
-  return normalizeAngle(result);
+  return -delta;
 }
 
 float normalizeAngle(float v) {

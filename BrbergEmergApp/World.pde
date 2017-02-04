@@ -1,6 +1,6 @@
 
 class World {
-  public static final int NEIGHBORHOOD_RADIUS = 200;
+  public static final int NEIGHBORHOOD_RADIUS = 100;
 
   private ArrayList<Attractor> _attractors;
   private ArrayList<Vehicle> _vehicles;
@@ -74,9 +74,9 @@ class World {
   World setupVehicles(int numVehicles) {
     for (int i = 0; i < numVehicles; i++) {
       Vehicle vehicle = new Vehicle(
-          random(width),
-          random(height),
-          random(2 * PI));
+          width/2 + random(100),
+          height/2 + random(100),
+          random(PI));
 
       _vehicles.add(vehicle);
     }
