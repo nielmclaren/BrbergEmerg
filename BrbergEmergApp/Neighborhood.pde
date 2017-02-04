@@ -42,7 +42,7 @@ class Neighborhood {
   ArrayList<Vehicle> getTooCloseVehicles(Vehicle vehicle) {
     ArrayList<Vehicle> result = new ArrayList<Vehicle>();
     for (Vehicle v : _vehicles) {
-      if (getDistanceBetween(vehicle, v) < Vehicle.MIN_DISTANCE) {
+      if (getDistanceBetween(vehicle, v) < World.MIN_DISTANCE) {
         result.add(v);
       }
     }

@@ -1,8 +1,5 @@
 
 class Vehicle implements IPositioned {
-  public static final float MIN_DISTANCE = 30;
-  public static final float MAX_DISTANCE = 60;
-
   private float _x;
   private float _y;
   private float _nextX;
@@ -111,20 +108,32 @@ class Vehicle implements IPositioned {
   }
 
   Vehicle prep() {
+    float attraction = getAttractionRotationDelta();
     float separation = getSeparationRotationDelta();
     float alignment = getAlignmentRotationDelta();
     float cohesion = getCohesionRotationDelta();
 
+    attraction *= 1;
     separation *= 1;
     alignment *= 1;
     cohesion *= 1;
 
-    _nextRotation = normalizeAngle(_rotation + separation + alignment + cohesion);
+    _nextRotation = normalizeAngle(_rotation + attraction + separation + alignment + cohesion);
 
     _nextX += _velocity * cos(_nextRotation);
     _nextY += _velocity * sin(_nextRotation);
 
     return this;
+  }
+
+  // Steer toward attractors.
+  private float getAttractionRotationDelta() {
+    //float dist = getDistanceBetween(this, _nearestAttractor);
+    if (_nearestAttractor != null) {
+      float attractorAngle = getAngleTo(this, _nearestAttractor);
+      return getScaledRotationDeltaToward(_rotation, attractorAngle, 0.1, 0.02);
+    }
+    return 0;
   }
 
   // Steer away from vehicles that are too close.
@@ -169,11 +178,6 @@ class Vehicle implements IPositioned {
     _x = _nextX;
     _y = _nextY;
     _rotation = _nextRotation;
-
-    while (_x < 0) _x += width;
-    while (_x > width) _x -= width;
-    while (_y < 0) _y += height;
-    while (_y > height) _y -= height;
     return this;
   }
 

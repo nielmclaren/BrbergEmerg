@@ -1,6 +1,7 @@
 
 class World {
   public static final int NEIGHBORHOOD_RADIUS = 100;
+  public static final int MIN_DISTANCE = 10;
 
   private ArrayList<Attractor> _attractors;
   private ArrayList<Vehicle> _vehicles;
@@ -47,7 +48,10 @@ class World {
     int maxAttempts = 100000;
 
     while (_attractors.size() < numAttractors && numAttempts < maxAttempts) {
-      Attractor attractor = new Attractor(random(width), random(height), 150);
+      Attractor attractor = new Attractor(
+          random(width*0.2, width*0.8),
+          random(height*0.2, height*0.8),
+          50);
 
       if (hasAttractorCollision(attractor)) {
         numAttempts++;
@@ -74,8 +78,8 @@ class World {
   World setupVehicles(int numVehicles) {
     for (int i = 0; i < numVehicles; i++) {
       Vehicle vehicle = new Vehicle(
-          width/2 + random(100),
-          height/2 + random(100),
+          random(width),
+          random(height),
           random(PI));
 
       _vehicles.add(vehicle);
@@ -110,14 +114,13 @@ class World {
   }
 
   World step() {
-    calculateNearestAttractors();
     calculateNeighborhoods();
     stepVehicles();
     prepVehicles();
     return this;
   }
 
-  private void calculateNearestAttractors() {
+  void calculateNearestAttractors() {
     for (Vehicle vehicle : _vehicles) {
       vehicle.nearestAttractor((Attractor)getNearestTo(_attractors, vehicle));
     }

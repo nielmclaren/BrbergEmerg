@@ -24,7 +24,7 @@ void reset() {
   world.clearVehicles();
   world.setupAttractors(5);
   world.setupVehicles(100);
-  world.calculateNeighborhoods();
+  world.calculateNearestAttractors();
 }
 
 void draw() {
@@ -71,8 +71,14 @@ void drawDebugVehicle(Vehicle vehicle) {
   stroke(255);
   strokeWeight(2);
   line(vehicle.x(), vehicle.y(),
-      vehicle.x() + 10 * cos(vehicle.rotation()),
-      vehicle.y() + 10 * sin(vehicle.rotation()));
+      vehicle.x() + 5 * cos(vehicle.rotation()),
+      vehicle.y() + 5 * sin(vehicle.rotation()));
+
+  stroke(32);
+  strokeWeight(1);
+  line(vehicle.x(), vehicle.y(),
+      vehicle.nearestAttractor().x(),
+      vehicle.nearestAttractor().y());
 }
 
 void drawVehicle(Vehicle vehicle) {
