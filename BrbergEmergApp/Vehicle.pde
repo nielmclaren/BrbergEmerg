@@ -108,8 +108,6 @@ class Vehicle implements IPositioned {
   }
 
   Vehicle prep() {
-    float averageAngleFrom = _neighborhood.getAverageAngleFrom(this);
-
     if (_nearestAttractor != null) {
       float attractorDirection = getAngleTo(this, _nearestAttractor);
       _rotation = getRotationToward(_rotation, attractorDirection, -0.02);
