@@ -2,7 +2,6 @@
 class World {
   public static final int NEIGHBORHOOD_RADIUS = 40;
   public static final int MIN_DISTANCE = 10;
-  public static final int ATTRACTOR_VISIT_THRESHOLD = 10;
 
   private ArrayList<Attractor> _attractors;
   private ArrayList<Vehicle> _vehicles;
@@ -45,15 +44,25 @@ class World {
   }
 
   World setupAttractors(int numAttractors) {
-    int size = 50;
-    _attractors.add(new Attractor(321, 234, size));
-    _attractors.add(new Attractor(455, 341, size));
-    _attractors.add(new Attractor(125, 502, size));
-    _attractors.add(new Attractor(380, 543, size));
-    _attractors.add(new Attractor(436, 725, size));
-    _attractors.add(new Attractor(724, 609, size));
-    _attractors.add(new Attractor(673, 486, size));
+    int numAttempts = 0;
+    int maxAttempts = 100000;
 
+    while (_attractors.size() < numAttractors && numAttempts < maxAttempts) {
+      Attractor attractor = new Attractor(
+          random(width*0.2, width*0.8),
+          random(height*0.2, height*0.8),
+          50);
+
+      if (hasAttractorCollision(attractor)) {
+        numAttempts++;
+        continue;
+      }
+
+      _attractors.add(attractor);
+      numAttempts = 0;
+    }
+
+    println("Resulting number of attractors: " + _attractors.size());
     return this;
   }
 
@@ -108,13 +117,13 @@ class World {
     calculateNeighborhoods();
     prepVehicles();
     stepVehicles();
-    updateAttractorVisits();
     return this;
   }
 
   void calculateNearestAttractors() {
     for (Vehicle vehicle : _vehicles) {
-      vehicle.nearestAttractor((Attractor)getNearestTo(_attractors, vehicle));
+      Attractor attractor = (Attractor)getNearestTo(_attractors, vehicle);
+      vehicle.attractor(attractor);
     }
   }
 
@@ -134,31 +143,6 @@ class World {
   private void stepVehicles() {
     for (Vehicle vehicle : _vehicles) {
       vehicle.step();
-    }
-  }
-
-  private void updateAttractorVisits() {
-    for (Attractor attractor : _attractors) {
-      int numVisits = 0;
-      for (Vehicle vehicle : _vehicles) {
-        if (getDistanceBetween(attractor, vehicle) < attractor.radius()) {
-          numVisits++;
-        }
-      }
-
-      if (numVisits > ATTRACTOR_VISIT_THRESHOLD) {
-        attractor.age(0);
-        attractor.badgeCount(0);
-      } else {
-        if (attractor.age() > 100) {
-          if (random(1) < 0.004) {
-            attractor.badgeCount(attractor.badgeCount() + 1);
-          }
-        } else if (attractor.age() == 100) {
-          attractor.badgeCount(attractor.badgeCount() + 1);
-        }
-        attractor.step();
-      }
     }
   }
 }

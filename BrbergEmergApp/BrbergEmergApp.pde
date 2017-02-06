@@ -4,11 +4,6 @@ World world;
 boolean isPaused;
 boolean isDebugMode;
 
-PImage backgroundImage;
-ArrayList<PImage> appIcons;
-ArrayList<Integer> appIconBadgeCounts;
-PFont badgeFont;
-
 FileNamer animationFolderNamer, fileNamer;
 
 void setup() {
@@ -16,39 +11,18 @@ void setup() {
 
   world = new World(width, height);
   isPaused = false;
-  isDebugMode = false;
+  isDebugMode = true;
 
   animationFolderNamer = new FileNamer("output/anim", "/");
   fileNamer = new FileNamer("output/export", "png");
 
-  backgroundImage = loadImage("attention/background.png");
-  appIcons = getAppIcons();
-  appIconBadgeCounts = new ArrayList<Integer>();
-  for (int i = 0; i < appIcons.size(); i++) {
-    appIconBadgeCounts.add(0);
-  }
-
-  badgeFont = loadFont("HelveticaNeue-Bold-16.vlw");
-
   reset();
-}
-
-ArrayList<PImage> getAppIcons() {
-  ArrayList<PImage> result = new ArrayList<PImage>();
-  result.add(loadImage("attention/facebook-128.png"));
-  result.add(loadImage("attention/gmail-128.png"));
-  result.add(loadImage("attention/instagram-128.png"));
-  result.add(loadImage("attention/snapchat-128.png"));
-  result.add(loadImage("attention/tumblr-128.png"));
-  result.add(loadImage("attention/twitter-128.png"));
-  result.add(loadImage("attention/youtube-128.png"));
-  return result;
 }
 
 void reset() {
   world.clearAttractors();
   world.clearVehicles();
-  world.setupAttractors(appIcons.size());
+  world.setupAttractors(7);
   world.setupVehicles(500);
   world.calculateNearestAttractors();
 }
@@ -63,12 +37,8 @@ void draw() {
 void redraw() {
   background(0);
 
-  imageMode(CORNER);
-  image(backgroundImage, 0, 0);
-
   drawAttractors();
   drawVehicles();
-  drawAppIcons();
 }
 
 void drawAttractors() {
@@ -115,30 +85,6 @@ void drawVehicle(Vehicle vehicle) {
   fill(255);
   ellipseMode(CENTER);
   ellipse(vehicle.x(), vehicle.y(), 4, 4);
-}
-
-void drawAppIcons() {
-  if (!isDebugMode) {
-    ArrayList<Attractor> attractors = world.attractorsRef();
-    for (int i = 0; i < attractors.size(); i++) {
-      Attractor attractor = attractors.get(i);
-
-      imageMode(CENTER);
-      image(appIcons.get(i % appIcons.size()), attractor.x(), attractor.y(), 48, 48);
-
-      int badgeCount = attractor.badgeCount();
-      if (badgeCount > 0) {
-        noStroke();
-        fill(253, 39, 5);
-        ellipseMode(CENTER);
-        ellipse(attractor.x() + 22, attractor.y() - 20, 22, 22);
-
-        fill(255);
-        textFont(badgeFont);
-        text(badgeCount, attractor.x() + 18, attractor.y() - 14);
-      }
-    }
-  }
 }
 
 void keyReleased() {
