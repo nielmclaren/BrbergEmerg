@@ -49,6 +49,7 @@ class World {
 
     while (_attractors.size() < numAttractors && numAttempts < maxAttempts) {
       Attractor attractor = new Attractor(
+          _attractors.size(),
           random(width*0.2, width*0.8),
           random(height*0.2, height*0.8),
           50);
@@ -124,6 +125,7 @@ class World {
     for (Vehicle vehicle : _vehicles) {
       Attractor attractor = (Attractor)getNearestTo(_attractors, vehicle);
       vehicle.attractor(attractor);
+      vehicle.groupId(attractor.id());
     }
   }
 

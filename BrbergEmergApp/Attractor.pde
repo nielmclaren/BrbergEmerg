@@ -1,13 +1,24 @@
 
 class Attractor implements IPositioned {
+  private int _id;
   private float _x;
   private float _y;
   private float _radius;
 
-  Attractor(float x, float y, float radius) {
+  Attractor(int id, float x, float y, float radius) {
+    _id = id;
     _x = x;
     _y = y;
     _radius = radius;
+  }
+
+  public int id() {
+    return _id;
+  }
+
+  public Attractor id(int v) {
+    _id = v;
+    return this;
   }
 
   public float x() {
@@ -45,6 +56,6 @@ class Attractor implements IPositioned {
   }
 
   public Attractor clone() {
-    return new Attractor(_x, _y, _radius);
+    return new Attractor(_id, _x, _y, _radius);
   }
 }

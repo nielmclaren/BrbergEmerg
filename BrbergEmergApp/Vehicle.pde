@@ -7,8 +7,11 @@ class Vehicle implements IPositioned {
   private float _velocity;
   private float _rotation;
   private float _nextRotation;
+
+  private int _groupId;
+
   private Neighborhood _neighborhood;
-  private Attractor _nearestAttractor;
+  private Attractor _attractor;
 
   private float _vehicleSizeSq;
 
@@ -20,8 +23,11 @@ class Vehicle implements IPositioned {
     _rotation = rotation;
     _nextRotation = rotation;
     _velocity = 3;
+
+    _groupId = -1;
+
     _neighborhood = new Neighborhood();
-    _nearestAttractor = null;
+    _attractor = null;
 
     _vehicleSizeSq = 20 * 20;
   }
@@ -89,6 +95,15 @@ class Vehicle implements IPositioned {
     return this;
   }
 
+  int groupId() {
+    return _groupId;
+  }
+
+  Vehicle groupId(int v) {
+    _groupId = v;
+    return this;
+  }
+
   Neighborhood neighborhoodRef() {
     return _neighborhood;
   }
@@ -98,12 +113,12 @@ class Vehicle implements IPositioned {
     return this;
   }
 
-  Attractor nearestAttractor() {
-    return _nearestAttractor.clone();
+  Attractor attractor() {
+    return _attractor.clone();
   }
 
-  Vehicle nearestAttractor(Attractor v) {
-    _nearestAttractor = v;
+  Vehicle attractor(Attractor v) {
+    _attractor = v;
     return this;
   }
 
@@ -128,9 +143,8 @@ class Vehicle implements IPositioned {
 
   // Steer toward attractors.
   private float getAttractionRotationDelta() {
-    //float dist = getDistanceBetween(this, _nearestAttractor);
-    if (_nearestAttractor != null) {
-      float attractorAngle = getAngleTo(this, _nearestAttractor);
+    if (_attractor != null) {
+      float attractorAngle = getAngleTo(this, _attractor);
       return getScaledRotationDeltaToward(_rotation, attractorAngle, 0.1, 0.02);
     }
     return 0;

@@ -4,6 +4,8 @@ World world;
 boolean isPaused;
 boolean isDebugMode;
 
+color[] vehicleColors;
+
 FileNamer animationFolderNamer, fileNamer;
 
 void setup() {
@@ -16,6 +18,15 @@ void setup() {
   animationFolderNamer = new FileNamer("output/anim", "/");
   fileNamer = new FileNamer("output/export", "png");
 
+  vehicleColors = new color[8];
+  vehicleColors[0] = color(0, 188, 157);
+  vehicleColors[1] = color(0, 203, 119);
+  vehicleColors[2] = color(0, 154, 217);
+  vehicleColors[3] = color(160, 90, 178);
+  vehicleColors[4] = color(44, 74, 93);
+  vehicleColors[5] = color(252, 194, 44);
+  vehicleColors[6] = color(246, 124, 40);
+  vehicleColors[7] = color(250, 73, 59);
   reset();
 }
 
@@ -75,14 +86,16 @@ void drawDebugVehicle(Vehicle vehicle) {
 }
 
 void drawVehicle(Vehicle vehicle) {
-  stroke(255);
+  int vehicleColor = vehicleColors[vehicle.groupId()];
+
+  stroke(vehicleColor);
   strokeWeight(2);
   line(vehicle.x(), vehicle.y(),
       vehicle.x() - 5 * cos(vehicle.rotation()),
       vehicle.y() - 5 * sin(vehicle.rotation()));
 
   noStroke();
-  fill(255);
+  fill(vehicleColor);
   ellipseMode(CENTER);
   ellipse(vehicle.x(), vehicle.y(), 4, 4);
 }
