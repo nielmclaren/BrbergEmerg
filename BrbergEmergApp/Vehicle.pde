@@ -138,6 +138,8 @@ class Vehicle implements IPositioned {
     _nextX += _velocity * cos(_nextRotation);
     _nextY += _velocity * sin(_nextRotation);
 
+    updateGroup();
+
     return this;
   }
 
@@ -186,6 +188,17 @@ class Vehicle implements IPositioned {
 
   private float getScaledRotationDeltaToward(float current, float target, float factor, float maxDelta) {
     return getRotationDeltaToward(current, target, factor * _velocity, maxDelta * _velocity);
+  }
+
+  private void updateGroup() {
+    if (random(1) < 0.1) {
+      int groupId = _neighborhood.getGroupStats().biggestGroupId();
+      if (groupId >= 0) {
+        _groupId = groupId;
+      } else {
+        _groupId = _attractor.id();
+      }
+    }
   }
 
   Vehicle step() {
