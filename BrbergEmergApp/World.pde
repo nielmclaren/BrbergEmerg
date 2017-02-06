@@ -106,7 +106,6 @@ class World {
       }
     }
     return new Neighborhood()
-      .nearestVehicle((Vehicle)getNearestTo(vehicles, vehicle))
       .vehiclesRef(neighborhoodVehicles);
   }
 
