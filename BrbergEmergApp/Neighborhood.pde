@@ -41,8 +41,9 @@ class Neighborhood {
   GroupStats getGroupStats() {
     HashMap<Integer, Integer> groupCounts = getGroupCounts();
 
-    GroupStats stats = new GroupStats();
-    stats.biggestGroupId(getBiggestGroupId(groupCounts));
+    GroupStats stats = new GroupStats()
+      .groupIds(new ArrayList(groupCounts.keySet()))
+      .biggestGroupId(getBiggestGroupId(groupCounts));
     return stats;
   }
 
