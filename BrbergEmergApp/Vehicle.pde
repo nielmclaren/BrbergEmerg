@@ -191,7 +191,7 @@ class Vehicle implements IPositioned {
   }
 
   private void updateGroup() {
-    if (random(1) < 0.1) {
+    if (random(1) < 0.01) {
       int groupId = _neighborhood.getGroupStats().biggestGroupId();
       if (groupId >= 0) {
         _groupId = groupId;

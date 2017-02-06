@@ -34,7 +34,7 @@ void reset() {
   world.clearAttractors();
   world.clearVehicles();
   world.setupAttractors(7);
-  world.setupVehicles(500);
+  world.setupVehicles(500, vehicleColors.length);
   world.calculateNearestAttractors();
 }
 

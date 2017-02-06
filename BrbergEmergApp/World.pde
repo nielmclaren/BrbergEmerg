@@ -76,12 +76,13 @@ class World {
     return false;
   }
 
-  World setupVehicles(int numVehicles) {
+  World setupVehicles(int numVehicles, int numGroups) {
     for (int i = 0; i < numVehicles; i++) {
       Vehicle vehicle = new Vehicle(
           random(width),
           random(height),
-          random(PI));
+          random(PI))
+        .groupId(floor(random(numGroups)));
 
       _vehicles.add(vehicle);
     }
@@ -124,7 +125,6 @@ class World {
     for (Vehicle vehicle : _vehicles) {
       Attractor attractor = (Attractor)getNearestTo(_attractors, vehicle);
       vehicle.attractor(attractor);
-      vehicle.groupId(attractor.id());
     }
   }
 
