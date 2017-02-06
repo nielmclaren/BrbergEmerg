@@ -46,7 +46,8 @@ void draw() {
 }
 
 void redraw() {
-  background(0);
+  fill(0, 3);
+  rect(0, 0, width, height);
 
   drawAttractors();
   drawVehicles();
@@ -104,6 +105,9 @@ void keyReleased() {
   switch (key) {
     case 'a':
       saveAnimation(100);
+      break;
+    case 'b':
+      background(0);
       break;
     case 'e':
       reset();
