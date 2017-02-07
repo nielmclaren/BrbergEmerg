@@ -1,9 +1,9 @@
 
-class DartboardAttractorPositioner implements IPositioner {
+class CenteredAttractorPositioner implements IPositioner {
   private World _world;
   private int _maxAttempts;
 
-  DartboardAttractorPositioner() {
+  CenteredAttractorPositioner() {
     _maxAttempts = 100000;
   }
 
@@ -11,7 +11,7 @@ class DartboardAttractorPositioner implements IPositioner {
     return _world;
   }
 
-  public DartboardAttractorPositioner world(World v) {
+  public CenteredAttractorPositioner world(World v) {
     _world = v;
     return this;
   }
@@ -20,43 +20,17 @@ class DartboardAttractorPositioner implements IPositioner {
     return _maxAttempts;
   }
 
-  public DartboardAttractorPositioner maxAttempts(int v) {
+  public CenteredAttractorPositioner maxAttempts(int v) {
     _maxAttempts = v;
     return this;
   }
 
   public boolean position(IPositioned target) {
-    int numAttempts = 0;
-    int maxAttempts = 100000;
-
-    float positionX;
-    float positionY;
-    float radius = ((Attractor)target).radius();
-
-    ArrayList<Attractor> attractors = _world.attractorsRef();
-    while (numAttempts < maxAttempts) {
-      positionX = random(width);
-      positionY = random(height);
-
-      if (hasAttractorCollision(positionX, positionY, radius)) {
-        numAttempts++;
-        continue;
-      } else {
-        target
-          .x(positionX)
-          .y(positionY);
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private boolean hasAttractorCollision(float x, float y, float radius) {
-    ArrayList<Attractor> attractors = _world.attractorsRef();
-    for (Attractor attractor : attractors) {
-      if (attractor.isColliding(x, y, radius)) {
-        return true;
-      }
+    if (_world.attractorsRef().size() <= 0) {
+      target
+        .x(_world.width() / 2)
+        .y(_world.height() / 2);
+      return true;
     }
     return false;
   }

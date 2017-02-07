@@ -112,6 +112,13 @@ class World {
     return getDistanceBetween(a, b) < NEIGHBORHOOD_RADIUS;
   }
 
+  World step(int numSteps) {
+    for (int i = 0; i < numSteps; i++) {
+      step();
+    }
+    return this;
+  }
+
   World step() {
     calculateNeighborhoods();
     prepVehicles();

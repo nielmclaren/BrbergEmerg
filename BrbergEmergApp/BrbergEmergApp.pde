@@ -6,7 +6,7 @@ boolean isDebugMode;
 
 color[] vehicleColors;
 
-DartboardAttractorPositioner attractorPositioner;
+CenteredAttractorPositioner attractorPositioner;
 
 FileNamer animationFolderNamer, fileNamer;
 
@@ -30,18 +30,25 @@ void setup() {
   vehicleColors[6] = color(246, 124, 40);
   vehicleColors[7] = color(250, 73, 59);
 
-  attractorPositioner = new DartboardAttractorPositioner()
+  attractorPositioner = new CenteredAttractorPositioner()
     .world(world);
 
   reset();
 }
 
 void reset() {
+  background(0);
+
   world.clearAttractors();
   world.clearVehicles();
   world.setupAttractors(attractorPositioner, 7);
   world.setupVehicles(1, vehicleColors.length);
   world.calculateNearestAttractors();
+
+  for (int i = 0; i < 5000; i++) {
+    world.step();
+    redraw();
+  }
 }
 
 void draw() {
@@ -52,9 +59,6 @@ void draw() {
 }
 
 void redraw() {
-  fill(0, 3);
-  rect(0, 0, width, height);
-
   drawAttractors();
   drawVehicles();
 }
