@@ -49,9 +49,13 @@ class Attractor implements IPositioned {
   }
 
   public boolean isColliding(Attractor a) {
-    float dx = _x - a.x();
-    float dy = _y - a.y();
-    float r = _radius + a.radius();
+    return isColliding(a.x(), a.y(), a.radius());
+  }
+
+  public boolean isColliding(float x, float y, float radius) {
+    float dx = _x - x;
+    float dy = _y - y;
+    float r = _radius + radius;
     return dx * dx + dy * dy < r * r;
   }
 

@@ -33,6 +33,24 @@ class World {
     return this;
   }
 
+  int width() {
+    return _width;
+  }
+
+  World width(int v) {
+    _width = v;
+    return this;
+  }
+
+  int height() {
+    return _height;
+  }
+
+  World height(int v) {
+    _height = v;
+    return this;
+  }
+
   World clearAttractors() {
     _attractors = new ArrayList<Attractor>();
     return this;
@@ -43,44 +61,24 @@ class World {
     return this;
   }
 
-  World setupAttractors(int numAttractors) {
-    int numAttempts = 0;
-    int maxAttempts = 100000;
-
-    while (_attractors.size() < numAttractors && numAttempts < maxAttempts) {
-      Attractor attractor = new Attractor(
-          _attractors.size(),
-          random(width*0.2, width*0.8),
-          random(height*0.2, height*0.8),
-          50);
-
-      if (hasAttractorCollision(attractor)) {
-        numAttempts++;
-        continue;
+  World setupAttractors(IPositioner positioner, int numAttractors) {
+    for (int i = 0; i < numAttractors; i++) {
+      Attractor attractor = new Attractor(i, 0, 0, 50);
+      if (positioner.position(attractor)) {
+        _attractors.add(attractor);
+      } else {
+        break;
       }
-
-      _attractors.add(attractor);
-      numAttempts = 0;
     }
-
     println("Resulting number of attractors: " + _attractors.size());
     return this;
-  }
-
-  private boolean hasAttractorCollision(Attractor attractor) {
-    for (Attractor a : _attractors) {
-      if (attractor.isColliding(a)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   World setupVehicles(int numVehicles, int numGroups) {
     for (int i = 0; i < numVehicles; i++) {
       Vehicle vehicle = new Vehicle(
-          random(width),
-          random(height),
+          random(_width),
+          random(_height),
           random(PI))
         .groupId(floor(random(numGroups)));
 
