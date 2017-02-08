@@ -18,3 +18,4 @@ class AlignmentImpulse extends Impulse {
     return currentVelocity;
   }
 }
+

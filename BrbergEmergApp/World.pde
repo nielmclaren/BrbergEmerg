@@ -7,12 +7,14 @@ class World {
   private ArrayList<Vehicle> _vehicles;
   private int _width;
   private int _height;
+  private long _age;
 
   World(int width, int height) {
     _attractors = new ArrayList<Attractor>();
     _vehicles = new ArrayList<Vehicle>();
     _width = width;
     _height = height;
+    _age = 0;
   }
 
   ArrayList<Attractor> attractorsRef() {
@@ -49,6 +51,10 @@ class World {
   World height(int v) {
     _height = v;
     return this;
+  }
+
+  long age() {
+    return _age;
   }
 
   World clearAttractors() {
@@ -121,6 +127,9 @@ class World {
     calculateNeighborhoods();
     prepVehicles();
     stepVehicles();
+
+    _age++;
+
     return this;
   }
 

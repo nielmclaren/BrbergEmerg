@@ -30,10 +30,11 @@ class Vehicle implements IPositioned {
     _nextRotation = rotation;
 
     _impulses = new ArrayList<Impulse>();
-    _impulses.add(new AttractorImpulse(_world, this));
-    _impulses.add(new SeparationImpulse(_world, this));
-    _impulses.add(new AlignmentImpulse(_world, this));
-    _impulses.add(new CohesionImpulse(_world, this));
+    //_impulses.add(new AttractorImpulse(_world, this));
+    //_impulses.add(new SeparationImpulse(_world, this));
+    //_impulses.add(new AlignmentImpulse(_world, this));
+    //_impulses.add(new CohesionImpulse(_world, this));
+    _impulses.add(new MeanderImpulse(_world, this));
 
     _groupId = -1;
 
@@ -72,6 +73,15 @@ class Vehicle implements IPositioned {
     return this;
   }
 
+  float velocity() {
+    return _velocity;
+  }
+
+  Vehicle velocity(float v) {
+    _velocity = v;
+    return this;
+  }
+
   float rotation() {
     return _rotation;
   }
@@ -82,12 +92,12 @@ class Vehicle implements IPositioned {
     return this;
   }
 
-  float velocity() {
-    return _velocity;
+  ArrayList<Impulse> impulsesRef() {
+    return _impulses;
   }
 
-  Vehicle velocity(float v) {
-    _velocity = v;
+  Vehicle impulsesRef(ArrayList<Impulse> v) {
+    _impulses = v;
     return this;
   }
 
