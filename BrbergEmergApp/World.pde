@@ -76,7 +76,7 @@ class World {
 
   World setupVehicles(IPositioner positioner, int numVehicles, int numGroups) {
     for (int i = 0; i < numVehicles; i++) {
-      Vehicle vehicle = new Vehicle(0, 0, random(PI))
+      Vehicle vehicle = new Vehicle(this, 0, 0, random(PI))
         .groupId(floor(random(numGroups)));
 
       if (positioner.position(vehicle)) {

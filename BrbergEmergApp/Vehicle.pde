@@ -1,6 +1,7 @@
 
 class Vehicle implements IPositioned {
   // nextX, nextY, nextRotation are not exposed externally.
+  private World _world;
   private float _x;
   private float _y;
   private float _nextX;
@@ -9,6 +10,8 @@ class Vehicle implements IPositioned {
   private float _rotation;
   private float _nextRotation;
 
+  private ArrayList<Impulse> _impulses;
+
   private int _groupId;
 
   private Neighborhood _neighborhood;
@@ -16,14 +19,21 @@ class Vehicle implements IPositioned {
 
   private float _vehicleSizeSq;
 
-  Vehicle(float x, float y, float rotation) {
+  Vehicle(World world, float x, float y, float rotation) {
+    _world = world;
     _x = x;
     _y = y;
     _nextX = x;
     _nextY = y;
+    _velocity = 3;
     _rotation = rotation;
     _nextRotation = rotation;
-    _velocity = 3;
+
+    _impulses = new ArrayList<Impulse>();
+    _impulses.add(new AttractorImpulse(_world, this));
+    _impulses.add(new SeparationImpulse(_world, this));
+    _impulses.add(new AlignmentImpulse(_world, this));
+    _impulses.add(new CohesionImpulse(_world, this));
 
     _groupId = -1;
 
@@ -31,6 +41,15 @@ class Vehicle implements IPositioned {
     _attractor = null;
 
     _vehicleSizeSq = 20 * 20;
+  }
+
+  World world() {
+    return _world;
+  }
+
+  Vehicle world(World v) {
+    _world = v;
+    return this;
   }
 
   float x() {
@@ -100,17 +119,12 @@ class Vehicle implements IPositioned {
   }
 
   Vehicle prep() {
-    float attraction = getAttractionRotationDelta();
-    float separation = getSeparationRotationDelta();
-    float alignment = getAlignmentRotationDelta();
-    float cohesion = getCohesionRotationDelta();
+    float rotationDelta = 0;
+    for (Impulse impulse : _impulses) {
+      rotationDelta += impulse.steer(_rotation, 1);
+    }
 
-    attraction *= 1;
-    separation *= 1;
-    alignment *= 1;
-    cohesion *= 1;
-
-    _nextRotation = normalizeAngle(_rotation + attraction + separation + alignment + cohesion);
+    _nextRotation = normalizeAngle(_rotation + rotationDelta);
 
     _nextX += _velocity * cos(_nextRotation);
     _nextY += _velocity * sin(_nextRotation);
@@ -118,53 +132,6 @@ class Vehicle implements IPositioned {
     updateGroup();
 
     return this;
-  }
-
-  // Steer toward attractors.
-  private float getAttractionRotationDelta() {
-    if (_attractor != null) {
-      float attractorAngle = getAngleTo(this, _attractor);
-      return getScaledRotationDeltaToward(_rotation, attractorAngle, 0.1, 0.02);
-    }
-    return 0;
-  }
-
-  // Steer away from vehicles that are too close.
-  private float getSeparationRotationDelta() {
-    ArrayList<Vehicle> tooCloseVehicles = _neighborhood.getTooCloseVehicles(this);
-    if (tooCloseVehicles.size() > 0) {
-      PVector averagePos = getAveragePosition(tooCloseVehicles);
-      float tooCloseDirection = getAngleTo(this, averagePos);
-      return getScaledRotationDeltaToward(_rotation, tooCloseDirection, -0.1, 0.02);
-    }
-    return 0;
-  }
-
-  // Steer toward the average direction that nearby vehicles are going.
-  private float getAlignmentRotationDelta() {
-    if (_neighborhood.vehiclesRef().size() > 0) {
-      float neighborhoodRotation = _neighborhood.getAverageRotation();
-      return getScaledRotationDeltaToward(_rotation, neighborhoodRotation, -0.1, 0.02);
-    }
-    return 0;
-  }
-
-  // Steer toward the average position of nearby vehicles.
-  private float getCohesionRotationDelta() {
-    if (_neighborhood.vehiclesRef().size() > 0) {
-      PVector averagePos = getAveragePosition(_neighborhood.vehiclesRef());
-      float neighborsDirection = getAngleTo(this, averagePos);
-      return getScaledRotationDeltaToward(_rotation, neighborsDirection, 0.1, 0.02);
-    }
-    return 0;
-  }
-
-  private float getScaledRotationDeltaToward(float current, float target, float factor) {
-    return getRotationDeltaToward(current, target, factor * _velocity, 0);
-  }
-
-  private float getScaledRotationDeltaToward(float current, float target, float factor, float maxDelta) {
-    return getRotationDeltaToward(current, target, factor * _velocity, maxDelta * _velocity);
   }
 
   private void updateGroup() {
