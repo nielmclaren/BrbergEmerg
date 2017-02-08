@@ -1,5 +1,6 @@
 
 class Vehicle implements IPositioned {
+  // nextX, nextY, nextRotation are not exposed externally.
   private float _x;
   private float _y;
   private float _nextX;
@@ -38,6 +39,7 @@ class Vehicle implements IPositioned {
 
   Vehicle x(float v) {
     _x = v;
+    _nextX = v;
     return this;
   }
 
@@ -47,23 +49,6 @@ class Vehicle implements IPositioned {
 
   Vehicle y(float v) {
     _y = v;
-    return this;
-  }
-
-  float nextX() {
-    return _nextX;
-  }
-
-  Vehicle nextX(float v) {
-    _nextX = v;
-    return this;
-  }
-
-  float nextY() {
-    return _nextY;
-  }
-
-  Vehicle nextY(float v) {
     _nextY = v;
     return this;
   }
@@ -74,14 +59,6 @@ class Vehicle implements IPositioned {
 
   Vehicle rotation(float v) {
     _rotation = v;
-    return this;
-  }
-
-  float nextRotation() {
-    return _nextRotation;
-  }
-
-  Vehicle nextRotation(float v) {
     _nextRotation = v;
     return this;
   }

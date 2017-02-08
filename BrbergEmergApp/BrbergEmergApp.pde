@@ -6,7 +6,7 @@ boolean isDebugMode;
 
 color[] vehicleColors;
 
-CenteredAttractorPositioner attractorPositioner;
+CenteredPositioner positioner;
 
 FileNamer animationFolderNamer, fileNamer;
 
@@ -30,7 +30,7 @@ void setup() {
   vehicleColors[6] = color(246, 124, 40);
   vehicleColors[7] = color(250, 73, 59);
 
-  attractorPositioner = new CenteredAttractorPositioner()
+  positioner = new CenteredPositioner()
     .world(world);
 
   reset();
@@ -41,11 +41,11 @@ void reset() {
 
   world.clearAttractors();
   world.clearVehicles();
-  world.setupAttractors(attractorPositioner, 7);
-  world.setupVehicles(1, vehicleColors.length);
+  world.setupAttractors(positioner, 7);
+  world.setupVehicles(positioner, 1, vehicleColors.length);
   world.calculateNearestAttractors();
 
-  for (int i = 0; i < 5000; i++) {
+  for (int i = 0; i < 1000; i++) {
     world.step();
     redraw();
   }

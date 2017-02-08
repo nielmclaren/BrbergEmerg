@@ -74,17 +74,15 @@ class World {
     return this;
   }
 
-  World setupVehicles(int numVehicles, int numGroups) {
+  World setupVehicles(IPositioner positioner, int numVehicles, int numGroups) {
     for (int i = 0; i < numVehicles; i++) {
-      Vehicle vehicle = new Vehicle(
-          random(_width),
-          random(_height),
-          random(PI))
+      Vehicle vehicle = new Vehicle(0, 0, random(PI))
         .groupId(floor(random(numGroups)));
 
-      _vehicles.add(vehicle);
+      if (positioner.position(vehicle)) {
+        _vehicles.add(vehicle);
+      }
     }
-
     return this;
   }
 
