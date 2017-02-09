@@ -5,11 +5,12 @@ WorldDrawer drawer;
 boolean isPaused;
 
 CenteredPositioner positioner;
+PFont paramFont;
 
 FileNamer animationFolderNamer, fileNamer;
 
 void setup() {
-  size(800, 800);
+  size(600, 600, P3D);
 
   world = new World(width, height);
   drawer = new WorldDrawer();
@@ -18,22 +19,26 @@ void setup() {
   animationFolderNamer = new FileNamer("output/anim", "/");
   fileNamer = new FileNamer("output/export", "png");
 
-  positioner = new CenteredPositioner()
-    .world(world);
+  positioner = new CenteredPositioner().world(world);
+  paramFont = loadFont("InputSansNarrow-Regular-24.vlw");
+
 
   reset();
 }
 
 void reset() {
-  background(0);
+  resetWorld();
 
+  background(0);
+  drawer.drawInitial(g, world);
+}
+
+void resetWorld() {
   world.clearAttractors();
   world.clearVehicles();
   world.setupAttractors(positioner, 7);
   world.setupVehicles(positioner, 1, 8);
   world.calculateNearestAttractors();
-
-  drawer.drawInitial(g, world);
 }
 
 void draw() {
@@ -53,6 +58,9 @@ void keyReleased() {
       break;
     case 'e':
       reset();
+      break;
+    case 'f':
+      saveParamSpace();
       break;
     case 'r':
       save(fileNamer.next());
@@ -76,7 +84,59 @@ void saveAnimation(int numFrames) {
   isPaused = false;
 }
 
-void mouseReleased() {
+void saveParamSpace() {
+  FileNamer namer = new FileNamer(animationFolderNamer.next() + "frame", "png");
+  for (float maxDelta = 0.1; maxDelta < 1; maxDelta += 0.1) {
+    for (float noiseScale = 0.1; noiseScale < 1; noiseScale += 0.1) {
+      saveParam(maxDelta, noiseScale, namer.next());
+    }
+  }
+}
+
+void saveParam(float maxDelta, float noiseScale, String savePath) {
+  PGraphics canvas = createGraphics(width, height, P3D);
+  canvas.beginDraw();
+
+
+  float quarterW = canvas.width/4;
+  float quarterH = canvas.height/4;
+  for (int i = 0; i < 16; i++) {
+    drawWorld(canvas,
+        (i % 4) * quarterW, floor(i / 4) * quarterH,
+        quarterW, quarterH, maxDelta, noiseScale);
+  }
+
+  canvas.fill(255);
+  canvas.textFont(paramFont);
+  canvas.text("Max delta: " + (float)floor(maxDelta * 100) / 100, 20, 30);
+  canvas.text("Noise scale: " + (float)floor(noiseScale * 100) / 100, 20, 60);
+
+  canvas.endDraw();
+  canvas.save(savePath);
+}
+
+void drawWorld(PGraphics g, float x, float y, float w, float h, float maxDelta, float noiseScale) {
+  PGraphics drawWorldCanvas = createGraphics(width, height, P3D);
+
+  resetWorld();
+
+  MeanderImpulse impulse = (MeanderImpulse)world.vehiclesRef().get(0).impulsesRef().get(0);
+  impulse
+    .maxDelta(maxDelta)
+    .noiseScale(noiseScale);
+
+  drawWorldCanvas.beginDraw();
+
+  drawer.drawInitial(drawWorldCanvas, world);
+
+  for (int i = 0; i < 1000; i++) {
+    world.step();
+    drawer.draw(drawWorldCanvas, world);
+  }
+
+  drawWorldCanvas.endDraw();
+
+  g.image(drawWorldCanvas, x, y, w, h);
 }
 
 int deg(float v) {
