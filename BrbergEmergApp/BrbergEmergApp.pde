@@ -2,7 +2,6 @@
 PImage chargeImage;
 World world;
 boolean isPaused;
-boolean isDebugMode;
 
 color[] vehicleColors;
 
@@ -15,7 +14,6 @@ void setup() {
 
   world = new World(width, height);
   isPaused = false;
-  isDebugMode = true;
 
   animationFolderNamer = new FileNamer("output/anim", "/");
   fileNamer = new FileNamer("output/export", "png");
@@ -64,15 +62,13 @@ void redraw() {
 }
 
 void drawAttractors() {
-  if (isDebugMode) {
-    ArrayList<Attractor> attractors = world.attractorsRef();
-    for (Attractor attractor : attractors) {
-      colorMode(RGB);
-      stroke(64);
-      fill(16);
-      ellipseMode(RADIUS);
-      ellipse(attractor.x(), attractor.y(), attractor.radius(), attractor.radius());
-    }
+  ArrayList<Attractor> attractors = world.attractorsRef();
+  for (Attractor attractor : attractors) {
+    colorMode(RGB);
+    stroke(64);
+    fill(16);
+    ellipseMode(RADIUS);
+    ellipse(attractor.x(), attractor.y(), attractor.radius(), attractor.radius());
   }
 }
 
@@ -80,11 +76,7 @@ void drawVehicles() {
   ArrayList<Vehicle> vehicles = world.vehiclesRef();
 
   for (Vehicle vehicle : vehicles) {
-    if (isDebugMode) {
-      drawDebugVehicle(vehicle);
-    } else {
-      drawVehicle(vehicle);
-    }
+    drawVehicle(vehicle);
   }
 }
 
@@ -125,9 +117,6 @@ void keyReleased() {
     case 'r':
       save(fileNamer.next());
       break;
-    case 't':
-      isDebugMode = !isDebugMode;
-      break;
     case ' ':
       isPaused = !isPaused;
       break;
@@ -136,9 +125,6 @@ void keyReleased() {
 
 void saveAnimation(int numFrames) {
   isPaused = true;
-
-  boolean wasDebugMode = isDebugMode;
-  isDebugMode = false;
 
   FileNamer frameNamer = new FileNamer(animationFolderNamer.next() + "frame", "png");
   for (int i = 0; i < numFrames; i++) {
@@ -149,8 +135,6 @@ void saveAnimation(int numFrames) {
   }
 
   isPaused = false;
-
-  isDebugMode = wasDebugMode;
 }
 
 void mouseReleased() {
