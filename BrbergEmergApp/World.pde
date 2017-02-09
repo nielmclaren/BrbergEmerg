@@ -57,6 +57,11 @@ class World {
     return _age;
   }
 
+  World age(long v) {
+    _age = v;
+    return this;
+  }
+
   World clearAttractors() {
     _attractors = new ArrayList<Attractor>();
     return this;

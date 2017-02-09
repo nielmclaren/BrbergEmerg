@@ -38,21 +38,25 @@ class WorldDrawer {
     ArrayList<Vehicle> vehicles = world.vehiclesRef();
 
     for (Vehicle vehicle : vehicles) {
-      drawVehicle(g, vehicle);
+      drawVehicle(g, world, vehicle);
     }
   }
 
-  private void drawVehicle(PGraphics g, Vehicle vehicle) {
+  private void drawVehicle(PGraphics g, World world, Vehicle vehicle) {
     int vehicleColor = vehicleColors[vehicle.groupId()];
 
-    g.stroke(vehicleColor);
+    long age = world.age();
+    color c = color((128 + floor(age / 10)) % 255, 255, 255);
+
+    g.colorMode(HSB);
+    g.stroke(c);
     g.strokeWeight(2);
     g.line(vehicle.x(), vehicle.y(),
         vehicle.x() - 5 * cos(vehicle.rotation()),
         vehicle.y() - 5 * sin(vehicle.rotation()));
 
     g.noStroke();
-    g.fill(vehicleColor);
+    g.fill(c);
     g.ellipseMode(CENTER);
     g.ellipse(vehicle.x(), vehicle.y(), 4, 4);
   }
