@@ -1,161 +1,70 @@
 
-class World {
-  public static final int NEIGHBORHOOD_RADIUS = 40;
-  public static final int MIN_DISTANCE = 10;
+class WorldDrawer {
+  private PFont paramFont;
+  private color[] vehicleColors;
 
-  private ArrayList<Attractor> _attractors;
-  private ArrayList<Vehicle> _vehicles;
-  private int _width;
-  private int _height;
-  private long _age;
+  WorldDrawer() {
+    paramFont = loadFont("InputSansNarrow-Regular-24.vlw");
 
-  World(int width, int height) {
-    _attractors = new ArrayList<Attractor>();
-    _vehicles = new ArrayList<Vehicle>();
-    _width = width;
-    _height = height;
-    _age = 0;
+    vehicleColors = new color[8];
+    vehicleColors[0] = color(0, 188, 157);
+    vehicleColors[1] = color(0, 203, 119);
+    vehicleColors[2] = color(0, 154, 217);
+    vehicleColors[3] = color(160, 90, 178);
+    vehicleColors[4] = color(44, 74, 93);
+    vehicleColors[5] = color(252, 194, 44);
+    vehicleColors[6] = color(246, 124, 40);
+    vehicleColors[7] = color(250, 73, 59);
   }
 
-  ArrayList<Attractor> attractorsRef() {
-    return _attractors;
+  public void drawInitial(PGraphics g, World world) {
+    drawLabel(g, world);
+    drawAttractors(g, world);
   }
 
-  World attractorsRef(ArrayList<Attractor> v) {
-    _attractors = v;
-    return this;
+  public void draw(PGraphics g, World world) {
+    drawVehicles(g, world);
   }
 
-  ArrayList<Vehicle> vehiclesRef() {
-    return _vehicles;
+  private void drawLabel(PGraphics g, World world) {
+    MeanderImpulse impulse = (MeanderImpulse)world.vehiclesRef().get(0).impulsesRef().get(0);
+    fill(255);
+    textFont(paramFont);
+    text("Max delta: " + impulse.maxDelta(), 20, 30);
+    text("Noise scale: " + impulse.noiseScale(), 20, 60);
   }
 
-  World vehiclesRef(ArrayList<Vehicle> v) {
-    _vehicles = v;
-    return this;
-  }
-
-  int width() {
-    return _width;
-  }
-
-  World width(int v) {
-    _width = v;
-    return this;
-  }
-
-  int height() {
-    return _height;
-  }
-
-  World height(int v) {
-    _height = v;
-    return this;
-  }
-
-  long age() {
-    return _age;
-  }
-
-  World clearAttractors() {
-    _attractors = new ArrayList<Attractor>();
-    return this;
-  }
-
-  World clearVehicles() {
-    _vehicles = new ArrayList<Vehicle>();
-    return this;
-  }
-
-  World setupAttractors(IPositioner positioner, int numAttractors) {
-    for (int i = 0; i < numAttractors; i++) {
-      Attractor attractor = new Attractor(i, 0, 0, 50);
-      if (positioner.position(attractor)) {
-        _attractors.add(attractor);
-      } else {
-        break;
-      }
-    }
-    println("Resulting number of attractors: " + _attractors.size());
-    return this;
-  }
-
-  World setupVehicles(IPositioner positioner, int numVehicles, int numGroups) {
-    for (int i = 0; i < numVehicles; i++) {
-      Vehicle vehicle = new Vehicle(this, 0, 0, random(PI))
-        .groupId(floor(random(numGroups)));
-
-      if (positioner.position(vehicle)) {
-        _vehicles.add(vehicle);
-      }
-    }
-    return this;
-  }
-
-  private boolean hasVehicleCollision(Vehicle vehicle) {
-    for (Vehicle v : _vehicles) {
-      if (vehicle.isColliding(v)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private Neighborhood getNeighborhood(ArrayList<Vehicle> vehicles, Vehicle vehicle) {
-    ArrayList<Vehicle> neighborhoodVehicles = new ArrayList<Vehicle>();
-    for (Vehicle v : _vehicles) {
-      if (vehicle != v && areNeighbors(vehicle, v)) {
-        neighborhoodVehicles.add(v);
-      }
-    }
-    return new Neighborhood()
-      .vehiclesRef(neighborhoodVehicles);
-  }
-
-  private boolean areNeighbors(Vehicle a, Vehicle b) {
-    return getDistanceBetween(a, b) < NEIGHBORHOOD_RADIUS;
-  }
-
-  World step(int numSteps) {
-    for (int i = 0; i < numSteps; i++) {
-      step();
-    }
-    return this;
-  }
-
-  World step() {
-    calculateNeighborhoods();
-    prepVehicles();
-    stepVehicles();
-
-    _age++;
-
-    return this;
-  }
-
-  void calculateNearestAttractors() {
-    for (Vehicle vehicle : _vehicles) {
-      Attractor attractor = (Attractor)getNearestTo(_attractors, vehicle);
-      vehicle.attractor(attractor);
+  private void drawAttractors(PGraphics g, World world) {
+    ArrayList<Attractor> attractors = world.attractorsRef();
+    for (Attractor attractor : attractors) {
+      g.colorMode(RGB);
+      g.stroke(64);
+      g.fill(16);
+      g.ellipseMode(RADIUS);
+      g.ellipse(attractor.x(), attractor.y(), attractor.radius(), attractor.radius());
     }
   }
 
-  private void calculateNeighborhoods() {
-    for (Vehicle vehicle : _vehicles) {
-      Neighborhood neighborhood = getNeighborhood(_vehicles, vehicle);
-      vehicle.neighborhoodRef(neighborhood);
+  private void drawVehicles(PGraphics g, World world) {
+    ArrayList<Vehicle> vehicles = world.vehiclesRef();
+
+    for (Vehicle vehicle : vehicles) {
+      drawVehicle(g, vehicle);
     }
   }
 
-  private void prepVehicles() {
-    for (Vehicle vehicle : _vehicles) {
-      vehicle.prep();
-    }
-  }
+  private void drawVehicle(PGraphics g, Vehicle vehicle) {
+    int vehicleColor = vehicleColors[vehicle.groupId()];
 
-  private void stepVehicles() {
-    for (Vehicle vehicle : _vehicles) {
-      vehicle.step();
-    }
+    g.stroke(vehicleColor);
+    g.strokeWeight(2);
+    g.line(vehicle.x(), vehicle.y(),
+        vehicle.x() - 5 * cos(vehicle.rotation()),
+        vehicle.y() - 5 * sin(vehicle.rotation()));
+
+    g.noStroke();
+    g.fill(vehicleColor);
+    g.ellipseMode(CENTER);
+    g.ellipse(vehicle.x(), vehicle.y(), 4, 4);
   }
 }

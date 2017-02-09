@@ -1,9 +1,8 @@
 
 PImage chargeImage;
 World world;
+WorldDrawer drawer;
 boolean isPaused;
-
-color[] vehicleColors;
 
 CenteredPositioner positioner;
 
@@ -13,20 +12,11 @@ void setup() {
   size(800, 800);
 
   world = new World(width, height);
+  drawer = new WorldDrawer();
   isPaused = false;
 
   animationFolderNamer = new FileNamer("output/anim", "/");
   fileNamer = new FileNamer("output/export", "png");
-
-  vehicleColors = new color[8];
-  vehicleColors[0] = color(0, 188, 157);
-  vehicleColors[1] = color(0, 203, 119);
-  vehicleColors[2] = color(0, 154, 217);
-  vehicleColors[3] = color(160, 90, 178);
-  vehicleColors[4] = color(44, 74, 93);
-  vehicleColors[5] = color(252, 194, 44);
-  vehicleColors[6] = color(246, 124, 40);
-  vehicleColors[7] = color(250, 73, 59);
 
   positioner = new CenteredPositioner()
     .world(world);
@@ -40,67 +30,17 @@ void reset() {
   world.clearAttractors();
   world.clearVehicles();
   world.setupAttractors(positioner, 7);
-  world.setupVehicles(positioner, 1, vehicleColors.length);
+  world.setupVehicles(positioner, 1, 8);
   world.calculateNearestAttractors();
 
-  for (int i = 0; i < 1000; i++) {
-    world.step();
-    redraw();
-  }
+  drawer.drawInitial(g, world);
 }
 
 void draw() {
   if (!isPaused) {
     world.step();
-    redraw();
+    drawer.draw(g, world);
   }
-}
-
-void redraw() {
-  drawAttractors();
-  drawVehicles();
-}
-
-void drawAttractors() {
-  ArrayList<Attractor> attractors = world.attractorsRef();
-  for (Attractor attractor : attractors) {
-    colorMode(RGB);
-    stroke(64);
-    fill(16);
-    ellipseMode(RADIUS);
-    ellipse(attractor.x(), attractor.y(), attractor.radius(), attractor.radius());
-  }
-}
-
-void drawVehicles() {
-  ArrayList<Vehicle> vehicles = world.vehiclesRef();
-
-  for (Vehicle vehicle : vehicles) {
-    drawVehicle(vehicle);
-  }
-}
-
-void drawDebugVehicle(Vehicle vehicle) {
-  stroke(255);
-  strokeWeight(2);
-  line(vehicle.x(), vehicle.y(),
-      vehicle.x() + 5 * cos(vehicle.rotation()),
-      vehicle.y() + 5 * sin(vehicle.rotation()));
-}
-
-void drawVehicle(Vehicle vehicle) {
-  int vehicleColor = vehicleColors[vehicle.groupId()];
-
-  stroke(vehicleColor);
-  strokeWeight(2);
-  line(vehicle.x(), vehicle.y(),
-      vehicle.x() - 5 * cos(vehicle.rotation()),
-      vehicle.y() - 5 * sin(vehicle.rotation()));
-
-  noStroke();
-  fill(vehicleColor);
-  ellipseMode(CENTER);
-  ellipse(vehicle.x(), vehicle.y(), 4, 4);
 }
 
 void keyReleased() {
@@ -129,8 +69,7 @@ void saveAnimation(int numFrames) {
   FileNamer frameNamer = new FileNamer(animationFolderNamer.next() + "frame", "png");
   for (int i = 0; i < numFrames; i++) {
     world.step();
-    world.step();
-    redraw();
+    drawer.draw(g, world);
     save(frameNamer.next());
   }
 
