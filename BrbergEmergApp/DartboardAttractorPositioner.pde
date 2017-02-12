@@ -3,17 +3,9 @@ class DartboardAttractorPositioner implements IPositioner {
   private World _world;
   private int _maxAttempts;
 
-  DartboardAttractorPositioner() {
+  DartboardAttractorPositioner(World world) {
+    _world = world;
     _maxAttempts = 100000;
-  }
-
-  public World world() {
-    return _world;
-  }
-
-  public DartboardAttractorPositioner world(World v) {
-    _world = v;
-    return this;
   }
 
   public int maxAttempts() {

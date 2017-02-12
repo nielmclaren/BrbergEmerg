@@ -4,13 +4,14 @@ World world;
 WorldDrawer drawer;
 boolean isPaused;
 
-CenteredPositioner positioner;
+CenteredPositioner centeredPositioner;
+RandomPositioner randomPositioner;
 PFont paramFont;
 
 FileNamer animationFolderNamer, fileNamer;
 
 void setup() {
-  size(600, 600, P3D);
+  size(800, 800, P3D);
 
   world = new World(width, height);
   drawer = new WorldDrawer();
@@ -19,7 +20,9 @@ void setup() {
   animationFolderNamer = new FileNamer("output/anim", "/");
   fileNamer = new FileNamer("output/export", "png");
 
-  positioner = new CenteredPositioner().world(world);
+  centeredPositioner = new CenteredPositioner(world);
+  randomPositioner = new RandomPositioner(world)
+    .rect(width/2 - 100, width/2 + 100, height/2 - 100, height/2 + 100);
   paramFont = loadFont("InputSansNarrow-Regular-24.vlw");
 
 
@@ -37,14 +40,15 @@ void resetWorld() {
   world.age(0);
   world.clearAttractors();
   world.clearVehicles();
-  world.setupAttractors(positioner, 7);
-  world.setupVehicles(positioner, 3, 8);
+  world.setupAttractors(centeredPositioner, 7);
+  world.setupVehicles(randomPositioner, 100, 8);
   world.calculateNearestAttractors();
 }
 
 void draw() {
   if (!isPaused) {
     world.step();
+    background(0);
     drawer.draw(g, world);
   }
 }
@@ -107,14 +111,9 @@ void drawWorld(PGraphics graphics, float x, float y, float w, float h, float max
   PGraphics drawWorldCanvas = createGraphics(600, 600, P3D);
 
   resetWorld();
-
-  ArrayList<Vehicle> vehicles = world.vehiclesRef();
-  for (Vehicle vehicle : vehicles) {
-    MeanderImpulse impulse = (MeanderImpulse)vehicle.impulsesRef().get(0);
-    impulse
-      .maxDelta(maxDelta)
-      .noiseScale(noiseScale);
-  }
+  world.meander
+    .maxDelta(maxDelta)
+    .noiseScale(noiseScale);
 
   drawWorldCanvas.beginDraw();
   drawWorldCanvas.background(0);
@@ -218,6 +217,18 @@ float getAngleTo(float ax, float ay, float bx, float by) {
   return normalizeAngle(atan2(dy, dx));
 }
 
+float getSignedAngleBetween(float angleA, float angleB) {
+  float delta = angleB - angleA;
+
+  if (abs(delta) > PI) {
+    if (delta > 0) {
+      return -2 * PI + delta;
+    }
+    return 2 * PI + delta;
+  }
+  return delta;
+}
+
 float getRotationToward(float current, float target, float factor) {
   return getRotationToward(current, target, factor, 0);
 }
@@ -227,17 +238,7 @@ float getRotationToward(float current, float target, float factor, float maxDelt
 }
 
 float getRotationDeltaToward(float current, float target, float factor, float maxDelta) {
-  float delta = target - current;
-  float result;
-
-  if (abs(delta) > PI) {
-    if (delta > 0) {
-      delta = -2 * PI + delta;
-    } else {
-      delta = 2 * PI + delta;
-    }
-  }
-  delta = delta * factor;
+  float delta = getSignedAngleBetween(current, target) * factor;
   if (maxDelta != 0) {
     delta = constrain(delta, -maxDelta, maxDelta);
   }

@@ -1,11 +1,9 @@
 
 class Impulse {
   protected World _world;
-  protected Vehicle _vehicle;
 
-  Impulse(World world, Vehicle vehicle) {
+  Impulse(World world) {
     _world = world;
-    _vehicle = vehicle;
   }
 
   World world() {
@@ -17,32 +15,21 @@ class Impulse {
     return this;
   }
 
-  Vehicle vehicle() {
-    return _vehicle;
+  float steer(Vehicle vehicle) {
+    return 0;
   }
 
-  Impulse vehicle(Vehicle v) {
-    _vehicle = v;
-    return this;
-  }
-
-  float steer(float currentRotation, float scale) {
-    return currentRotation;
-  }
-
-  float accelerate(float currentVelocity, float scale) {
-    return currentVelocity;
+  float accelerate(Vehicle vehicle) {
+    return vehicle.velocity();
   }
 
   Impulse step() {
     return this;
   }
 
-  protected float getScaledRotationDeltaToward(float current, float target, float factor) {
-    return getRotationDeltaToward(current, target, factor * _vehicle.velocity(), 0);
-  }
-
-  protected float getScaledRotationDeltaToward(float current, float target, float factor, float maxDelta) {
-    return getRotationDeltaToward(current, target, factor * _vehicle.velocity(), maxDelta * _vehicle.velocity());
+  protected float getScaledRotationDeltaToward(Vehicle vehicle, float target, float factor, float maxDelta) {
+    float current = vehicle.rotation();
+    float velocity = vehicle.velocity();
+    return getRotationDeltaToward(current, target, factor * velocity, maxDelta * velocity);
   }
 }

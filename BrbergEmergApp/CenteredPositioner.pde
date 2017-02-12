@@ -3,17 +3,9 @@ class CenteredPositioner implements IPositioner {
   private World _world;
   private int _maxAttempts;
 
-  CenteredPositioner() {
+  CenteredPositioner(World world) {
+    _world = world;
     _maxAttempts = 100000;
-  }
-
-  public World world() {
-    return _world;
-  }
-
-  public CenteredPositioner world(World v) {
-    _world = v;
-    return this;
   }
 
   public int maxAttempts() {

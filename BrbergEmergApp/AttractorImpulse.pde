@@ -1,20 +1,20 @@
 
 // Steer toward attractors.
 class AttractorImpulse extends Impulse {
-  AttractorImpulse(World world, Vehicle vehicle) {
-    super(world, vehicle);
+  AttractorImpulse(World world) {
+    super(world);
   }
 
-  float steer(float currentRotation, float scale) {
-    Attractor attractor = _vehicle.attractor();
+  float steer(Vehicle vehicle) {
+    Attractor attractor = vehicle.attractor();
     if (attractor != null) {
-      float attractorAngle = getAngleTo(_vehicle, attractor);
-      return getScaledRotationDeltaToward(currentRotation, attractorAngle, 0.1, 0.02);
+      float attractorAngle = getAngleTo(vehicle, attractor);
+      return getScaledRotationDeltaToward(vehicle, attractorAngle, 0.5, 0.05);
     }
     return 0;
   }
 
-  float accelerate(float currentVelocity, float scale) {
-    return currentVelocity;
+  float accelerate(Vehicle vehicle) {
+    return vehicle.velocity();
   }
 }

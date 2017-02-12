@@ -5,10 +5,10 @@ class MeanderImpulse extends Impulse {
   private float _noiseScale;
   private float _seed;
 
-  MeanderImpulse(World world, Vehicle vehicle) {
-    super(world, vehicle);
+  MeanderImpulse(World world) {
+    super(world);
 
-    _maxDelta = 0.1;
+    _maxDelta = 0.02;
     _noiseScale = 0.1;
     _seed = random(1000);
   }
@@ -31,11 +31,11 @@ class MeanderImpulse extends Impulse {
     return this;
   }
 
-  float steer(float currentRotation, float scale) {
+  float steer(Vehicle vehicle) {
     return (noise(_seed * _noiseScale + _world.age() * _noiseScale) - 0.5) * _maxDelta * 2 * PI;
   }
 
-  float accelerate(float currentVelocity, float scale) {
-    return currentVelocity;
+  float accelerate(Vehicle vehicle) {
+    return vehicle.velocity();
   }
 }

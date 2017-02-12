@@ -1,21 +1,21 @@
 
 // Steer toward the average position of nearby vehicles.
 class CohesionImpulse extends Impulse {
-  CohesionImpulse(World world, Vehicle vehicle) {
-    super(world, vehicle);
+  CohesionImpulse(World world) {
+    super(world);
   }
 
-  float steer(float currentRotation, float scale) {
-    Neighborhood neighborhood = _vehicle.neighborhoodRef();
+  float steer(Vehicle vehicle) {
+    Neighborhood neighborhood = vehicle.neighborhoodRef();
     if (neighborhood.vehiclesRef().size() > 0) {
       PVector averagePos = getAveragePosition(neighborhood.vehiclesRef());
-      float neighborsDirection = getAngleTo(_vehicle, averagePos);
-      return getScaledRotationDeltaToward(currentRotation, neighborsDirection, 0.1, 0.02);
+      float neighborsDirection = getAngleTo(vehicle, averagePos);
+      return getScaledRotationDeltaToward(vehicle, neighborsDirection, 0.001, 0.001);
     }
     return 0;
   }
 
-  float accelerate(float currentVelocity, float scale) {
-    return currentVelocity;
+  float accelerate(Vehicle vehicle) {
+    return vehicle.velocity();
   }
 }

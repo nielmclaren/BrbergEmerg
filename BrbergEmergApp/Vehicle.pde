@@ -10,8 +10,6 @@ class Vehicle implements IPositioned {
   private float _rotation;
   private float _nextRotation;
 
-  private ArrayList<Impulse> _impulses;
-
   private int _groupId;
 
   private Neighborhood _neighborhood;
@@ -28,13 +26,6 @@ class Vehicle implements IPositioned {
     _velocity = 3;
     _rotation = rotation;
     _nextRotation = rotation;
-
-    _impulses = new ArrayList<Impulse>();
-    //_impulses.add(new AttractorImpulse(_world, this));
-    //_impulses.add(new SeparationImpulse(_world, this));
-    //_impulses.add(new AlignmentImpulse(_world, this));
-    //_impulses.add(new CohesionImpulse(_world, this));
-    _impulses.add(new MeanderImpulse(_world, this));
 
     _groupId = -1;
 
@@ -92,15 +83,6 @@ class Vehicle implements IPositioned {
     return this;
   }
 
-  ArrayList<Impulse> impulsesRef() {
-    return _impulses;
-  }
-
-  Vehicle impulsesRef(ArrayList<Impulse> v) {
-    _impulses = v;
-    return this;
-  }
-
   int groupId() {
     return _groupId;
   }
@@ -130,9 +112,12 @@ class Vehicle implements IPositioned {
 
   Vehicle prep() {
     float rotationDelta = 0;
-    for (Impulse impulse : _impulses) {
-      rotationDelta += impulse.steer(_rotation, 1);
-    }
+
+    rotationDelta += _world.alignment.steer(this);
+    rotationDelta += _world.cohesion.steer(this);
+    rotationDelta += _world.meander.steer(this);
+    rotationDelta += _world.separation.steer(this);
+    rotationDelta += _world.attraction.steer(this);
 
     _nextRotation = normalizeAngle(_rotation + rotationDelta);
 

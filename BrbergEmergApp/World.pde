@@ -1,7 +1,7 @@
 
 class World {
   public static final int NEIGHBORHOOD_RADIUS = 40;
-  public static final int MIN_DISTANCE = 10;
+  public static final int MIN_DISTANCE = 20;
 
   private ArrayList<Attractor> _attractors;
   private ArrayList<Vehicle> _vehicles;
@@ -9,12 +9,24 @@ class World {
   private int _height;
   private long _age;
 
+  public AttractorImpulse attraction;
+  public AlignmentImpulse alignment;
+  public CohesionImpulse cohesion;
+  public MeanderImpulse meander;
+  public SeparationImpulse separation;
+
   World(int width, int height) {
     _attractors = new ArrayList<Attractor>();
     _vehicles = new ArrayList<Vehicle>();
     _width = width;
     _height = height;
     _age = 0;
+
+    attraction = new AttractorImpulse(this);
+    separation = new SeparationImpulse(this);
+    alignment = new AlignmentImpulse(this);
+    cohesion = new CohesionImpulse(this);
+    meander = new MeanderImpulse(this);
   }
 
   ArrayList<Attractor> attractorsRef() {
