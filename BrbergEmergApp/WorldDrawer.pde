@@ -50,7 +50,7 @@ class WorldDrawer {
 
     g.colorMode(HSB);
     g.stroke(c);
-    g.strokeWeight(2);
+    g.strokeWeight(5);
     g.line(vehicle.x(), vehicle.y(),
         vehicle.x() - 5 * cos(vehicle.rotation()),
         vehicle.y() - 5 * sin(vehicle.rotation()));
@@ -58,7 +58,7 @@ class WorldDrawer {
     g.noStroke();
     g.fill(c);
     g.ellipseMode(CENTER);
-    g.ellipse(vehicle.x(), vehicle.y(), 4, 4);
+    g.ellipse(vehicle.x(), vehicle.y(), 8, 8);
   }
 }
 

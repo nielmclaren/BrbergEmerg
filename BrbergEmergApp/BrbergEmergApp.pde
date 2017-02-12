@@ -38,7 +38,7 @@ void resetWorld() {
   world.clearAttractors();
   world.clearVehicles();
   world.setupAttractors(positioner, 7);
-  world.setupVehicles(positioner, 4, 8);
+  world.setupVehicles(positioner, 3, 8);
   world.calculateNearestAttractors();
 }
 
@@ -95,7 +95,7 @@ void saveParamSpace() {
   for (int col = 0; col < numCols; col++) {
     for (int row = 0; row < numRows; row++) {
       float maxDelta = map(col, 0, numCols, 0.01, 0.3);
-      float noiseScale = map(row, 0, numRows, 0.01, 1.0);
+      float noiseScale = map(pow((float)row / numRows, 4), 0, 1, 0.05, 5.0);
       drawWorld(canvas, col * w, row * h, w, h, maxDelta, noiseScale);
     }
   }
