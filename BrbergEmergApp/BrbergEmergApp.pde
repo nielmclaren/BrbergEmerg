@@ -5,6 +5,7 @@ WorldDrawer drawer;
 boolean isPaused;
 
 CenteredPositioner centeredPositioner;
+DartboardAttractorPositioner dartboardAttractorPositioner;
 RandomPositioner randomPositioner;
 PFont paramFont;
 
@@ -21,6 +22,8 @@ void setup() {
   fileNamer = new FileNamer("output/export", "png");
 
   centeredPositioner = new CenteredPositioner(world);
+  dartboardAttractorPositioner = new DartboardAttractorPositioner(world)
+    .rect(width/2 - 200, width/2 + 200, height/2 - 200, height/2 + 200);
   randomPositioner = new RandomPositioner(world)
     .rect(width/2 - 100, width/2 + 100, height/2 - 100, height/2 + 100);
   paramFont = loadFont("InputSansNarrow-Regular-24.vlw");
@@ -40,16 +43,14 @@ void resetWorld() {
   world.age(0);
   world.clearAttractors();
   world.clearVehicles();
-  world.setupAttractors(centeredPositioner, 7);
-  world.setupVehicles(randomPositioner, 100, 8);
+  world.setupAttractors(dartboardAttractorPositioner, 3);
+  world.setupVehicles(randomPositioner, 200, 8);
   world.calculateNearestAttractors();
 }
 
 void draw() {
   if (!isPaused) {
     world.step();
-    //background(0);
-
     drawer.draw(g, world);
   }
 }

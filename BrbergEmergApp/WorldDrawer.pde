@@ -21,14 +21,14 @@ class WorldDrawer {
 
   public void draw(PGraphics g, World world) {
     drawVehicles(g, world);
-    //drawAttractors(g, world);
+    drawAttractors(g, world);
   }
 
   private void drawAttractors(PGraphics g, World world) {
     ArrayList<Attractor> attractors = world.attractorsRef();
     for (Attractor attractor : attractors) {
       g.colorMode(RGB);
-      g.stroke(64);
+      g.noStroke();
       g.fill(16);
       g.ellipseMode(RADIUS);
       g.ellipse(attractor.x(), attractor.y(), attractor.radius(), attractor.radius());
@@ -44,10 +44,11 @@ class WorldDrawer {
   }
 
   private void drawVehicle(PGraphics g, World world, Vehicle vehicle) {
-    int vehicleColor = vehicleColors[vehicle.groupId()];
-
     long age = world.age();
-    color c = color((128 + floor(vehicle.groupId() * 5 + age / 5)) % 255, 255, (floor(vehicle.groupId() * 5 + age / 2)));
+
+    color c = color(
+        constrain(map(age, 0, 1000, 255 + 32, 128) % 255, 0, 255), 255,
+        map(age, 0, 1000, 64, 255), 16);
 
     g.colorMode(HSB);
     g.stroke(c);
