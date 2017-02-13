@@ -48,7 +48,8 @@ void resetWorld() {
 void draw() {
   if (!isPaused) {
     world.step();
-    background(0);
+    //background(0);
+
     drawer.draw(g, world);
   }
 }
@@ -212,8 +213,8 @@ float getAngleTo(PVector a, PVector b) {
 }
 
 float getAngleTo(float ax, float ay, float bx, float by) {
-  float dx = ax - bx;
-  float dy = ay - by;
+  float dx = bx - ax;
+  float dy = by - ay;
   return normalizeAngle(atan2(dy, dx));
 }
 
@@ -242,7 +243,7 @@ float getRotationDeltaToward(float current, float target, float factor, float ma
   if (maxDelta != 0) {
     delta = constrain(delta, -maxDelta, maxDelta);
   }
-  return -delta;
+  return delta;
 }
 
 float normalizeAngle(float v) {

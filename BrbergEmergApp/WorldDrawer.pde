@@ -21,7 +21,7 @@ class WorldDrawer {
 
   public void draw(PGraphics g, World world) {
     drawVehicles(g, world);
-    drawAttractors(g, world);
+    //drawAttractors(g, world);
   }
 
   private void drawAttractors(PGraphics g, World world) {
@@ -47,7 +47,7 @@ class WorldDrawer {
     int vehicleColor = vehicleColors[vehicle.groupId()];
 
     long age = world.age();
-    color c = color((128 + floor(age / 10)) % 255, 255, 255);
+    color c = color((128 + floor(vehicle.groupId() * 5 + age / 5)) % 255, 255, (floor(vehicle.groupId() * 5 + age / 2)));
 
     g.colorMode(HSB);
     g.stroke(c);

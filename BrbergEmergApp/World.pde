@@ -1,7 +1,7 @@
 
 class World {
   public static final int NEIGHBORHOOD_RADIUS = 40;
-  public static final int MIN_DISTANCE = 20;
+  public static final int MIN_DISTANCE = 8;
 
   private ArrayList<Attractor> _attractors;
   private ArrayList<Vehicle> _vehicles;
