@@ -1,9 +1,11 @@
 
 class Neighborhood {
   private ArrayList<Vehicle> _vehicles;
+  private HashMap<Integer, ArrayList<Vehicle>> _groupIdToVehicle;
 
   Neighborhood() {
     _vehicles = new ArrayList<Vehicle>();
+    _groupIdToVehicle = new HashMap<Integer, ArrayList<Vehicle>>();
   }
 
   ArrayList<Vehicle> vehiclesRef() {
@@ -12,20 +14,27 @@ class Neighborhood {
 
   Neighborhood vehiclesRef(ArrayList<Vehicle> v) {
     _vehicles = v;
+
+    _groupIdToVehicle = new HashMap<Integer, ArrayList<Vehicle>>();
+    for (Vehicle vehicle : _vehicles) {
+      if (_groupIdToVehicle.containsKey(vehicle.groupId())) {
+        _groupIdToVehicle.get(vehicle.groupId()).add(vehicle);
+      } else {
+        ArrayList<Vehicle> vehicles = new ArrayList<Vehicle>();
+        vehicles.add(vehicle);
+        _groupIdToVehicle.put(vehicle.groupId(), vehicles);
+      }
+    }
+
     return this;
   }
 
-  float getAverageRotation() {
-    if (_vehicles.size() <= 0) {
-      return 0;
+  ArrayList<Vehicle> vehiclesByGroupId(int groupId) {
+    ArrayList<Vehicle> vehicles = _groupIdToVehicle.get(groupId);
+    if (vehicles == null) {
+      return new ArrayList<Vehicle>();
     }
-
-    float sum = 0;
-    for (Vehicle vehicle : _vehicles) {
-      sum += vehicle.rotation();
-    }
-
-    return normalizeAngle(sum / _vehicles.size());
+    return vehicles;
   }
 
   ArrayList<Vehicle> getTooCloseVehicles(Vehicle vehicle) {

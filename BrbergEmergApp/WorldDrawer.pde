@@ -20,6 +20,10 @@ class WorldDrawer {
   }
 
   public void draw(PGraphics g, World world) {
+    g.fill(0, 4);
+    g.noStroke();
+    g.rect(0, 0, width, height);
+
     drawVehicles(g, world);
     drawAttractors(g, world);
   }
@@ -46,9 +50,7 @@ class WorldDrawer {
   private void drawVehicle(PGraphics g, World world, Vehicle vehicle) {
     long age = world.age();
 
-    color c = color(
-        constrain(map(age, 0, 1000, 255 + 32, 128) % 255, 0, 255), 255,
-        map(age, 0, 1000, 64, 255), 16);
+    color c = vehicleColors[vehicle.groupId()];
 
     g.colorMode(HSB);
     g.stroke(c);

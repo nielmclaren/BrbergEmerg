@@ -44,7 +44,7 @@ void resetWorld() {
   world.clearAttractors();
   world.clearVehicles();
   world.setupAttractors(dartboardAttractorPositioner, 3);
-  world.setupVehicles(randomPositioner, 200, 8);
+  world.setupVehicles(randomPositioner, 100, 8);
   world.calculateNearestAttractors();
 }
 
@@ -157,6 +157,19 @@ PVector getAveragePosition(ArrayList<? extends IPositioned> items) {
   }
   result.div(items.size());
   return result;
+}
+
+float getAverageRotation(ArrayList<Vehicle> vehicles) {
+  if (vehicles.size() <= 0) {
+    return 0;
+  }
+
+  float sum = 0;
+  for (Vehicle vehicle : vehicles) {
+    sum += vehicle.rotation();
+  }
+
+  return normalizeAngle(sum / vehicles.size());
 }
 
 IPositioned getNearestTo(ArrayList<? extends IPositioned> items, IPositioned target) {

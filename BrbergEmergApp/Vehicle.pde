@@ -124,29 +124,7 @@ class Vehicle implements IPositioned {
     _nextX += _velocity * cos(_nextRotation);
     _nextY += _velocity * sin(_nextRotation);
 
-    updateGroup();
-
     return this;
-  }
-
-  private void updateGroup() {
-    if (random(1) < 0.01) {
-      int groupId = getRandomGroup(_neighborhood.getGroupStats());
-      if (groupId >= 0) {
-        _groupId = groupId;
-      } else {
-        _groupId = _attractor.id();
-      }
-    }
-  }
-
-  private int getRandomGroup(GroupStats groupStats) {
-    ArrayList<Integer> groupIds = groupStats.groupIds();
-    if (groupIds.size() <= 0) {
-      return -1;
-    }
-
-    return groupIds.get(floor(random(groupIds.size())));
   }
 
   Vehicle step() {
