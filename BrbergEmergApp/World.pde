@@ -1,12 +1,14 @@
 
 class World {
-  public static final int NEIGHBORHOOD_RADIUS = 40;
+  public static final int NEIGHBORHOOD_RADIUS = 80;
   public static final int MIN_DISTANCE = 8;
+  public static final int OUT_GROUP_MIN_DISTANCE = 40;
 
   private ArrayList<Attractor> _attractors;
   private ArrayList<Vehicle> _vehicles;
   private int _width;
   private int _height;
+  private int _numGroups;
   private long _age;
 
   public AttractorImpulse attraction;
@@ -14,12 +16,14 @@ class World {
   public CohesionImpulse cohesion;
   public MeanderImpulse meander;
   public SeparationImpulse separation;
+  public RepulsionImpulse repulsion;
 
-  World(int width, int height) {
+  World(int width, int height, int numGroups) {
     _attractors = new ArrayList<Attractor>();
     _vehicles = new ArrayList<Vehicle>();
     _width = width;
     _height = height;
+    _numGroups = numGroups;
     _age = 0;
 
     attraction = new AttractorImpulse(this);
@@ -27,6 +31,7 @@ class World {
     alignment = new AlignmentImpulse(this);
     cohesion = new CohesionImpulse(this);
     meander = new MeanderImpulse(this);
+    repulsion = new RepulsionImpulse(this);
   }
 
   ArrayList<Attractor> attractorsRef() {
@@ -65,6 +70,10 @@ class World {
     return this;
   }
 
+  int numGroups() {
+    return _numGroups;
+  }
+
   long age() {
     return _age;
   }
@@ -96,10 +105,10 @@ class World {
     return this;
   }
 
-  World setupVehicles(IPositioner positioner, int numVehicles, int numGroups) {
+  World setupVehicles(IPositioner positioner, int numVehicles) {
     for (int i = 0; i < numVehicles; i++) {
       Vehicle vehicle = new Vehicle(this, 0, 0, random(PI))
-        .groupId(floor(random(numGroups)));
+        .groupId(floor(random(_numGroups)));
 
       if (positioner.position(vehicle)) {
         _vehicles.add(vehicle);
@@ -124,7 +133,7 @@ class World {
         neighborhoodVehicles.add(v);
       }
     }
-    return new Neighborhood()
+    return new Neighborhood(this)
       .vehiclesRef(neighborhoodVehicles);
   }
 

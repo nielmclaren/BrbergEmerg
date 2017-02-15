@@ -1,10 +1,10 @@
 
-// Steer away from vehicles that are too close.
-class SeparationImpulse extends Impulse {
+// Steer away from nearby vehicles.
+class RepulsionImpulse extends Impulse {
   private float _factor;
   private float _maxDelta;
 
-  SeparationImpulse(World world) {
+  RepulsionImpulse(World world) {
     super(world);
 
     _factor = 0.1;
@@ -15,7 +15,7 @@ class SeparationImpulse extends Impulse {
     return _factor;
   }
 
-  SeparationImpulse factor(float v) {
+  RepulsionImpulse factor(float v) {
     _factor = v;
     return this;
   }
@@ -24,13 +24,13 @@ class SeparationImpulse extends Impulse {
     return _maxDelta;
   }
 
-  SeparationImpulse maxDelta(float v) {
+  RepulsionImpulse maxDelta(float v) {
     _maxDelta = v;
     return this;
   }
 
   float steer(Vehicle vehicle) {
-    ArrayList<Vehicle> tooCloseVehicles = vehicle.neighborhoodRef().getVehiclesWithin(vehicle, World.MIN_DISTANCE);
+    ArrayList<Vehicle> tooCloseVehicles = (ArrayList<Vehicle>)getItemsWithin(vehicle.neighborhoodRef().outGroupVehicles(vehicle.groupId()), vehicle, World.OUT_GROUP_MIN_DISTANCE);
     if (tooCloseVehicles.size() > 0) {
       PVector averagePos = getAveragePosition(tooCloseVehicles);
       float tooCloseDirection = getAngleTo(vehicle, averagePos);

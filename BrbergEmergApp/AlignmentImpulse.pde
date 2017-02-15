@@ -31,7 +31,7 @@ class AlignmentImpulse extends Impulse {
 
   float steer(Vehicle vehicle) {
     Neighborhood neighborhood = vehicle.neighborhoodRef();
-    ArrayList<Vehicle> groupVehicles = neighborhood.vehiclesByGroupId(vehicle.groupId());
+    ArrayList<Vehicle> groupVehicles = neighborhood.inGroupVehicles(vehicle.groupId());
     if (groupVehicles.size() > 0) {
       float neighborhoodRotation = getAverageRotation(groupVehicles);
       return getScaledRotationDeltaToward(vehicle, neighborhoodRotation, _factor, _maxDelta);

@@ -29,7 +29,7 @@ class Vehicle implements IPositioned {
 
     _groupId = -1;
 
-    _neighborhood = new Neighborhood();
+    _neighborhood = new Neighborhood(_world);
     _attractor = null;
 
     _vehicleSizeSq = 20 * 20;
@@ -117,6 +117,7 @@ class Vehicle implements IPositioned {
     rotationDelta += _world.attraction.steer(this);
     rotationDelta += _world.cohesion.steer(this);
     rotationDelta += _world.meander.steer(this);
+    rotationDelta += _world.repulsion.steer(this);
     rotationDelta += _world.separation.steer(this);
 
     _nextRotation = normalizeAngle(_rotation + rotationDelta);

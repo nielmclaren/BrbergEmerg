@@ -14,7 +14,7 @@ FileNamer animationFolderNamer, fileNamer;
 void setup() {
   size(800, 800, P3D);
 
-  world = new World(width, height);
+  world = new World(width, height, 8);
   drawer = new WorldDrawer();
   isPaused = false;
 
@@ -44,7 +44,7 @@ void resetWorld() {
   world.clearAttractors();
   world.clearVehicles();
   world.setupAttractors(dartboardAttractorPositioner, 3);
-  world.setupVehicles(randomPositioner, 100, 8);
+  world.setupVehicles(randomPositioner, 100);
   world.calculateNearestAttractors();
 }
 
@@ -62,6 +62,7 @@ void keyReleased() {
       break;
     case 'b':
       background(0);
+      world.age(0);
       break;
     case 'e':
       reset();
@@ -186,6 +187,16 @@ IPositioned getNearestTo(ArrayList<? extends IPositioned> items, IPositioned tar
   }
 
   return nearest;
+}
+
+ArrayList<? extends IPositioned> getItemsWithin(ArrayList<? extends IPositioned> items, IPositioned target, float distance) {
+  ArrayList<IPositioned> result = new ArrayList<IPositioned>();
+  for (IPositioned item : items) {
+    if (getDistanceBetween(target, item) < distance) {
+      result.add(item);
+    }
+  }
+  return result;
 }
 
 float getDistanceBetween(IPositioned a, IPositioned b) {
