@@ -106,7 +106,7 @@ class World {
   World setupAttractors(IPositioner positioner, int numAttractors) {
     for (int i = 0; i < numAttractors; i++) {
       Attractor attractor = new Attractor(i, 0, 0, 50);
-      if (positioner.position(attractor)) {
+      if (positioner.position(attractor, i)) {
         _attractors.add(attractor);
       } else {
         break;
@@ -120,7 +120,7 @@ class World {
       Vehicle vehicle = new Vehicle(this, 0, 0, random(PI))
         .groupId(floor(random(_numGroups)));
 
-      if (positioner.position(vehicle)) {
+      if (positioner.position(vehicle, i)) {
         _vehicles.add(vehicle);
       }
     }

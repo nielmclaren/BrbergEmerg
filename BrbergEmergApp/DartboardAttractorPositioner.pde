@@ -33,7 +33,7 @@ class DartboardAttractorPositioner implements IPositioner {
     return this;
   }
 
-  public boolean position(IPositioned target) {
+  public boolean position(IPositioned target, int index) {
     int numAttempts = 0;
     int maxAttempts = 100000;
 

@@ -8,6 +8,7 @@ CenteredPositioner centeredPositioner;
 CustomPositioner customPositioner;
 DartboardAttractorPositioner dartboardAttractorPositioner;
 RandomPositioner randomPositioner;
+RingPositioner ringPositioner;
 PFont paramFont;
 
 FileNamer animationFolderNamer, fileNamer;
@@ -28,6 +29,8 @@ void setup() {
     .rect(width/2 - 200, width/2 + 200, height/2 - 200, height/2 + 200);
   randomPositioner = new RandomPositioner(world)
     .rect(width/2 - 100, width/2 + 100, height/2 - 100, height/2 + 100);
+  ringPositioner = new RingPositioner(world)
+    .numPositions(3);
   paramFont = loadFont("InputSansNarrow-Regular-24.vlw");
 
 
@@ -45,8 +48,8 @@ void resetWorld() {
   world.age(0);
   world.clearAttractors();
   world.clearVehicles();
-  world.setupAttractors(dartboardAttractorPositioner, 3);
-  world.setupVehicles(randomPositioner, 30);
+  world.setupAttractors(ringPositioner, 3);
+  world.setupVehicles(randomPositioner, 300);
 }
 
 void draw() {
@@ -58,6 +61,18 @@ void draw() {
 
 void keyReleased() {
   switch (key) {
+    case '1':
+      world.step(10);
+      break;
+    case '2':
+      world.step(100);
+      break;
+    case '3':
+      world.step(1000);
+      break;
+    case '4':
+      world.step(10000);
+      break;
     case 'a':
       saveAnimation(100);
       break;

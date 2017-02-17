@@ -22,7 +22,7 @@ class RandomPositioner implements IPositioner {
     return this;
   }
 
-  public boolean position(IPositioned target) {
+  public boolean position(IPositioned target, int index) {
     target
       .x(random(_minX, _maxX))
       .y(random(_minY, _maxY));
