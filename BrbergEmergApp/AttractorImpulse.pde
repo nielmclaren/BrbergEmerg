@@ -7,7 +7,7 @@ class AttractorImpulse extends Impulse {
   AttractorImpulse(World world) {
     super(world);
 
-    _factor = 0.1;
+    _factor = 100;
     _maxDelta = 0.02;
   }
 
@@ -36,7 +36,7 @@ class AttractorImpulse extends Impulse {
       float attractorAngle = getAngleTo(vehicle, attractor);
       if (abs(getSignedAngleBetween(vehicle.rotation(), attractorAngle)) > PI  * 0.4) {
         float distance = getDistanceBetween(vehicle, attractor);
-        float factor = _factor * distance * distance;
+        float factor = _factor / (distance * distance);
         result += getScaledRotationDeltaToward(vehicle, attractorAngle, factor, _maxDelta);
       }
     }

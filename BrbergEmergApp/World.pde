@@ -8,30 +8,34 @@ class World {
   private ArrayList<Vehicle> _vehicles;
   private int _width;
   private int _height;
+  private PVector _center;
   private int _numGroups;
   private long _age;
 
-  public AttractorImpulse attraction;
   public AlignmentImpulse alignment;
+  public AttractorImpulse attraction;
+  public CenteringImpulse centering;
   public CohesionImpulse cohesion;
   public MeanderImpulse meander;
-  public SeparationImpulse separation;
   public RepulsionImpulse repulsion;
+  public SeparationImpulse separation;
 
   World(int width, int height, int numGroups) {
     _attractors = new ArrayList<Attractor>();
     _vehicles = new ArrayList<Vehicle>();
     _width = width;
     _height = height;
+    _center = new PVector(_width/2, _height/2);
     _numGroups = numGroups;
     _age = 0;
 
-    attraction = new AttractorImpulse(this);
-    separation = new SeparationImpulse(this);
     alignment = new AlignmentImpulse(this);
+    attraction = new AttractorImpulse(this);
+    centering = new CenteringImpulse(this);
     cohesion = new CohesionImpulse(this);
     meander = new MeanderImpulse(this);
     repulsion = new RepulsionImpulse(this);
+    separation = new SeparationImpulse(this);
   }
 
   ArrayList<Attractor> attractorsRef() {
@@ -58,6 +62,7 @@ class World {
 
   World width(int v) {
     _width = v;
+    _center = new PVector(_width/2, _height/2);
     return this;
   }
 
@@ -67,7 +72,12 @@ class World {
 
   World height(int v) {
     _height = v;
+    _center = new PVector(_width/2, _height/2);
     return this;
+  }
+
+  PVector centerRef() {
+    return _center;
   }
 
   int numGroups() {
