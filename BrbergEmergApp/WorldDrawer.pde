@@ -5,12 +5,12 @@ class WorldDrawer {
   WorldDrawer() {
     vehicleColors = new color[8];
     vehicleColors[0] = color(0, 188, 157);
-    vehicleColors[1] = color(0, 203, 119);
-    vehicleColors[2] = color(0, 154, 217);
-    vehicleColors[3] = color(160, 90, 178);
-    vehicleColors[4] = color(44, 74, 93);
+    vehicleColors[1] = color(246, 124, 40);
+    vehicleColors[2] = color(160, 90, 178);
+    vehicleColors[3] = color(44, 74, 93);
+    vehicleColors[4] = color(0, 203, 119);
     vehicleColors[5] = color(252, 194, 44);
-    vehicleColors[6] = color(246, 124, 40);
+    vehicleColors[6] = color(0, 154, 217);
     vehicleColors[7] = color(250, 73, 59);
   }
 
@@ -20,6 +20,7 @@ class WorldDrawer {
   }
 
   public void draw(PGraphics g, World world) {
+    g.background(0);
     drawVehicles(g, world);
     drawAttractors(g, world);
   }
@@ -44,20 +45,9 @@ class WorldDrawer {
   }
 
   private void drawVehicle(PGraphics g, World world, Vehicle vehicle) {
-    long age = world.age();
+    color c = vehicleColors[vehicle.groupId()];
 
     g.colorMode(HSB);
-    color c = vehicleColors[vehicle.groupId()];
-    c = color(hue(c), saturation(c), brightness(c), 255 - 255 * age / 100);
-
-    float radius = world.width() * 0.35;
-    float dx = vehicle.x() - world.width()/2;
-    float dy = vehicle.y() - world.height()/2;
-    if (dx * dx + dy * dy > radius * radius) {
-      c = color(hue(c), saturation(c), brightness(c), 255 - 255 * age / 50);
-    }
-
-
     g.stroke(c);
     g.strokeWeight(2);
     g.line(vehicle.x(), vehicle.y(),

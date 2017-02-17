@@ -15,7 +15,7 @@ FileNamer animationFolderNamer, fileNamer;
 void setup() {
   size(800, 800, P3D);
 
-  world = new World(width, height, 8);
+  world = new World(width, height, 3);
   drawer = new WorldDrawer();
   isPaused = false;
 
@@ -45,9 +45,8 @@ void resetWorld() {
   world.age(0);
   world.clearAttractors();
   world.clearVehicles();
-  //world.setupAttractors(dartboardAttractorPositioner, 3);
-  world.setupVehicles(customPositioner, 100);
-  world.calculateNearestAttractors();
+  world.setupAttractors(dartboardAttractorPositioner, 3);
+  world.setupVehicles(randomPositioner, 30);
 }
 
 void draw() {

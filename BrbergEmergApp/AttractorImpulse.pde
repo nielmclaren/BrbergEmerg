@@ -30,16 +30,17 @@ class AttractorImpulse extends Impulse {
   }
 
   float steer(Vehicle vehicle) {
-    Attractor attractor = vehicle.attractor();
-    if (attractor != null) {
+    float result = 0;
+    ArrayList<Attractor> attractors = _world.attractorsRef();
+    for (Attractor attractor : attractors) {
       float attractorAngle = getAngleTo(vehicle, attractor);
       if (abs(getSignedAngleBetween(vehicle.rotation(), attractorAngle)) > PI  * 0.4) {
         float distance = getDistanceBetween(vehicle, attractor);
         float factor = _factor * distance * distance;
-        return getScaledRotationDeltaToward(vehicle, attractorAngle, factor, _maxDelta);
+        result += getScaledRotationDeltaToward(vehicle, attractorAngle, factor, _maxDelta);
       }
     }
-    return 0;
+    return result;
   }
 
   float accelerate(Vehicle vehicle) {

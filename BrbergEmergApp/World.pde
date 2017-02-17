@@ -158,13 +158,6 @@ class World {
     return this;
   }
 
-  void calculateNearestAttractors() {
-    for (Vehicle vehicle : _vehicles) {
-      Attractor attractor = (Attractor)getNearestTo(_attractors, vehicle);
-      vehicle.attractor(attractor);
-    }
-  }
-
   private void calculateNeighborhoods() {
     for (Vehicle vehicle : _vehicles) {
       Neighborhood neighborhood = getNeighborhood(_vehicles, vehicle);
