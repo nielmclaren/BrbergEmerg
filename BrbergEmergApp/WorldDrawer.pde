@@ -48,7 +48,15 @@ class WorldDrawer {
 
     g.colorMode(HSB);
     color c = vehicleColors[vehicle.groupId()];
-    c = color(hue(c), saturation(c), brightness(c) * age / 1000, 16);
+    c = color(hue(c), saturation(c), brightness(c), 255 - 255 * age / 100);
+
+    float radius = world.width() * 0.35;
+    float dx = vehicle.x() - world.width()/2;
+    float dy = vehicle.y() - world.height()/2;
+    if (dx * dx + dy * dy > radius * radius) {
+      c = color(hue(c), saturation(c), brightness(c), 255 - 255 * age / 50);
+    }
+
 
     g.stroke(c);
     g.strokeWeight(2);

@@ -5,6 +5,7 @@ WorldDrawer drawer;
 boolean isPaused;
 
 CenteredPositioner centeredPositioner;
+CustomPositioner customPositioner;
 DartboardAttractorPositioner dartboardAttractorPositioner;
 RandomPositioner randomPositioner;
 PFont paramFont;
@@ -22,6 +23,7 @@ void setup() {
   fileNamer = new FileNamer("output/export", "png");
 
   centeredPositioner = new CenteredPositioner(world);
+  customPositioner = new CustomPositioner(world);
   dartboardAttractorPositioner = new DartboardAttractorPositioner(world)
     .rect(width/2 - 200, width/2 + 200, height/2 - 200, height/2 + 200);
   randomPositioner = new RandomPositioner(world)
@@ -43,8 +45,8 @@ void resetWorld() {
   world.age(0);
   world.clearAttractors();
   world.clearVehicles();
-  world.setupAttractors(dartboardAttractorPositioner, 3);
-  world.setupVehicles(randomPositioner, 100);
+  //world.setupAttractors(dartboardAttractorPositioner, 3);
+  world.setupVehicles(customPositioner, 100);
   world.calculateNearestAttractors();
 }
 

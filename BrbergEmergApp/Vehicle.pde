@@ -102,6 +102,9 @@ class Vehicle implements IPositioned {
   }
 
   Attractor attractor() {
+    if (_attractor == null) {
+      return null;
+    }
     return _attractor.clone();
   }
 
