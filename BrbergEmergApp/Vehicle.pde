@@ -7,7 +7,6 @@ class Vehicle implements IPositioned {
   private float _nextX;
   private float _nextY;
   private float _velocity;
-  private PVector _forceVelocity;
   private float _rotation;
   private float _nextRotation;
 
@@ -25,7 +24,6 @@ class Vehicle implements IPositioned {
     _nextX = x;
     _nextY = y;
     _velocity = 3;
-    _forceVelocity = new PVector();
     _rotation = rotation;
     _nextRotation = rotation;
 
@@ -75,15 +73,6 @@ class Vehicle implements IPositioned {
     return this;
   }
 
-  PVector forceVelocityRef() {
-    return _forceVelocity;
-  }
-
-  Vehicle forceVelocityRef(PVector v) {
-    _forceVelocity = v;
-    return this;
-  }
-
   float rotation() {
     return _rotation;
   }
@@ -129,18 +118,16 @@ class Vehicle implements IPositioned {
 
     rotationDelta += _world.alignment.steer(this);
     rotationDelta += _world.attraction.steer(this);
-    //rotationDelta += _world.centering.steer(this);
+    rotationDelta += _world.centering.steer(this);
     rotationDelta += _world.cohesion.steer(this);
     rotationDelta += _world.meander.steer(this);
     rotationDelta += _world.repulsion.steer(this);
     rotationDelta += _world.separation.steer(this);
 
-    _forceVelocity = _world.centeringForce.accelerate(this);
-
     _nextRotation = normalizeAngle(_rotation + rotationDelta);
 
-    _nextX += _velocity * cos(_nextRotation) + _forceVelocity.x;
-    _nextY += _velocity * sin(_nextRotation) + _forceVelocity.y;
+    _nextX += _velocity * cos(_nextRotation);
+    _nextY += _velocity * sin(_nextRotation);
 
     return this;
   }

@@ -7,8 +7,8 @@ class CenteringImpulse extends Impulse {
   CenteringImpulse(World world) {
     super(world);
 
-    _factor = 0.00003;
-    _maxDelta = 0.01;
+    _factor = 0.00000003;
+    _maxDelta = 0.02;
   }
 
   float factor() {
@@ -32,7 +32,7 @@ class CenteringImpulse extends Impulse {
   float steer(Vehicle vehicle) {
     float angle = getAngleTo(vehicle, _world.centerRef());
     float distance = getDistanceBetween(vehicle, _world.centerRef());
-    float factor = _factor * distance;
+    float factor = _factor * distance * distance;
     return getScaledRotationDeltaToward(vehicle, angle, factor, _maxDelta);
   }
 

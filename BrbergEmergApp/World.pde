@@ -20,8 +20,6 @@ class World {
   public RepulsionImpulse repulsion;
   public SeparationImpulse separation;
 
-  public CenteringForce centeringForce;
-
   World(int width, int height, int numGroups) {
     _attractors = new ArrayList<Attractor>();
     _vehicles = new ArrayList<Vehicle>();
@@ -38,8 +36,6 @@ class World {
     meander = new MeanderImpulse(this);
     repulsion = new RepulsionImpulse(this);
     separation = new SeparationImpulse(this);
-
-    centeringForce = new CenteringForce(this);
   }
 
   ArrayList<Attractor> attractorsRef() {

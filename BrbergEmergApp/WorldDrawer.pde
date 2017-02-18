@@ -20,6 +20,7 @@ class WorldDrawer {
   }
 
   public void draw(PGraphics g, World world) {
+    g.background(0);
     drawVehicles(g, world);
     drawAttractors(g, world);
   }
@@ -47,8 +48,6 @@ class WorldDrawer {
     color c = vehicleColors[vehicle.groupId()];
 
     g.colorMode(HSB);
-    c = color(map(vehicle.forceVelocityRef().mag(), 0, 10, 128, 255), 255, 255, 8);
-
     g.stroke(c);
     g.strokeWeight(2);
     g.line(vehicle.x(), vehicle.y(),

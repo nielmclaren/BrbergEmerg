@@ -16,7 +16,7 @@ FileNamer animationFolderNamer, fileNamer;
 void setup() {
   size(800, 800, P3D);
 
-  world = new World(width, height, 1);
+  world = new World(width, height, 3);
   drawer = new WorldDrawer();
   isPaused = false;
 
@@ -27,7 +27,8 @@ void setup() {
   customPositioner = new CustomPositioner(world);
   dartboardAttractorPositioner = new DartboardAttractorPositioner(world)
     .rect(width/2 - 200, width/2 + 200, height/2 - 200, height/2 + 200);
-  randomPositioner = new RandomPositioner(world);
+  randomPositioner = new RandomPositioner(world)
+    .rect(width/2 - 100, width/2 + 100, height/2 - 100, height/2 + 100);
   ringPositioner = new RingPositioner(world)
     .numPositions(3);
   paramFont = loadFont("InputSansNarrow-Regular-24.vlw");
