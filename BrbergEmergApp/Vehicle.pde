@@ -2,6 +2,7 @@
 class Vehicle implements IPositioned {
   // nextX, nextY, nextRotation are not exposed externally.
   private World _world;
+  private int _id;
   private float _x;
   private float _y;
   private float _nextX;
@@ -17,8 +18,9 @@ class Vehicle implements IPositioned {
 
   private float _vehicleSizeSq;
 
-  Vehicle(World world, float x, float y, float rotation) {
+  Vehicle(World world, int id, float x, float y, float rotation) {
     _world = world;
+    _id = id;
     _x = x;
     _y = y;
     _nextX = x;
@@ -41,6 +43,15 @@ class Vehicle implements IPositioned {
 
   Vehicle world(World v) {
     _world = v;
+    return this;
+  }
+
+  int id() {
+    return _id;
+  }
+
+  Vehicle id(int v) {
+    _id = v;
     return this;
   }
 
