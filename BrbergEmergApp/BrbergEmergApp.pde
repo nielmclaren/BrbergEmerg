@@ -26,13 +26,12 @@ void setup() {
   centeredPositioner = new CenteredPositioner(world);
   customPositioner = new CustomPositioner(world);
   dartboardAttractorPositioner = new DartboardAttractorPositioner(world)
-    .rect(width/2 - 200, width/2 + 200, height/2 - 200, height/2 + 200);
+    .rect(width/2 - 300, width/2 + 300, height/2 - 300, height/2 + 300);
   randomPositioner = new RandomPositioner(world)
     .rect(width/2 - 100, width/2 + 100, height/2 - 100, height/2 + 100);
   ringPositioner = new RingPositioner(world)
     .numPositions(3);
   paramFont = loadFont("InputSansNarrow-Regular-24.vlw");
-
 
   reset();
 }
@@ -48,8 +47,8 @@ void resetWorld() {
   world.age(0);
   world.clearAttractors();
   world.clearVehicles();
-  world.setupAttractors(ringPositioner, 3);
-  world.setupVehicles(randomPositioner, 300);
+  world.setupAttractors(dartboardAttractorPositioner, 6);
+  world.setupVehicles(customPositioner, 100);
 }
 
 void draw() {
