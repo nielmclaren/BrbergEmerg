@@ -53,7 +53,7 @@ class WorldDrawer {
       float rotationFactor = abs(getSignedAngleBetween(vehicle.rotation(), groupRotation)) / PI;
 
       c = color(
-          map(rotationFactor, 0, 1, 192, 255 + 32) % 255,
+          (hue(c) + map(rotationFactor, 0, 1, 0, 32)) % 255,
           saturation(c),
           brightness(c),
           map(rotationFactor, 0, 1, 0, 64));
