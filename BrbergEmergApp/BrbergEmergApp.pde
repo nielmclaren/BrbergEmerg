@@ -181,12 +181,13 @@ float getAverageRotation(ArrayList<Vehicle> vehicles) {
     return 0;
   }
 
-  float sum = 0;
+  PVector sum = new PVector();
   for (Vehicle vehicle : vehicles) {
-    sum += vehicle.rotation();
+    float r = vehicle.rotation();
+    sum.add(cos(r), sin(r));
   }
 
-  return normalizeAngle(sum / vehicles.size());
+  return normalizeAngle(atan2(sum.y, sum.x));
 }
 
 IPositioned getNearestTo(ArrayList<? extends IPositioned> items, IPositioned target) {
