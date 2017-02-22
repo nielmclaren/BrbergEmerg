@@ -4,14 +4,14 @@ class WorldDrawer {
 
   WorldDrawer() {
     vehicleColors = new color[8];
-    vehicleColors[0] = color(0, 188, 157);
+    vehicleColors[0] = color(160, 90, 178);
     vehicleColors[1] = color(246, 124, 40);
-    vehicleColors[2] = color(160, 90, 178);
-    vehicleColors[3] = color(44, 74, 93);
-    vehicleColors[4] = color(0, 203, 119);
-    vehicleColors[5] = color(252, 194, 44);
-    vehicleColors[6] = color(0, 154, 217);
-    vehicleColors[7] = color(250, 73, 59);
+    vehicleColors[2] = color(250, 73, 59);
+    vehicleColors[3] = color(0, 154, 217);
+    vehicleColors[4] = color(44, 74, 93);
+    vehicleColors[5] = color(0, 188, 157);
+    vehicleColors[6] = color(0, 203, 119);
+    vehicleColors[7] = color(252, 194, 44);
   }
 
   public void drawInitial(PGraphics g, World world) {
@@ -45,6 +45,7 @@ class WorldDrawer {
   private void drawVehicle(PGraphics g, World world, Vehicle vehicle) {
     g.colorMode(HSB);
 
+    float len = 4;
     color c = vehicleColors[vehicle.groupId()];
     if (vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()).size() <= 0) {
       c = color(hue(c), saturation(c), brightness(c), 2);
@@ -52,23 +53,30 @@ class WorldDrawer {
       float groupRotation = getAverageRotation(vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()));
       float rotationFactor = abs(getSignedAngleBetween(vehicle.rotation(), groupRotation)) / PI;
 
+      float h = (hue(c) - map(rotationFactor, 0, 1, 0, 32)) % 255;
+      while (h < 0) {
+        h += 255;
+      }
+
       c = color(
-          (hue(c) + map(rotationFactor, 0, 1, 0, 32)) % 255,
+          h,
           saturation(c),
           brightness(c),
-          map(rotationFactor, 0, 1, 0, 64));
+          64);
+          //map(rotationFactor, 0, 1, 4, 64));
+      len = rotationFactor * 20;
     }
 
+    g.strokeWeight(4);
     g.stroke(c);
-    g.strokeWeight(2);
     g.line(vehicle.x(), vehicle.y(),
-        vehicle.x() - 5 * cos(vehicle.rotation()),
-        vehicle.y() - 5 * sin(vehicle.rotation()));
+        vehicle.x() - len * cos(vehicle.rotation() + PI/2),
+        vehicle.y() - len * sin(vehicle.rotation() + PI/2));
 
-    g.noStroke();
-    g.fill(c);
-    g.ellipseMode(CENTER);
-    g.ellipse(vehicle.x(), vehicle.y(), 4, 4);
+    //g.noStroke();
+    //g.fill(c);
+    //g.ellipseMode(CENTER);
+    //g.ellipse(vehicle.x(), vehicle.y(), 4, 4);
   }
 }
 
