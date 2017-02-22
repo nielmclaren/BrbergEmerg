@@ -1,6 +1,7 @@
 
 class WorldDrawer {
   private color[] vehicleColors;
+  private String[] vehicleGlyphs;
 
   WorldDrawer() {
     vehicleColors = new color[8];
@@ -12,6 +13,25 @@ class WorldDrawer {
     vehicleColors[5] = color(0, 188, 157);
     vehicleColors[6] = color(0, 203, 119);
     vehicleColors[7] = color(252, 194, 44);
+
+    vehicleGlyphs = new String[17];
+    vehicleGlyphs[0] = "\u2192";
+    vehicleGlyphs[1] = "\u219B";
+    vehicleGlyphs[2] = "\u27F6";
+    vehicleGlyphs[3] = "\u21D2";
+    vehicleGlyphs[4] = "\u21E2";
+    vehicleGlyphs[5] = "\u21C9";
+    vehicleGlyphs[6] = "\u21C0";
+    vehicleGlyphs[7] = "\u21FC";
+    vehicleGlyphs[8] = "\u21A0";
+    vehicleGlyphs[9] = "\u2907";
+    vehicleGlyphs[10] = "\u2911";
+    vehicleGlyphs[11] = "\u291A";
+    vehicleGlyphs[12] = "\u290F";
+    vehicleGlyphs[13] = "\u291C";
+    vehicleGlyphs[14] = "\u2945";
+    vehicleGlyphs[15] = "\u219D";
+    vehicleGlyphs[16] = "\u2971";
   }
 
   public void drawInitial(PGraphics g, World world) {
@@ -45,15 +65,14 @@ class WorldDrawer {
   private void drawVehicle(PGraphics g, World world, Vehicle vehicle) {
     g.colorMode(HSB);
 
-    float len = 4;
     color c = vehicleColors[vehicle.groupId()];
     if (vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()).size() <= 0) {
-      c = color(hue(c), saturation(c), brightness(c), 2);
+      c = color(hue(c), saturation(c), brightness(c), 255);
     } else {
       float groupRotation = getAverageRotation(vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()));
       float rotationFactor = abs(getSignedAngleBetween(vehicle.rotation(), groupRotation)) / PI;
 
-      float h = (hue(c) - map(rotationFactor, 0, 1, 0, 32)) % 255;
+      float h = (hue(c) - map(rotationFactor, 0, 1, 0, 48)) % 255;
       while (h < 0) {
         h += 255;
       }
@@ -62,21 +81,16 @@ class WorldDrawer {
           h,
           saturation(c),
           brightness(c),
-          64);
-          //map(rotationFactor, 0, 1, 4, 64));
-      len = rotationFactor * 20;
+          255);
     }
 
-    g.strokeWeight(4);
-    g.stroke(c);
-    g.line(vehicle.x(), vehicle.y(),
-        vehicle.x() - len * cos(vehicle.rotation() + PI/2),
-        vehicle.y() - len * sin(vehicle.rotation() + PI/2));
-
-    //g.noStroke();
-    //g.fill(c);
-    //g.ellipseMode(CENTER);
-    //g.ellipse(vehicle.x(), vehicle.y(), 4, 4);
+    g.fill(c);
+    g.pushMatrix();
+    g.translate(vehicle.x(), vehicle.y());
+    g.rotate(vehicle.rotation());
+    g.textSize(24);
+    g.text(vehicleGlyphs[vehicle.groupId()], 0, 0);
+    g.popMatrix();
   }
 }
 
