@@ -14,6 +14,7 @@ class World {
 
   public AlignmentImpulse alignment;
   public AttractorImpulse attraction;
+  public InverseAttractorImpulse inverseAttraction;
   public CenteringImpulse centering;
   public CohesionImpulse cohesion;
   public MeanderImpulse meander;
@@ -30,7 +31,8 @@ class World {
     _age = 0;
 
     alignment = new AlignmentImpulse(this);
-    attraction = new AttractorImpulse(this);
+    attraction = new AttractorImpulse(this).isSingleAttractor(true);
+    inverseAttraction = new InverseAttractorImpulse(this).isSingleAttractor(true);
     centering = new CenteringImpulse(this);
     cohesion = new CohesionImpulse(this);
     meander = new MeanderImpulse(this);
@@ -117,8 +119,10 @@ class World {
 
   World setupVehicles(IPositioner positioner, int numVehicles) {
     for (int i = 0; i < numVehicles; i++) {
+      int groupId = floor(random(_numGroups));
       Vehicle vehicle = new Vehicle(this, i, 0, 0, random(PI))
-        .groupId(floor(random(_numGroups)));
+        .groupId(groupId)
+        .attractor(_attractors.get(groupId));
 
       if (positioner.position(vehicle, i)) {
         _vehicles.add(vehicle);

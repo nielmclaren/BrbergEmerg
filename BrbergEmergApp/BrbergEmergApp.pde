@@ -1,5 +1,6 @@
 
-PImage chargeImage;
+int numGroups;
+
 World world;
 WorldDrawer drawer;
 boolean isPaused;
@@ -15,8 +16,11 @@ FileNamer animationFolderNamer, fileNamer;
 
 void setup() {
   size(800, 800, P3D);
+  frameRate(5);
 
-  world = new World(width, height, 3);
+  numGroups = 4;
+
+  world = new World(width, height, numGroups);
   drawer = new WorldDrawer();
   isPaused = false;
 
@@ -30,7 +34,7 @@ void setup() {
   randomPositioner = new RandomPositioner(world)
     .rect(width/2 - 100, width/2 + 100, height/2 - 100, height/2 + 100);
   ringPositioner = new RingPositioner(world)
-    .numPositions(3);
+    .numPositions(numGroups);
   paramFont = loadFont("InputSansNarrow-Regular-24.vlw");
 
   reset();
@@ -47,13 +51,13 @@ void resetWorld() {
   world.age(0);
   world.clearAttractors();
   world.clearVehicles();
-  world.setupAttractors(dartboardAttractorPositioner, 6);
+  world.setupAttractors(dartboardAttractorPositioner, numGroups);
   world.setupVehicles(customPositioner, 100);
 }
 
 void draw() {
   if (!isPaused) {
-    world.step();
+    world.step(7);
     drawer.draw(g, world);
   }
 }

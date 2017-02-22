@@ -7,7 +7,7 @@ class CenteringImpulse extends Impulse {
   CenteringImpulse(World world) {
     super(world);
 
-    _factor = 0.0000001;
+    _factor = 0.00000001;
     _maxDelta = 0.02;
   }
 
