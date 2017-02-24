@@ -5,12 +5,12 @@ class WorldDrawer {
 
   WorldDrawer() {
     vehicleColors = new color[8];
-    vehicleColors[0] = color(160, 90, 178);
+    vehicleColors[0] = color(0, 188, 157);
     vehicleColors[1] = color(246, 124, 40);
     vehicleColors[2] = color(250, 73, 59);
     vehicleColors[3] = color(0, 154, 217);
-    vehicleColors[4] = color(44, 74, 93);
-    vehicleColors[5] = color(0, 188, 157);
+    vehicleColors[4] = color(160, 90, 178);
+    vehicleColors[5] = color(44, 74, 93);
     vehicleColors[6] = color(0, 203, 119);
     vehicleColors[7] = color(252, 194, 44);
 
@@ -35,7 +35,6 @@ class WorldDrawer {
   }
 
   public void drawInitial(PGraphics g, World world) {
-    g.background(0);
     drawAttractors(g, world);
   }
 
@@ -65,9 +64,10 @@ class WorldDrawer {
   private void drawVehicle(PGraphics g, World world, Vehicle vehicle) {
     g.colorMode(HSB);
 
+    int alpha = 255;
     color c = vehicleColors[vehicle.groupId()];
     if (vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()).size() <= 0) {
-      c = color(hue(c), saturation(c), brightness(c), 255);
+      c = color(hue(c), saturation(c), brightness(c), alpha);
     } else {
       float groupRotation = getAverageRotation(vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()));
       float rotationFactor = abs(getSignedAngleBetween(vehicle.rotation(), groupRotation)) / PI;
@@ -81,7 +81,7 @@ class WorldDrawer {
           h,
           saturation(c),
           brightness(c),
-          255);
+          alpha);
     }
 
     g.fill(c);

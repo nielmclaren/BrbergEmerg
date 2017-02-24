@@ -1,4 +1,6 @@
 
+PImage backgroundImage;
+
 int numGroups;
 
 World world;
@@ -16,9 +18,11 @@ FileNamer animationFolderNamer, fileNamer;
 
 void setup() {
   size(800, 800, P3D);
-  frameRate(5);
+  frameRate(4);
 
   numGroups = 4;
+
+  backgroundImage = loadImage("northamericamap.png");
 
   world = new World(width, height, numGroups);
   drawer = new WorldDrawer();
@@ -52,12 +56,12 @@ void resetWorld() {
   world.clearAttractors();
   world.clearVehicles();
   world.setupAttractors(dartboardAttractorPositioner, numGroups);
-  world.setupVehicles(customPositioner, 100);
+  world.setupVehicles(customPositioner, 80);
 }
 
 void draw() {
   if (!isPaused) {
-    world.step(7);
+    world.step(8);
     drawer.draw(g, world);
   }
 }
@@ -80,7 +84,7 @@ void keyReleased() {
       saveAnimation(100);
       break;
     case 'b':
-      background(0);
+      image(backgroundImage, 0, 0);
       world.age(0);
       break;
     case 'e':
