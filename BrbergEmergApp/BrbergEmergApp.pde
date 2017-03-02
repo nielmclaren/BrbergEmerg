@@ -1,6 +1,4 @@
 
-PImage backgroundImage;
-
 int numGroups;
 
 World world;
@@ -18,11 +16,9 @@ FileNamer animationFolderNamer, fileNamer;
 
 void setup() {
   size(800, 800, P3D);
-  frameRate(4);
+  frameRate(20);
 
   numGroups = 4;
-
-  backgroundImage = loadImage("northamericamap.png");
 
   world = new World(width, height, numGroups);
   drawer = new WorldDrawer();
@@ -84,7 +80,7 @@ void keyReleased() {
       saveAnimation(100);
       break;
     case 'b':
-      image(backgroundImage, 0, 0);
+      background(0);
       world.age(0);
       break;
     case 'e':

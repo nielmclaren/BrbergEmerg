@@ -1,7 +1,7 @@
 
 class World {
   public static final int NEIGHBORHOOD_RADIUS = 80;
-  public static final int MIN_DISTANCE = 8;
+  public static final int MIN_DISTANCE = 15;
   public static final int OUT_GROUP_MIN_DISTANCE = 40;
 
   private ArrayList<Attractor> _attractors;
@@ -31,7 +31,7 @@ class World {
     _age = 0;
 
     alignment = new AlignmentImpulse(this);
-    attraction = new AttractorImpulse(this).isSingleAttractor(true);
+    attraction = new AttractorImpulse(this).isSingleAttractor(false);
     inverseAttraction = new InverseAttractorImpulse(this).isSingleAttractor(true);
     centering = new CenteringImpulse(this);
     cohesion = new CohesionImpulse(this);
