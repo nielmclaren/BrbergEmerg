@@ -15,7 +15,7 @@ class CustomPositioner implements IPositioner {
       vehicle
         .x(_world.width()/2 + radius * cos(angle))
         .y(_world.height()/2 + radius * sin(angle))
-        .rotation(normalizeAngle(angle + PI));
+        .rotation(normalizeAngle(angle + PI + random(-1, 1) * PI));
     }
 
     return true;

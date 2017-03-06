@@ -1,7 +1,6 @@
 
 class WorldDrawer {
   private color[] vehicleColors;
-  private String[] vehicleGlyphs;
 
   WorldDrawer() {
     vehicleColors = new color[8];
@@ -13,13 +12,6 @@ class WorldDrawer {
     vehicleColors[5] = color(44, 74, 93);
     vehicleColors[6] = color(0, 203, 119);
     vehicleColors[7] = color(252, 194, 44);
-
-    ArrayList<String> glyphs = new ArrayList<String>();
-    glyphs.add("\u21e2");
-    glyphs.add("\u21e8");
-    glyphs.add("\uffeb");
-    glyphs.add("\u279b");
-    vehicleGlyphs = glyphs.toArray(new String[glyphs.size()]);
   }
 
   public void drawInitial(PGraphics g, World world) {
@@ -52,7 +44,7 @@ class WorldDrawer {
   private void drawVehicle(PGraphics g, World world, Vehicle vehicle) {
     g.colorMode(HSB);
 
-    int alpha = 0;
+    int alpha = 128;
     color c = vehicleColors[vehicle.groupId() + 2];
     if (vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()).size() <= 0) {
       c = color(hue(c), saturation(c), brightness(c), alpha);
@@ -65,8 +57,6 @@ class WorldDrawer {
         h += 255;
       }
 
-      alpha = floor(map(rotationFactor, 0, 1, map(world.age(), 0, 1000, 16, 255), 255));
-
       c = color(
           h,
           saturation(c),
@@ -74,12 +64,11 @@ class WorldDrawer {
           alpha);
     }
 
-    g.fill(c);
+    g.stroke(c);
     g.pushMatrix();
     g.translate(vehicle.x(), vehicle.y());
     g.rotate(vehicle.rotation());
-    g.textSize(20);
-    g.text(vehicleGlyphs[vehicle.groupId() % vehicleGlyphs.length], 0, 0);
+    g.line(0, 0, 5, 0);
     g.popMatrix();
   }
 }

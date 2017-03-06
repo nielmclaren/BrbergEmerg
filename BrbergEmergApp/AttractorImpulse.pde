@@ -2,6 +2,7 @@
 // Steer toward attractors. Nearer attractors have more influence.
 class AttractorImpulse extends Impulse {
   private float _factor;
+  private float _maxAngleBetween;
   private float _maxDelta;
   private boolean _isSingleAttractor;
 
@@ -9,7 +10,8 @@ class AttractorImpulse extends Impulse {
     super(world);
 
     _factor = 50;
-    _maxDelta = 0.02;
+    _maxAngleBetween = PI  * 0.2;
+    _maxDelta = 0.03;
     _isSingleAttractor = false;
   }
 
@@ -19,6 +21,15 @@ class AttractorImpulse extends Impulse {
 
   AttractorImpulse factor(float v) {
     _factor = v;
+    return this;
+  }
+
+  float maxAngleBetween() {
+    return _maxAngleBetween;
+  }
+
+  AttractorImpulse maxAngleBetween(float v) {
+    _maxAngleBetween = v;
     return this;
   }
 
@@ -55,7 +66,7 @@ class AttractorImpulse extends Impulse {
 
   private float getRotationDeltaToward(Vehicle vehicle, Attractor attractor) {
     float attractorAngle = getAngleTo(vehicle, attractor);
-    if (abs(getSignedAngleBetween(vehicle.rotation(), attractorAngle)) > PI  * 0.4) {
+    if (abs(getSignedAngleBetween(vehicle.rotation(), attractorAngle)) > _maxAngleBetween) {
       float distance = getDistanceBetween(vehicle, attractor);
       float factor = _factor / (distance * distance);
       return getScaledRotationDeltaToward(vehicle, attractorAngle, factor, _maxDelta);

@@ -7,8 +7,8 @@ class CohesionImpulse extends Impulse {
   CohesionImpulse(World world) {
     super(world);
 
-    _factor = 0.1;
-    _maxDelta = 0.02;
+    _factor = 0.000001;
+    _maxDelta = 0.01;
   }
 
   float factor() {
