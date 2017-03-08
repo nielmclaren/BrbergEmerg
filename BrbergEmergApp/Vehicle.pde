@@ -131,7 +131,7 @@ class Vehicle implements IPositioned {
     rotationDelta += _world.inverseAttraction.steer(this);
     //rotationDelta += _world.centering.steer(this);
     rotationDelta += _world.cohesion.steer(this);
-    //rotationDelta += _world.meander.steer(this);
+    rotationDelta += _world.meander.steer(this);
     rotationDelta += _world.repulsion.steer(this);
     rotationDelta += _world.separation.steer(this);
 

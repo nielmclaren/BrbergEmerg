@@ -19,6 +19,7 @@ class WorldDrawer {
   }
 
   public void draw(PGraphics g, World world) {
+    g.background(0);
     drawVehicles(g, world);
   }
 
@@ -44,7 +45,7 @@ class WorldDrawer {
   private void drawVehicle(PGraphics g, World world, Vehicle vehicle) {
     g.colorMode(HSB);
 
-    int alpha = 128;
+    int alpha = 192;
     color c = vehicleColors[vehicle.groupId() + 2];
     if (vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()).size() <= 0) {
       c = color(hue(c), saturation(c), brightness(c), alpha);
@@ -52,7 +53,7 @@ class WorldDrawer {
       float groupRotation = getAverageRotation(vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()));
       float rotationFactor = abs(getSignedAngleBetween(vehicle.rotation(), groupRotation)) / PI;
 
-      float h = (hue(c) - map(rotationFactor, 0, 1, 0, 48)) % 255;
+      float h = (hue(c) - map(rotationFactor, 0, 1, 0, 64)) % 255;
       while (h < 0) {
         h += 255;
       }
@@ -64,11 +65,12 @@ class WorldDrawer {
           alpha);
     }
 
-    g.stroke(c);
+    g.blendMode(ADD);
+    g.fill(c);
     g.pushMatrix();
     g.translate(vehicle.x(), vehicle.y());
     g.rotate(vehicle.rotation());
-    g.line(0, 0, 5, 0);
+    g.ellipse(0, 0, 10, 10);
     g.popMatrix();
   }
 }

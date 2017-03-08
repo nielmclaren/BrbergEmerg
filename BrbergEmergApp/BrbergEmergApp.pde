@@ -3,6 +3,8 @@ int numGroups;
 
 World world;
 WorldDrawer drawer;
+PGraphics buffer;
+short[] shortBuffer;
 boolean isPaused;
 
 CenteredPositioner centeredPositioner;
@@ -21,6 +23,11 @@ void setup() {
 
   world = new World(width, height, numGroups);
   drawer = new WorldDrawer();
+  buffer = createGraphics(width, height, P3D);
+  shortBuffer = new short[width * height * 3];
+  for (int i = 0; i < shortBuffer.length; i++) {
+    shortBuffer[i] = Short.MIN_VALUE;
+  }
   isPaused = false;
 
   animationFolderNamer = new FileNamer("output/anim", "/");
@@ -43,7 +50,10 @@ void reset() {
   resetWorld();
 
   background(0);
-  drawer.drawInitial(g, world);
+  buffer.beginDraw();
+  buffer.background(0);
+  drawer.drawInitial(buffer, world);
+  buffer.endDraw();
 }
 
 void resetWorld() {
@@ -57,8 +67,54 @@ void resetWorld() {
 void draw() {
   if (!isPaused) {
     world.step();
-    drawer.draw(g, world);
+    buffer.beginDraw();
+    drawer.draw(buffer, world);
+    buffer.endDraw();
+
+    // buffer to shortBuffer
+    colorMode(HSB);
+    buffer.loadPixels();
+    for (int i = 0; i < buffer.pixels.length; i++) {
+      color p = buffer.pixels[i];
+      if (brightness(p) > 192) {
+        p = color(0, 255, 255);
+        shortBuffer[i * 3 + 0] = (short)constrain(shortBuffer[i * 3 + 0] + byteToShort(red(p)), Short.MIN_VALUE, Short.MAX_VALUE);
+        shortBuffer[i * 3 + 1] = (short)constrain(shortBuffer[i * 3 + 1] + byteToShort(green(p)), Short.MIN_VALUE, Short.MAX_VALUE);
+        shortBuffer[i * 3 + 2] = (short)constrain(shortBuffer[i * 3 + 2] + byteToShort(blue(p)), Short.MIN_VALUE, Short.MAX_VALUE);
+      }
+    }
+
+    // fade shortBuffer
+    for (int i = 0; i < shortBuffer.length; i++) {
+      shortBuffer[i] -= 32;
+    }
+
+    // shortBuffer to screen
+    loadPixels();
+    for (int i = 0; i < buffer.pixels.length; i++) {
+      pixels[i] = color(
+          shortBuffer[i * 3 + 0] / 255,
+          shortBuffer[i * 3 + 1] / 255,
+          shortBuffer[i * 3 + 2] / 255);
+    }
+    updatePixels();
   }
+}
+
+void clear() {
+  background(0);
+  buffer.background(0);
+  for (int i = 0; i < shortBuffer.length; i++) {
+    shortBuffer[i] = Short.MIN_VALUE;
+  }
+}
+
+private int shortToFloat(int v) {
+  return floor(((float)v - Short.MIN_VALUE) / (Short.MAX_VALUE - Short.MIN_VALUE) * 255);
+}
+
+private short byteToShort(float v) {
+  return (short)((float)v / 255 * (Short.MAX_VALUE - Short.MIN_VALUE - 1) + Short.MIN_VALUE);
 }
 
 void keyReleased() {
@@ -79,10 +135,11 @@ void keyReleased() {
       saveAnimation(100);
       break;
     case 'b':
-      background(0);
+      clear();
       world.age(0);
       break;
     case 'e':
+      clear();
       reset();
       break;
     case 'f':
