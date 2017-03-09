@@ -15,6 +15,7 @@ class WorldDrawer {
   }
 
   public void drawInitial(PGraphics g, World world) {
+    g.background(0);
     drawAttractors(g, world);
   }
 
@@ -43,7 +44,7 @@ class WorldDrawer {
   }
 
   private void drawVehicle(PGraphics g, World world, Vehicle vehicle) {
-    g.colorMode(HSB);
+    colorMode(HSB);
 
     int alpha = 192;
     color c = vehicleColors[vehicle.groupId() + 2];
