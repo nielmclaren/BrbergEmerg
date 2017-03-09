@@ -28,7 +28,7 @@ void setup() {
   world = new World(imageWidth, imageHeight, numGroups);
   drawer = new WorldDrawer();
   buffer = createGraphics(imageWidth, imageHeight, P3D);
-  shortBuffer = new ShortImage(imageWidth, imageHeight);
+  shortBuffer = new ShortImage(imageWidth, imageHeight, ARGB);
   isPaused = false;
 
   animationFolderNamer = new FileNamer("output/anim", "/");

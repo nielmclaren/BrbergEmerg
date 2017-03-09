@@ -46,7 +46,7 @@ class WorldDrawer {
   private void drawVehicle(PGraphics g, World world, Vehicle vehicle) {
     colorMode(HSB);
 
-    int alpha = 192;
+    int alpha = 64;
     color c = vehicleColors[vehicle.groupId() + 2];
     if (vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()).size() <= 0) {
       c = color(hue(c), saturation(c), brightness(c), alpha);
