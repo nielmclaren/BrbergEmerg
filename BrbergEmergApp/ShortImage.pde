@@ -15,17 +15,26 @@ class ShortImage {
   }
 
   color getPixel(int x, int y) {
-    return color(
-        deepToFloat(_values[(y * _width + x) * 3 + 0]) * 256.0,
-        deepToFloat(_values[(y * _width + x) * 3 + 1]) * 256.0,
-        deepToFloat(_values[(y * _width + x) * 3 + 2]) * 256.0);
+    pushStyle();
+    colorMode(RGB, 1);
+    color c = color(
+        deepToFloat(_values[(y * _width + x) * 3 + 0]),
+        deepToFloat(_values[(y * _width + x) * 3 + 1]),
+        deepToFloat(_values[(y * _width + x) * 3 + 2]));
+    popStyle();
+    return c;
   }
 
   void setPixel(int x, int y, color v) {
-    _values[(y * _width + x) * 3 + 0] = floatToDeep(red(v) / 256.0);
-    _values[(y * _width + x) * 3 + 1] = floatToDeep(green(v) / 256.0);
-    _values[(y * _width + x) * 3 + 2] = floatToDeep(blue(v) / 256.0);
+    pushStyle();
+    colorMode(RGB, 1);
+
+    _values[(y * _width + x) * 3 + 0] = floatToDeep(red(v));
+    _values[(y * _width + x) * 3 + 1] = floatToDeep(green(v));
+    _values[(y * _width + x) * 3 + 2] = floatToDeep(blue(v));
+
     _isImageDirty = true;
+    popStyle();
   }
 
   short getRedValue(int x, int y) {
@@ -112,50 +121,60 @@ class ShortImage {
   }
 
   void updateImage() {
-    colorMode(RGB);
+    pushStyle();
+    colorMode(RGB, 1);
     _image.loadPixels();
 
     int pixelCount = _width * _height;
     for (int i = 0; i < pixelCount; i++) {
       _image.pixels[i] = color(
-          deepToFloat(_values[i * 3 + 0]) * 256.0,
-          deepToFloat(_values[i * 3 + 1]) * 256.0,
-          deepToFloat(_values[i * 3 + 2]) * 256.0);
+          deepToFloat(_values[i * 3 + 0]),
+          deepToFloat(_values[i * 3 + 1]),
+          deepToFloat(_values[i * 3 + 2]));
     }
 
     _image.updatePixels();
 
     _isImageDirty = false;
+    popStyle();
   }
 
   void setImage(PImage inputImg) {
+    pushStyle();
+    colorMode(RGB, 1);
+
     inputImg.loadPixels();
 
     int pixelCount = inputImg.width * inputImg.height;
     for (int i = 0; i < pixelCount; i++) {
-      _values[i * 3 + 0] = floatToDeep(red(inputImg.pixels[i]) / 256.0);
-      _values[i * 3 + 1] = floatToDeep(green(inputImg.pixels[i]) / 256.0);
-      _values[i * 3 + 2] = floatToDeep(blue(inputImg.pixels[i]) / 256.0);
+      _values[i * 3 + 0] = floatToDeep(red(inputImg.pixels[i]));
+      _values[i * 3 + 1] = floatToDeep(green(inputImg.pixels[i]));
+      _values[i * 3 + 2] = floatToDeep(blue(inputImg.pixels[i]));
     }
 
     _isImageDirty = true;
+    popStyle();
   }
 
   void addImage(PImage inputImg) {
+    pushStyle();
+    colorMode(RGB, 1);
+
     inputImg.loadPixels();
 
     int shortRange = Short.MAX_VALUE - Short.MIN_VALUE;
     int pixelCount = inputImg.width * inputImg.height;
     for (int i = 0; i < pixelCount; i++) {
       _values[i * 3 + 0] = (short)min(_values[i * 3 + 0]
-          + red(inputImg.pixels[i]) * shortRange / 256.0, Short.MAX_VALUE);
+          + red(inputImg.pixels[i]) * shortRange, Short.MAX_VALUE);
       _values[i * 3 + 1] = (short)min(_values[i * 3 + 1]
-          + green(inputImg.pixels[i]) * shortRange / 256.0, Short.MAX_VALUE);
+          + green(inputImg.pixels[i]) * shortRange, Short.MAX_VALUE);
       _values[i * 3 + 2] = (short)min(_values[i * 3 + 2]
-          + blue(inputImg.pixels[i]) * shortRange / 256.0, Short.MAX_VALUE);
+          + blue(inputImg.pixels[i]) * shortRange, Short.MAX_VALUE);
     }
 
     _isImageDirty = true;
+    popStyle();
   }
 
   private float deepToFloat(int v) {
