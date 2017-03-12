@@ -21,7 +21,7 @@ void setup() {
 
   imageWidth = 800;
   imageHeight = 800;
-  numGroups = 1;
+  numGroups = 2;
 
   world = new World(imageWidth, imageHeight, numGroups);
   drawer = new WorldDrawer();
@@ -52,8 +52,8 @@ void resetWorld() {
   world.age(0);
   world.clearAttractors();
   world.clearVehicles();
-  world.setupAttractors(centeredPositioner, numGroups);
-  world.setupVehicles(customPositioner, 300);
+  world.setupAttractors(customPositioner, numGroups);
+  world.setupVehicles(randomPositioner, 100);
 }
 
 void draw() {

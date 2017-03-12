@@ -7,15 +7,14 @@ class CustomPositioner implements IPositioner {
   }
 
   public boolean position(IPositioned target, int index) {
-    float angle = random(2 * PI);
-    float radius = _world.width() * 0.35;
-
-    Vehicle vehicle = (Vehicle)target;
-    if (vehicle != null) {
-      vehicle
-        .x(_world.width()/2 + radius * cos(angle))
-        .y(_world.height()/2 + radius * sin(angle))
-        .rotation(normalizeAngle(angle + PI + random(-1, 1) * PI));
+    if (index == 0) {
+      target
+        .x(_world.width()/2 - 150)
+        .y(_world.height()/2);
+    } else if (index == 1) {
+      target
+        .x(_world.width()/2 + 150)
+        .y(_world.height()/2);
     }
 
     return true;
