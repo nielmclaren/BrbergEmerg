@@ -5,8 +5,6 @@ int numGroups;
 
 World world;
 WorldDrawer drawer;
-PGraphics buffer;
-ShortImage shortBuffer;
 boolean isPaused;
 
 CenteredPositioner centeredPositioner;
@@ -19,7 +17,7 @@ PFont paramFont;
 FileNamer animationFolderNamer, fileNamer;
 
 void setup() {
-  size(1600, 800, P3D);
+  size(800, 800, P3D);
 
   imageWidth = 800;
   imageHeight = 800;
@@ -27,8 +25,6 @@ void setup() {
 
   world = new World(imageWidth, imageHeight, numGroups);
   drawer = new WorldDrawer();
-  buffer = createGraphics(imageWidth, imageHeight, P3D);
-  shortBuffer = new ShortImage(imageWidth, imageHeight, ARGB);
   isPaused = false;
 
   animationFolderNamer = new FileNamer("output/anim", "/");
@@ -49,12 +45,7 @@ void setup() {
 
 void reset() {
   resetWorld();
-
-  buffer.beginDraw();
-  drawer.drawInitial(buffer, world);
-  buffer.endDraw();
-
-  shortBuffer.setImage(buffer);
+  drawer.drawInitial(g, world);
 }
 
 void resetWorld() {
@@ -68,32 +59,12 @@ void resetWorld() {
 void draw() {
   if (!isPaused) {
     world.step();
-
-    buffer.beginDraw();
-    drawer.draw(buffer, world);
-    buffer.endDraw();
-
-    image(buffer, 0, 0);
-
-    shortBuffer.addImage(buffer);
-    shortBuffer.fade(0.01);
-    PImage outputImage = shortBuffer.getImageRef();
-    image(outputImage, imageWidth, 0);
+    drawer.draw(g, world);
   }
 }
 
 void clear() {
   background(0);
-  buffer.background(0);
-  shortBuffer.setImage(buffer);
-}
-
-private int shortToFloat(int v) {
-  return floor(((float)v - Short.MIN_VALUE) / (Short.MAX_VALUE - Short.MIN_VALUE) * 255);
-}
-
-private short byteToShort(float v) {
-  return (short)((float)v / 255 * (Short.MAX_VALUE - Short.MIN_VALUE - 1) + Short.MIN_VALUE);
 }
 
 void keyReleased() {
@@ -110,9 +81,6 @@ void keyReleased() {
     case '4':
       world.step(10000);
       break;
-    case 'a':
-      saveAnimation(100);
-      break;
     case 'b':
       clear();
       world.age(0);
@@ -121,80 +89,13 @@ void keyReleased() {
       clear();
       reset();
       break;
-    case 'f':
-      saveParamSpace();
-      break;
     case 'r':
-      PImage outputImage = shortBuffer.getImageRef();
-      outputImage.save(fileNamer.next());
+      save(fileNamer.next());
       break;
     case ' ':
       isPaused = !isPaused;
       break;
   }
-}
-
-void saveAnimation(int numFrames) {
-  isPaused = true;
-
-  FileNamer frameNamer = new FileNamer(animationFolderNamer.next() + "frame", "png");
-  for (int i = 0; i < numFrames; i++) {
-    world.step();
-    drawer.draw(g, world);
-    save(frameNamer.next());
-  }
-
-  isPaused = false;
-}
-
-void saveParamSpace() {
-  PGraphics canvas = createGraphics(3600, 3600, P3D);
-
-  int numCols = 12;
-  int numRows = 12;
-  float w = (float)canvas.width / numCols;
-  float h = (float)canvas.height / numRows;
-  for (int col = 0; col < numCols; col++) {
-    for (int row = 0; row < numRows; row++) {
-      float maxDelta = map(col, 0, numCols, 0.01, 0.3);
-      float noiseScale = map(pow((float)row / numRows, 4), 0, 1, 0.05, 5.0);
-      drawWorld(canvas, col * w, row * h, w, h, maxDelta, noiseScale);
-    }
-  }
-
-  canvas.save(fileNamer.next());
-}
-
-void drawWorld(PGraphics graphics, float x, float y, float w, float h, float maxDelta, float noiseScale) {
-  PGraphics drawWorldCanvas = createGraphics(600, 600, P3D);
-
-  resetWorld();
-  world.meander
-    .maxDelta(maxDelta)
-    .noiseScale(noiseScale);
-
-  drawWorldCanvas.beginDraw();
-  drawWorldCanvas.background(0);
-
-  drawer.drawInitial(drawWorldCanvas, world);
-
-  for (int i = 0; i < 1000; i++) {
-    world.step();
-    drawer.draw(drawWorldCanvas, world);
-  }
-
-  drawWorldCanvas.beginDraw();
-  drawWorldCanvas.fill(255);
-  drawWorldCanvas.textFont(paramFont);
-  drawWorldCanvas.text("Max delta: " + (float)floor(maxDelta * 100) / 100, 20, 30);
-  drawWorldCanvas.text("Noise scale: " + (float)floor(noiseScale * 100) / 100, 20, 60);
-  drawWorldCanvas.endDraw();
-
-  drawWorldCanvas.endDraw();
-
-  graphics.beginDraw();
-  graphics.image(drawWorldCanvas, x, y, w, h);
-  graphics.endDraw();
 }
 
 int deg(float v) {

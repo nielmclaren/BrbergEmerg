@@ -46,7 +46,7 @@ class WorldDrawer {
   private void drawVehicle(PGraphics g, World world, Vehicle vehicle) {
     colorMode(HSB);
 
-    int alpha = 64;
+    int alpha = 128;
     color c = vehicleColors[vehicle.groupId() + 2];
     if (vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()).size() <= 0) {
       c = color(hue(c), saturation(c), brightness(c), alpha);
@@ -68,10 +68,14 @@ class WorldDrawer {
 
     g.blendMode(ADD);
     g.fill(c);
+    g.stroke(c);
+    g.strokeWeight(3);
     g.pushMatrix();
     g.translate(vehicle.x(), vehicle.y());
     g.rotate(vehicle.rotation());
-    g.ellipse(0, 0, 10, 10);
+    g.ellipseMode(CENTER);
+    g.ellipse(0, 0, 3, 3);
+    g.line(0, 0, -5, 0);
     g.popMatrix();
   }
 }
