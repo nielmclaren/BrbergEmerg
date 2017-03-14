@@ -21,7 +21,7 @@ void setup() {
 
   imageWidth = 800;
   imageHeight = 800;
-  numGroups = 2;
+  numGroups = 3;
 
   world = new World(imageWidth, imageHeight, numGroups);
   drawer = new WorldDrawer();

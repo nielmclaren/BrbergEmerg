@@ -7,15 +7,13 @@ class CustomPositioner implements IPositioner {
   }
 
   public boolean position(IPositioned target, int index) {
-    if (index == 0) {
-      target
-        .x(_world.width()/2 - 150)
-        .y(_world.height()/2);
-    } else if (index == 1) {
-      target
-        .x(_world.width()/2 + 150)
-        .y(_world.height()/2);
-    }
+    int numTargets = 3;
+    float angle = (float)index / numTargets * 2 * PI;
+    float radius = 150;
+
+    target
+      .x(_world.width()/2 + radius * cos(angle))
+      .y(_world.height()/2 + radius * sin(angle));
 
     return true;
   }
