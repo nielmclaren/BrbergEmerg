@@ -5,7 +5,9 @@ int numGroups;
 
 World world;
 WorldDrawer drawer;
+PGraphics buffer;
 boolean isPaused;
+boolean isBackgroundEnabled;
 
 CenteredPositioner centeredPositioner;
 CustomPositioner customPositioner;
@@ -17,15 +19,17 @@ PFont paramFont;
 FileNamer animationFolderNamer, fileNamer;
 
 void setup() {
-  size(800, 800, P3D);
+  size(1000, 800, P3D);
 
-  imageWidth = 800;
-  imageHeight = 800;
-  numGroups = 3;
+  imageWidth = 3000;
+  imageHeight = 2400;
+  numGroups = 5;
 
   world = new World(imageWidth, imageHeight, numGroups);
   drawer = new WorldDrawer();
+  buffer = createGraphics(imageWidth, imageHeight, P3D);
   isPaused = false;
+  isBackgroundEnabled = false;
 
   animationFolderNamer = new FileNamer("output/anim", "/");
   fileNamer = new FileNamer("output/export", "png");
@@ -33,7 +37,7 @@ void setup() {
   centeredPositioner = new CenteredPositioner(world);
   customPositioner = new CustomPositioner(world);
   dartboardAttractorPositioner = new DartboardAttractorPositioner(world)
-    .rect(imageWidth/2 - 300, imageWidth/2 + 300, imageHeight/2 - 300, imageHeight/2 + 300);
+    .rect(imageWidth * 0.15, imageWidth * 0.85, imageHeight * 0.15, imageHeight * 0.85);
   randomPositioner = new RandomPositioner(world)
     .rect(imageWidth/2 - 100, imageWidth/2 + 100, imageHeight/2 - 100, imageHeight/2 + 100);
   ringPositioner = new RingPositioner(world)
@@ -45,26 +49,38 @@ void setup() {
 
 void reset() {
   resetWorld();
-  drawer.drawInitial(g, world);
+  buffer.beginDraw();
+  drawer.drawInitial(buffer, world);
+  buffer.endDraw();
 }
 
 void resetWorld() {
   world.age(0);
   world.clearAttractors();
   world.clearVehicles();
-  world.setupAttractors(customPositioner, numGroups);
-  world.setupVehicles(randomPositioner, 100);
+  world.setupAttractors(dartboardAttractorPositioner, numGroups);
+  world.setupVehicles(randomPositioner, 1000);
 }
 
 void draw() {
   if (!isPaused) {
     world.step();
-    drawer.draw(g, world);
+
+    buffer.beginDraw();
+    if (isBackgroundEnabled) {
+      buffer.background(0);
+    }
+    drawer.draw(buffer, world);
+    buffer.endDraw();
+
+    image(buffer, 0, 0, imageWidth/3, imageHeight/3);
   }
 }
 
 void clear() {
-  background(0);
+  buffer.beginDraw();
+  buffer.background(0);
+  buffer.endDraw();
 }
 
 void keyReleased() {
@@ -79,7 +95,7 @@ void keyReleased() {
       world.step(1000);
       break;
     case '4':
-      world.step(10000);
+      world.step(5000);
       break;
     case 'b':
       clear();
@@ -90,7 +106,10 @@ void keyReleased() {
       reset();
       break;
     case 'r':
-      save(fileNamer.next());
+      buffer.save(fileNamer.next());
+      break;
+    case 't':
+      isBackgroundEnabled = !isBackgroundEnabled;
       break;
     case ' ':
       isPaused = !isPaused;

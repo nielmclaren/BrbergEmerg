@@ -1,8 +1,9 @@
 
 class World {
-  public static final int NEIGHBORHOOD_RADIUS = 80;
-  public static final int MIN_DISTANCE = 15;
-  public static final int OUT_GROUP_MIN_DISTANCE = 40;
+  public static final int ATTRACTOR_RADIUS = 300;
+  public static final int NEIGHBORHOOD_RADIUS = 240;
+  public static final int MIN_DISTANCE = 60;
+  public static final int OUT_GROUP_MIN_DISTANCE = 120;
 
   private ArrayList<Attractor> _attractors;
   private ArrayList<Vehicle> _vehicles;
@@ -107,7 +108,7 @@ class World {
 
   World setupAttractors(IPositioner positioner, int numAttractors) {
     for (int i = 0; i < numAttractors; i++) {
-      Attractor attractor = new Attractor(i, 0, 0, 50);
+      Attractor attractor = new Attractor(i, 0, 0, ATTRACTOR_RADIUS);
       if (positioner.position(attractor, i)) {
         _attractors.add(attractor);
       } else {

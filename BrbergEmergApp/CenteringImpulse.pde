@@ -8,7 +8,7 @@ class CenteringImpulse extends Impulse {
     super(world);
 
     _factor = 0.00000001;
-    _maxDelta = 0.02;
+    _maxDelta = 0.006;
   }
 
   float factor() {

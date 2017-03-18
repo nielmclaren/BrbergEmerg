@@ -11,7 +11,7 @@ class AttractorImpulse extends Impulse {
 
     _factor = 50;
     _maxAngleBetween = PI  * 0.2;
-    _maxDelta = 0.03;
+    _maxDelta = 0.01;
     _isSingleAttractor = false;
   }
 
