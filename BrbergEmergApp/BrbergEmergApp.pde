@@ -19,10 +19,11 @@ PFont paramFont;
 FileNamer animationFolderNamer, fileNamer;
 
 void setup() {
-  size(1000, 800, P3D);
+  //size(1920, 1080, P3D);
+  fullScreen(P3D, 0);
 
-  imageWidth = 3000;
-  imageHeight = 2400;
+  imageWidth = 1920;
+  imageHeight = 1080;
   numGroups = 5;
 
   world = new World(imageWidth, imageHeight, numGroups);
@@ -38,8 +39,7 @@ void setup() {
   customPositioner = new CustomPositioner(world);
   dartboardAttractorPositioner = new DartboardAttractorPositioner(world)
     .rect(imageWidth * 0.15, imageWidth * 0.85, imageHeight * 0.15, imageHeight * 0.85);
-  randomPositioner = new RandomPositioner(world)
-    .rect(imageWidth/2 - 100, imageWidth/2 + 100, imageHeight/2 - 100, imageHeight/2 + 100);
+  randomPositioner = new RandomPositioner(world);
   ringPositioner = new RingPositioner(world)
     .numPositions(numGroups);
   paramFont = loadFont("InputSansNarrow-Regular-24.vlw");
@@ -59,7 +59,7 @@ void resetWorld() {
   world.clearAttractors();
   world.clearVehicles();
   world.setupAttractors(dartboardAttractorPositioner, numGroups);
-  world.setupVehicles(randomPositioner, 1000);
+  world.setupVehicles(randomPositioner, 600);
 }
 
 void draw() {
@@ -73,7 +73,7 @@ void draw() {
     drawer.draw(buffer, world);
     buffer.endDraw();
 
-    image(buffer, 0, 0, imageWidth/3, imageHeight/3);
+    image(buffer, 0, 0);
   }
 }
 

@@ -9,9 +9,9 @@ class AttractorImpulse extends Impulse {
   AttractorImpulse(World world) {
     super(world);
 
-    _factor = 50;
+    _factor = 100;
     _maxAngleBetween = PI  * 0.2;
-    _maxDelta = 0.01;
+    _maxDelta = 0.02;
     _isSingleAttractor = false;
   }
 

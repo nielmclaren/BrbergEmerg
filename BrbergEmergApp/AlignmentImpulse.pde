@@ -7,8 +7,8 @@ class AlignmentImpulse extends Impulse {
   AlignmentImpulse(World world) {
     super(world);
 
-    _factor = 0.01;
-    _maxDelta = 0.02;
+    _factor = 0.02;
+    _maxDelta = 0.04;
   }
 
   float factor() {

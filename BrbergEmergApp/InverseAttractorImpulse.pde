@@ -9,9 +9,9 @@ class InverseAttractorImpulse extends Impulse {
   InverseAttractorImpulse(World world) {
     super(world);
 
-    _factor = 0.0000002;
+    _factor = 0.0000004;
     _maxAngleBetween = PI  * 0.45;
-    _maxDelta = 0.006;
+    _maxDelta = 0.012;
     _isSingleAttractor = false;
   }
 

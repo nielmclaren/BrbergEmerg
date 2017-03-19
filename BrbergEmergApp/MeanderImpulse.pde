@@ -8,8 +8,8 @@ class MeanderImpulse extends Impulse {
   MeanderImpulse(World world) {
     super(world);
 
-    _maxDelta = 0.006;
-    _noiseScale = 0.03;
+    _maxDelta = 0.012;
+    _noiseScale = 0.06;
     _seed = random(1000);
   }
 

@@ -16,12 +16,6 @@ class WorldDrawer {
 
   public void drawInitial(PGraphics g, World world) {
     g.background(0);
-
-    for (int i = 0; i < vehicleColors.length; i++) {
-      g.fill(vehicleColors[i]);
-        g.rect(i * 300, 0, 300, 300);
-    }
-
     drawAttractors(g, world);
   }
 
@@ -61,7 +55,7 @@ class WorldDrawer {
     float rotationFactor = abs(getSignedAngleBetween(vehicle.rotation(), groupRotation)) / PI;
 
     float h = (hue(c)
-        - constrain(map(rotationFactor, 0, 1, 0, 64), 0, 64)
+        - constrain(map(rotationFactor, 0, 1, 0, 32), 0, 32)
         //- constrain(map(world.age(), 0, 10000, 32, 0), 0, 32)
         ) % 255;
     while (h < 0) {
@@ -69,7 +63,7 @@ class WorldDrawer {
     }
 
     int alpha = floor(0
-        + constrain(map(rotationFactor, 0, 1, 0, 32), 0, 32)
+        + constrain(map(rotationFactor, 0, 1, 2, 32), 2, 32)
         + constrain(map(world.age(), 0, 10000, 0, 64), 0, 64)
         ) % 255;
     while (alpha < 0) {
@@ -82,16 +76,17 @@ class WorldDrawer {
         brightness(c),
         alpha);
 
+    int radius = floor(map(rotationFactor, 0, 1, 4, 16));
+
     g.fill(c);
-    g.stroke(c);
-    g.strokeWeight(6);
     g.pushMatrix();
     g.translate(vehicle.x(), vehicle.y());
     g.rotate(vehicle.rotation());
-    //g.ellipseMode(CENTER);
-    //g.ellipse(0, 0, 3, 3);
-    g.line(0, 0, -21, 0);
+    g.ellipseMode(CENTER);
+    g.ellipse(0, 0, radius, radius);
+
     g.popMatrix();
+
   }
 }
 

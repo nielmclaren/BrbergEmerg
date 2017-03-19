@@ -1,9 +1,9 @@
 
 class World {
-  public static final int ATTRACTOR_RADIUS = 300;
-  public static final int NEIGHBORHOOD_RADIUS = 240;
-  public static final int MIN_DISTANCE = 60;
-  public static final int OUT_GROUP_MIN_DISTANCE = 120;
+  public static final int ATTRACTOR_RADIUS = 200;
+  public static final int NEIGHBORHOOD_RADIUS = 160;
+  public static final int MIN_DISTANCE = 40;
+  public static final int OUT_GROUP_MIN_DISTANCE = 80;
 
   private ArrayList<Attractor> _attractors;
   private ArrayList<Vehicle> _vehicles;

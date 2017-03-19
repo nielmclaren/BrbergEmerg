@@ -7,8 +7,8 @@ class SeparationImpulse extends Impulse {
   SeparationImpulse(World world) {
     super(world);
 
-    _factor = 0.2;
-    _maxDelta = 0.016;
+    _factor = 0.4;
+    _maxDelta = 0.032;
   }
 
   float factor() {

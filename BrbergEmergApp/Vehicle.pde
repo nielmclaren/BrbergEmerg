@@ -25,7 +25,7 @@ class Vehicle implements IPositioned {
     _y = y;
     _nextX = x;
     _nextY = y;
-    _velocity = 3;
+    _velocity = 2;
     _rotation = rotation;
     _nextRotation = rotation;
 
