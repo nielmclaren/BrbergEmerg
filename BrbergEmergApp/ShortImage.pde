@@ -49,8 +49,8 @@ class ShortImage {
     return _image;
   }
 
-  void fade(float v) {
-    v = constrain(v, 0, 1) * (Short.MAX_VALUE - Short.MIN_VALUE);
+  void fade(float fadeAmount) {
+    short v = (short)(constrain(fadeAmount, 0, 1) * (Short.MAX_VALUE - Short.MIN_VALUE));
     for (int i = 0; i < _values.length; i++) {
       _values[i] = (short)max(_values[i] - v, Short.MIN_VALUE);
     }
@@ -86,6 +86,35 @@ class ShortImage {
 
     _isImageDirty = true;
     popStyle();
+  }
+
+  void blendImage(PImage inputImg) {
+    pushStyle();
+    colorMode(RGB, 1);
+
+    inputImg.loadPixels();
+
+    int pixelCount = inputImg.width * inputImg.height;
+    for (int i = 0; i < pixelCount; i++) {
+      blendColor(i, inputImg.pixels[i]);
+    }
+
+    _isImageDirty = true;
+    popStyle();
+  }
+
+  private void blendColor(int pixelIndex, color v) {
+    int shortRange = Short.MAX_VALUE - Short.MIN_VALUE;
+    float a = alpha(v);
+    float ia = 1 - a;
+
+    int i = pixelIndex * _numChannels;
+
+    _values[i + 0] = (short)min(ia * (_values[i + 0] - Short.MIN_VALUE) + Short.MIN_VALUE + a * red(v) * shortRange, Short.MAX_VALUE);
+    if (_format == RGB || _format == ARGB) {
+      _values[i + 1] = (short)min(ia * (_values[i + 1] - Short.MIN_VALUE) + Short.MIN_VALUE + a * green(v) * shortRange, Short.MAX_VALUE);
+      _values[i + 2] = (short)min(ia * (_values[i + 2] - Short.MIN_VALUE) + Short.MIN_VALUE + a * blue(v) * shortRange, Short.MAX_VALUE);
+    }
   }
 
   void addImage(PImage inputImg) {
@@ -128,7 +157,7 @@ class ShortImage {
             deepToFloat(_values[pixelIndex * 4 + 0]),
             deepToFloat(_values[pixelIndex * 4 + 1]),
             deepToFloat(_values[pixelIndex * 4 + 2]),
-            deepToFloat(_values[pixelIndex * 4 + 3]));
+            1);
       default:
         throw new Error("Bad format. format=" + _format);
     }
@@ -140,9 +169,6 @@ class ShortImage {
     if (_format == RGB || _format == ARGB) {
       _values[pixelIndex * _numChannels + 1] = floatToDeep(green(v));
       _values[pixelIndex * _numChannels + 2] = floatToDeep(blue(v));
-    }
-    if (_format == ARGB) {
-      _values[pixelIndex * _numChannels + 3] = floatToDeep(alpha(v));
     }
   }
 

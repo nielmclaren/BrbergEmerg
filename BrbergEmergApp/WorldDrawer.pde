@@ -63,7 +63,7 @@ class WorldDrawer {
     }
 
     int alpha = floor(0
-        + constrain(map(rotationFactor, 0, 1, 2, 32), 2, 32)
+        + constrain(map(rotationFactor, 0, 1, 128, 255), 128, 255)
         + constrain(map(world.age(), 0, 10000, 0, 64), 0, 64)
         ) % 255;
     while (alpha < 0) {
@@ -79,6 +79,7 @@ class WorldDrawer {
     int radius = floor(map(rotationFactor, 0, 1, 4, 16));
 
     g.fill(c);
+    g.noStroke();
     g.pushMatrix();
     g.translate(vehicle.x(), vehicle.y());
     g.rotate(vehicle.rotation());

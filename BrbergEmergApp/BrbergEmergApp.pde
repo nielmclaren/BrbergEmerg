@@ -6,8 +6,8 @@ int numGroups;
 World world;
 WorldDrawer drawer;
 PGraphics buffer;
+ShortImage shortBuffer;
 boolean isPaused;
-boolean isBackgroundEnabled;
 
 CenteredPositioner centeredPositioner;
 CustomPositioner customPositioner;
@@ -19,18 +19,17 @@ PFont paramFont;
 FileNamer animationFolderNamer, fileNamer;
 
 void setup() {
-  //size(1920, 1080, P3D);
-  fullScreen(P3D, 0);
+  size(1080, 1080, P3D);
 
-  imageWidth = 1920;
+  imageWidth = 1080;
   imageHeight = 1080;
-  numGroups = 5;
+  numGroups = 3;
 
   world = new World(imageWidth, imageHeight, numGroups);
   drawer = new WorldDrawer();
   buffer = createGraphics(imageWidth, imageHeight, P3D);
+  shortBuffer = new ShortImage(imageWidth, imageHeight, ARGB);
   isPaused = false;
-  isBackgroundEnabled = false;
 
   animationFolderNamer = new FileNamer("output/anim", "/");
   fileNamer = new FileNamer("output/export", "png");
@@ -52,6 +51,8 @@ void reset() {
   buffer.beginDraw();
   drawer.drawInitial(buffer, world);
   buffer.endDraw();
+
+  shortBuffer.setImage(buffer);
 }
 
 void resetWorld() {
@@ -59,7 +60,7 @@ void resetWorld() {
   world.clearAttractors();
   world.clearVehicles();
   world.setupAttractors(dartboardAttractorPositioner, numGroups);
-  world.setupVehicles(randomPositioner, 600);
+  world.setupVehicles(randomPositioner, 400);
 }
 
 void draw() {
@@ -67,13 +68,14 @@ void draw() {
     world.step();
 
     buffer.beginDraw();
-    if (isBackgroundEnabled) {
-      buffer.background(0);
-    }
+    buffer.background(0, 0);
     drawer.draw(buffer, world);
     buffer.endDraw();
 
-    image(buffer, 0, 0);
+    shortBuffer.fade(0.001);
+    shortBuffer.blendImage(buffer);
+
+    image(shortBuffer.getImageRef(), 0, 0);
   }
 }
 
@@ -81,6 +83,7 @@ void clear() {
   buffer.beginDraw();
   buffer.background(0);
   buffer.endDraw();
+  shortBuffer.setImage(buffer);
 }
 
 void keyReleased() {
@@ -97,6 +100,9 @@ void keyReleased() {
     case '4':
       world.step(5000);
       break;
+    case 'a':
+      saveAnimation(50);
+      break;
     case 'b':
       clear();
       world.age(0);
@@ -108,14 +114,34 @@ void keyReleased() {
     case 'r':
       buffer.save(fileNamer.next());
       break;
-    case 't':
-      isBackgroundEnabled = !isBackgroundEnabled;
-      break;
     case ' ':
       isPaused = !isPaused;
       break;
   }
 }
+
+void saveAnimation(int numFrames) {
+  isPaused = true;
+
+  FileNamer frameNamer = new FileNamer(animationFolderNamer.next() + "frame", "png");
+  for (int i = 0; i < numFrames; i++) {
+    world.step();
+
+    buffer.beginDraw();
+    buffer.background(0, 0);
+    drawer.draw(buffer, world);
+    buffer.endDraw();
+
+    shortBuffer.fade(0.001);
+    shortBuffer.blendImage(buffer);
+
+    shortBuffer.getImageRef().save(frameNamer.next());
+  }
+
+  isPaused = false;
+}
+
+///
 
 int deg(float v) {
   return floor(v * 180/PI);
