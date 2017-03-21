@@ -165,7 +165,11 @@ class ShortImage {
 
   // NOTE: colorMode must be set to RGB before calling setColor.
   protected void setColor(int pixelIndex, color v) {
-    float a = alpha(v);
+    setColor(pixelIndex, v, alpha(v));
+  }
+
+  // NOTE: colorMode must be set to RGB before calling setColor.
+  protected void setColor(int pixelIndex, color v, float a) {
     float ia = 1 - a;
 
     if (a >= 1) {

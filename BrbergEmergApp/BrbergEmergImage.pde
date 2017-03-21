@@ -30,8 +30,6 @@ class BrbergEmergImage extends ShortImage {
       return;
     }
 
-    colorMode(HSB);
-
     color c = vehicleColors[vehicle.groupId()];
 
     float groupRotation = getAverageRotation(vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()));
@@ -53,6 +51,7 @@ class BrbergEmergImage extends ShortImage {
       alpha += 255;
     }
 
+    colorMode(HSB);
     c = color(
         h,
         saturation(c),
@@ -60,19 +59,29 @@ class BrbergEmergImage extends ShortImage {
         alpha);
 
     int radius = floor(map(rotationFactor, 0, 1, 2, 8));
-    int radiusSquared = radius * radius;
 
-    int minX = max(0, targetX - radius);
-    int maxX = min(targetX + radius, _width - 1);
-    int minY = max(0, targetY - radius);
-    int maxY = min(targetY + radius, _height - 1);
+    pushStyle();
+    colorMode(RGB, 1);
 
-    for (int x = minX; x < maxX; x++) {
-      for (int y = minY; y < maxY; y++) {
-        float dx = x - targetX;
-        float dy = y - targetY;
-        if (dx * dx + dy * dy < radiusSquared) {
-          setPixel(x, y, c);
+    drawCircle(targetX, targetY, radius, c, alpha);
+
+    _isImageDirty = true;
+    popStyle();
+  }
+
+  private void drawCircle(int targetX, int targetY, int radius, color c, int alpha) {
+    float radiusSquared = radius * radius;
+    for (int x = -radius; x <= radius; x++) {
+      for (int y = -radius; y <= radius; y++) {
+        if (targetX + x < 0 || targetX + x >= g.width || targetY + y < 0 || targetY + y >= g.height) {
+          continue;
+        }
+
+        float rSquared = (x + 0.5) * (x + 0.5) + (y + 0.5) * (y + 0.5);
+        if (rSquared < radiusSquared) {
+          float error = radius - sqrt(rSquared);
+          int pixelIndex = (targetY + y) * _width + (targetX + x);
+          setColor(pixelIndex, c, error * alpha/255);
         }
       }
     }
