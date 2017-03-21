@@ -165,6 +165,31 @@ float getAverageRotation(ArrayList<Vehicle> vehicles) {
   return normalizeAngle(atan2(sum.y, sum.x));
 }
 
+float getScaledAverageRotation(IPositioned center, int maxDistance, ArrayList<Vehicle> vehicles) {
+  if (vehicles.size() <= 0) {
+    return 0;
+  }
+
+  int maxDistanceSquared = maxDistance * maxDistance;
+  float x = center.x();
+  float y = center.y();
+
+  PVector sum = new PVector();
+  for (Vehicle vehicle : vehicles) {
+    float dx = vehicle.x() - x;
+    float dy = vehicle.y() - y;
+    float dSquared = dx * dx + dy * dy;
+    if (dSquared < maxDistanceSquared) {
+      float d = sqrt(dSquared);
+      float k = 1 - d / maxDistance;
+      float r = vehicle.rotation();
+      sum.add(k * cos(r), k * sin(r));
+    }
+  }
+
+  return normalizeAngle(atan2(sum.y, sum.x));
+}
+
 IPositioned getNearestTo(ArrayList<? extends IPositioned> items, IPositioned target) {
   float nearestDist = Float.MAX_VALUE;
   IPositioned nearest = null;

@@ -26,15 +26,10 @@ class BrbergEmergImage extends ShortImage {
     int targetX = floor(vehicle.x());
     int targetY = floor(vehicle.y());
 
-    if (vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()).size() <= 0) {
-      return;
-    }
-
-    color c = vehicleColors[vehicle.groupId()];
-
-    float groupRotation = getAverageRotation(vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()));
+    float groupRotation = getScaledAverageRotation(vehicle, World.NEIGHBORHOOD_RADIUS, vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()));
     float rotationFactor = abs(getSignedAngleBetween(vehicle.rotation(), groupRotation)) / PI;
 
+    color c = vehicleColors[vehicle.groupId()];
     float h = (hue(c)
         - constrain(map(rotationFactor, 0, 1, 0, 32), 0, 32)
         //- constrain(map(world.age(), 0, 10000, 32, 0), 0, 32)
@@ -43,25 +38,28 @@ class BrbergEmergImage extends ShortImage {
       h += 255;
     }
 
-    int alpha = floor(0
-        + constrain(map(rotationFactor, 0, 1, 32, 128), 32, 128)
-        + constrain(map(world.age(), 0, 10000, 0, 64), 0, 64)
-        ) % 255;
-    while (alpha < 0) {
-      alpha += 255;
-    }
-
+    pushStyle();
     colorMode(HSB);
     c = color(
         h,
         saturation(c),
-        brightness(c),
-        alpha);
+        brightness(c));
 
-    int radius = floor(map(rotationFactor, 0, 1, 2, 8));
+    int minRadius = 2;
+    int radius = floor(map(rotationFactor, 0, 1, minRadius, 8));
+    if (vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()).size() <= 0) {
+      radius = minRadius;
+    }
 
-    pushStyle();
     colorMode(RGB, 1);
+
+    int alpha = floor(0
+        + constrain(map(rotationFactor, 0, 1, 32, 128), 32, 128)
+        + constrain(map(world.age(), 0, 100000, 0, 64), 0, 64)
+        ) % 255;
+    while (alpha < 0) {
+      alpha += 255;
+    }
 
     drawCircle(targetX, targetY, radius, c, alpha);
 
