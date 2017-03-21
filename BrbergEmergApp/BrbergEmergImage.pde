@@ -26,7 +26,8 @@ class BrbergEmergImage extends ShortImage {
     int targetX = floor(vehicle.x());
     int targetY = floor(vehicle.y());
 
-    float groupRotation = getScaledAverageRotation(vehicle, World.NEIGHBORHOOD_RADIUS, vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()));
+    float groupRotation = getScaledAverageRotation(vehicle, World.NEIGHBORHOOD_RADIUS,
+        vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()));
     float rotationFactor = abs(getSignedAngleBetween(vehicle.rotation(), groupRotation)) / PI;
 
     color c = vehicleColors[vehicle.groupId()];
@@ -45,8 +46,8 @@ class BrbergEmergImage extends ShortImage {
         saturation(c),
         brightness(c));
 
-    int minRadius = 2;
-    int radius = floor(map(rotationFactor, 0, 1, minRadius, 8));
+    int minRadius = 12;
+    int radius = floor(map(rotationFactor, 0, 1, minRadius, 24));
     if (vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()).size() <= 0) {
       radius = minRadius;
     }
@@ -61,7 +62,7 @@ class BrbergEmergImage extends ShortImage {
       alpha += 255;
     }
 
-    drawCircle(targetX, targetY, radius, c, alpha);
+    drawCircleFalloff(targetX, targetY, radius, c, alpha);
 
     _isImageDirty = true;
     popStyle();
@@ -80,6 +81,28 @@ class BrbergEmergImage extends ShortImage {
           float error = radius - sqrt(rSquared);
           int pixelIndex = (targetY + y) * _width + (targetX + x);
           setColor(pixelIndex, c, error * alpha/255);
+        }
+      }
+    }
+  }
+
+  private void drawCircleFalloff(int targetX, int targetY, int radius, color c, int alpha) {
+    float falloff = 0.88;
+    float radiusSquared = radius * radius;
+    for (int x = -radius; x <= radius; x++) {
+      for (int y = -radius; y <= radius; y++) {
+        if (targetX + x < 0 || targetX + x >= g.width || targetY + y < 0 || targetY + y >= g.height) {
+          continue;
+        }
+
+        float rSquared = (x + 0.5) * (x + 0.5) + (y + 0.5) * (y + 0.5);
+        if (rSquared < radiusSquared) {
+          float v = sqrt(rSquared) / radius;
+          v = 1 + 1 / pow(v + falloff, 2) - 1 / pow(falloff, 2);
+          v = constrain(v, 0, 1);
+
+          int pixelIndex = (targetY + y) * _width + (targetX + x);
+          setColor(pixelIndex, c, v * 0.2 * alpha/255);
         }
       }
     }
