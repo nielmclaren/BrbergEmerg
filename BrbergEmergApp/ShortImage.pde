@@ -1,13 +1,13 @@
 
 class ShortImage {
-  private int _width;
-  private int _height;
-  private int _format;
-  private int _numChannels;
-  private short[] _values;
+  protected int _width;
+  protected int _height;
+  protected int _format;
+  protected int _numChannels;
+  protected short[] _values;
 
-  private PImage _image;
-  private boolean _isImageDirty;
+  protected PImage _image;
+  protected boolean _isImageDirty;
 
   ShortImage(int w, int h, int format) {
     _width = w;
@@ -103,7 +103,7 @@ class ShortImage {
     popStyle();
   }
 
-  private void blendColor(int pixelIndex, color v) {
+  protected void blendColor(int pixelIndex, color v) {
     int shortRange = Short.MAX_VALUE - Short.MIN_VALUE;
     float a = alpha(v);
     float ia = 1 - a;
@@ -143,7 +143,7 @@ class ShortImage {
   }
 
   // NOTE: colorMode must be set to RGB before calling getColor.
-  private color getColor(int pixelIndex) {
+  protected color getColor(int pixelIndex) {
     switch (_format) {
       case ALPHA:
         return color(deepToFloat(_values[pixelIndex]));
@@ -164,15 +164,26 @@ class ShortImage {
   }
 
   // NOTE: colorMode must be set to RGB before calling setColor.
-  private void setColor(int pixelIndex, color v) {
-    _values[pixelIndex * _numChannels + 0] = floatToDeep(red(v));
-    if (_format == RGB || _format == ARGB) {
-      _values[pixelIndex * _numChannels + 1] = floatToDeep(green(v));
-      _values[pixelIndex * _numChannels + 2] = floatToDeep(blue(v));
+  protected void setColor(int pixelIndex, color v) {
+    float a = alpha(v);
+    float ia = 1 - a;
+
+    if (a >= 1) {
+      _values[pixelIndex * _numChannels + 0] = floatToDeep(red(v));
+      if (_format == RGB || _format == ARGB) {
+        _values[pixelIndex * _numChannels + 1] = floatToDeep(green(v));
+        _values[pixelIndex * _numChannels + 2] = floatToDeep(blue(v));
+      }
+    } else {
+      _values[pixelIndex * _numChannels + 0] = floatToDeep(ia * deepToFloat(_values[pixelIndex * _numChannels + 0]) + a * red(v));
+      if (_format == RGB || _format == ARGB) {
+        _values[pixelIndex * _numChannels + 1] = floatToDeep(ia * deepToFloat(_values[pixelIndex * _numChannels + 1]) + a * green(v));
+        _values[pixelIndex * _numChannels + 2] = floatToDeep(ia * deepToFloat(_values[pixelIndex * _numChannels + 2]) + a * blue(v));
+      }
     }
   }
 
-  private void addColor(int pixelIndex, color v) {
+  protected void addColor(int pixelIndex, color v) {
     int shortRange = Short.MAX_VALUE - Short.MIN_VALUE;
     float a = alpha(v);
 
@@ -188,11 +199,11 @@ class ShortImage {
     }
   }
 
-  private float deepToFloat(int v) {
+  protected float deepToFloat(int v) {
     return ((float)v - Short.MIN_VALUE) / (Short.MAX_VALUE - Short.MIN_VALUE);
   }
 
-  private short floatToDeep(float v) {
+  protected short floatToDeep(float v) {
     return (short)(v * (Short.MAX_VALUE - Short.MIN_VALUE - 1) + Short.MIN_VALUE);
   }
 }

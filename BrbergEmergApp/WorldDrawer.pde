@@ -23,12 +23,17 @@ class WorldDrawer {
     drawVehicles(g, world);
   }
 
-  private void drawAttractors(PGraphics g, World world) {
+  public void draw(BrbergEmergImage g, World world) {
+    drawVehicles(g, world);
+  }
+
+  public void drawAttractors(PGraphics g, World world) {
     ArrayList<Attractor> attractors = world.attractorsRef();
     for (Attractor attractor : attractors) {
       g.colorMode(RGB);
-      g.noStroke();
-      g.fill(16);
+      g.stroke(32);
+      g.strokeWeight(8);
+      g.noFill();
       g.ellipseMode(RADIUS);
       g.ellipse(attractor.x(), attractor.y(), attractor.radius(), attractor.radius());
     }
@@ -39,6 +44,14 @@ class WorldDrawer {
 
     for (Vehicle vehicle : vehicles) {
       drawVehicle(g, world, vehicle);
+    }
+  }
+
+  private void drawVehicles(BrbergEmergImage g, World world) {
+    ArrayList<Vehicle> vehicles = world.vehiclesRef();
+
+    for (Vehicle vehicle : vehicles) {
+      g.drawVehicle(world, vehicle);
     }
   }
 

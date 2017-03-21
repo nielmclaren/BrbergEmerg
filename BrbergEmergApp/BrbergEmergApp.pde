@@ -5,9 +5,9 @@ int numGroups;
 
 World world;
 WorldDrawer drawer;
-PGraphics buffer;
-ShortImage shortBuffer;
+BrbergEmergImage buffer;
 boolean isPaused;
+boolean showAttractors;
 
 CenteredPositioner centeredPositioner;
 CustomPositioner customPositioner;
@@ -27,9 +27,9 @@ void setup() {
 
   world = new World(imageWidth, imageHeight, numGroups);
   drawer = new WorldDrawer();
-  buffer = createGraphics(imageWidth, imageHeight, P3D);
-  shortBuffer = new ShortImage(imageWidth, imageHeight, ARGB);
+  buffer = new BrbergEmergImage(imageWidth, imageHeight, ARGB);
   isPaused = false;
+  showAttractors = true;
 
   animationFolderNamer = new FileNamer("output/anim", "/");
   fileNamer = new FileNamer("output/export", "png");
@@ -48,11 +48,7 @@ void setup() {
 
 void reset() {
   resetWorld();
-  buffer.beginDraw();
-  drawer.drawInitial(buffer, world);
-  buffer.endDraw();
-
-  shortBuffer.setImage(buffer);
+  buffer.clear();
 }
 
 void resetWorld() {
@@ -67,23 +63,19 @@ void draw() {
   if (!isPaused) {
     world.step();
 
-    buffer.beginDraw();
-    buffer.background(0, 0);
+    buffer.fade(0.001);
     drawer.draw(buffer, world);
-    buffer.endDraw();
 
-    shortBuffer.fade(0.001);
-    shortBuffer.blendImage(buffer);
+    image(buffer.getImageRef(), 0, 0);
 
-    image(shortBuffer.getImageRef(), 0, 0);
+    if (showAttractors) {
+      drawer.drawAttractors(g, world);
+    }
   }
 }
 
 void clear() {
-  buffer.beginDraw();
-  buffer.background(0);
-  buffer.endDraw();
-  shortBuffer.setImage(buffer);
+  buffer.clear();
 }
 
 void keyReleased() {
@@ -101,7 +93,7 @@ void keyReleased() {
       world.step(5000);
       break;
     case 'a':
-      saveAnimation(50);
+      saveAnimation(1000);
       break;
     case 'b':
       clear();
@@ -112,7 +104,10 @@ void keyReleased() {
       reset();
       break;
     case 'r':
-      buffer.save(fileNamer.next());
+      buffer.getImageRef().save(fileNamer.next());
+      break;
+    case 't':
+      showAttractors = !showAttractors;
       break;
     case ' ':
       isPaused = !isPaused;
@@ -127,15 +122,10 @@ void saveAnimation(int numFrames) {
   for (int i = 0; i < numFrames; i++) {
     world.step();
 
-    buffer.beginDraw();
-    buffer.background(0, 0);
+    buffer.fade(0.001);
     drawer.draw(buffer, world);
-    buffer.endDraw();
 
-    shortBuffer.fade(0.001);
-    shortBuffer.blendImage(buffer);
-
-    shortBuffer.getImageRef().save(frameNamer.next());
+    buffer.getImageRef().save(frameNamer.next());
   }
 
   isPaused = false;
