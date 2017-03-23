@@ -62,7 +62,8 @@ class BrbergEmergImage extends ShortImage {
       alpha += 255;
     }
 
-    drawCircleFalloff(targetX, targetY, radius, c, alpha);
+    drawCircleFalloff(targetX, targetY, radius, c, floor(alpha));
+    drawCircle(targetX, targetY, 2, c, alpha);
 
     _isImageDirty = true;
     popStyle();
