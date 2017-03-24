@@ -109,14 +109,14 @@ class BrbergEmergImage extends ShortImage {
     colorMode(RGB);
 
     ArrayList<Integer> colors = new ArrayList<Integer>();
-    colors.add(color(246, 124, 40));
-    colors.add(color(250, 73, 59));
-    colors.add(color(0, 154, 217));
-    colors.add(color(160, 90, 178));
-    colors.add(color(44, 74, 93));
-    colors.add(color(0, 188, 157));
-    colors.add(color(0, 203, 119));
-    colors.add(color(252, 194, 44));
+    colors.add(#6afe4d);
+    colors.add(#4dfec2);
+    colors.add(#ad4dfe);
+    colors.add(#f84dfe);
+    colors.add(#4e7fbb);
+    colors.add(#4d9afe);
+    colors.add(#a2d8ea);
+    colors.add(#00b83c);
 
     Integer[] result = new Integer[colors.size()];
     colors.toArray(result);
