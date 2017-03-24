@@ -1,19 +1,11 @@
 
 class BrbergEmergImage extends ShortImage {
-  private color[] vehicleColors;
+  private Integer[] vehicleColors;
 
   BrbergEmergImage(int w, int h, int format) {
     super(w, h, format);
 
-    vehicleColors = new color[8];
-    vehicleColors[0] = color(246, 124, 40);
-    vehicleColors[1] = color(250, 73, 59);
-    vehicleColors[2] = color(0, 154, 217);
-    vehicleColors[3] = color(160, 90, 178);
-    vehicleColors[4] = color(44, 74, 93);
-    vehicleColors[5] = color(0, 188, 157);
-    vehicleColors[6] = color(0, 203, 119);
-    vehicleColors[7] = color(252, 194, 44);
+    resetColors();
   }
 
   void clear() {
@@ -26,9 +18,12 @@ class BrbergEmergImage extends ShortImage {
     int targetX = floor(vehicle.x());
     int targetY = floor(vehicle.y());
 
-    float groupRotation = getScaledAverageRotation(vehicle, World.NEIGHBORHOOD_RADIUS,
+    float groupRotation = getScaledAverageRotation(vehicle, vehicle.rotation(), World.NEIGHBORHOOD_RADIUS,
         vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()));
     float rotationFactor = abs(getSignedAngleBetween(vehicle.rotation(), groupRotation)) / PI;
+    if (vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()).size() <= 0) {
+      rotationFactor = 0;
+    }
 
     color c = vehicleColors[vehicle.groupId()];
     float h = (hue(c)
@@ -48,9 +43,6 @@ class BrbergEmergImage extends ShortImage {
 
     int minRadius = 12;
     int radius = floor(map(rotationFactor, 0, 1, minRadius, 24));
-    if (vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()).size() <= 0) {
-      radius = minRadius;
-    }
 
     colorMode(RGB, 1);
 
@@ -106,6 +98,40 @@ class BrbergEmergImage extends ShortImage {
           setColor(pixelIndex, c, v * 0.2 * alpha/255);
         }
       }
+    }
+  }
+
+  void resetColors() {
+    vehicleColors = getVehicleColors();
+  }
+
+  private Integer[] getVehicleColors() {
+    colorMode(RGB);
+
+    ArrayList<Integer> colors = new ArrayList<Integer>();
+    colors.add(color(246, 124, 40));
+    colors.add(color(250, 73, 59));
+    colors.add(color(0, 154, 217));
+    colors.add(color(160, 90, 178));
+    colors.add(color(44, 74, 93));
+    colors.add(color(0, 188, 157));
+    colors.add(color(0, 203, 119));
+    colors.add(color(252, 194, 44));
+
+    Integer[] result = new Integer[colors.size()];
+    colors.toArray(result);
+    shuffleArray(result);
+    return result;
+  }
+
+  // Implementing Fisher-Yates shuffle
+  private void shuffleArray(Integer[] ar) {
+    for (int i = ar.length - 1; i > 0; i--) {
+      int index = floor(random(i + 1));
+      // Simple swap
+      int a = ar[index];
+      ar[index] = ar[i];
+      ar[i] = a;
     }
   }
 }

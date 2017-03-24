@@ -49,6 +49,7 @@ void setup() {
 void reset() {
   resetWorld();
   buffer.clear();
+  buffer.resetColors();
 }
 
 void resetWorld() {
@@ -165,7 +166,7 @@ float getAverageRotation(ArrayList<Vehicle> vehicles) {
   return normalizeAngle(atan2(sum.y, sum.x));
 }
 
-float getScaledAverageRotation(IPositioned center, int maxDistance, ArrayList<Vehicle> vehicles) {
+float getScaledAverageRotation(IPositioned center, float baseRotation, int maxDistance, ArrayList<Vehicle> vehicles) {
   if (vehicles.size() <= 0) {
     return 0;
   }
@@ -174,7 +175,7 @@ float getScaledAverageRotation(IPositioned center, int maxDistance, ArrayList<Ve
   float x = center.x();
   float y = center.y();
 
-  PVector sum = new PVector();
+  PVector sum = new PVector(cos(baseRotation), sin(baseRotation));
   for (Vehicle vehicle : vehicles) {
     float dx = vehicle.x() - x;
     float dy = vehicle.y() - y;
