@@ -7,6 +7,7 @@ class World {
 
   private ArrayList<Attractor> _attractors;
   private ArrayList<Vehicle> _vehicles;
+  private HashMap<Integer, Touch> _cursorIdToTouch;
   private int _width;
   private int _height;
   private PVector _center;
@@ -25,6 +26,7 @@ class World {
   World(int width, int height, int numGroups) {
     _attractors = new ArrayList<Attractor>();
     _vehicles = new ArrayList<Vehicle>();
+    _cursorIdToTouch = new HashMap<Integer, Touch>();
     _width = width;
     _height = height;
     _center = new PVector(_width/2, _height/2);
@@ -52,6 +54,43 @@ class World {
 
   ArrayList<Vehicle> vehiclesRef() {
     return _vehicles;
+  }
+
+  ArrayList<Touch> touches() {
+    return new ArrayList<Touch>(_cursorIdToTouch.values());
+  }
+
+  World addTouch(TuioCursor cursor) {
+    Vehicle vehicle = getNearestFreeVehicle(cursor.getX() * width, cursor.getY() * height);
+    Touch touch = new Touch(cursor, vehicle);
+    vehicle.touch(touch);
+    _cursorIdToTouch.put(cursor.getCursorID(), touch);
+    return this;
+  }
+
+  private Vehicle getNearestFreeVehicle(float x, float y) {
+    ArrayList<Vehicle> vehicles = (ArrayList<Vehicle>)_vehicles.clone();
+    Vehicle vehicle = null;
+    while (vehicles.size() > 0) {
+      vehicle = (Vehicle)getNearestTo(vehicles, x, y);
+      if (vehicle.touchRef() == null) {
+        return vehicle;
+      }
+      vehicles.remove(vehicle);
+    }
+    return null;
+  }
+
+  World updateTouch(TuioCursor cursor) {
+    //Touch touch = _cursorIdToTouch.get(cursor.getCursorID());
+    return this;
+  }
+
+  World removeTouch(TuioCursor cursor) {
+    Touch touch = _cursorIdToTouch.get(cursor.getCursorID());
+    touch.vehicleRef().touch(null);
+    _cursorIdToTouch.remove(cursor.getCursorID());
+    return this;
   }
 
   World vehiclesRef(ArrayList<Vehicle> v) {

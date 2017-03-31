@@ -6,7 +6,7 @@ class CenteredPositioner implements IPositioner {
     _world = world;
   }
 
-  public boolean position(IPositioned target, int index) {
+  public boolean position(IPositionable target, int index) {
     target
       .x(_world.width() / 2)
       .y(_world.height() / 2);

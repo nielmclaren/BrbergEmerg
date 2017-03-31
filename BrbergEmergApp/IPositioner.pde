@@ -1,4 +1,4 @@
 
 interface IPositioner {
-  public boolean position(IPositioned p, int index);
+  public boolean position(IPositionable p, int index);
 }

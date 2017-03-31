@@ -14,6 +14,10 @@ class BrbergEmergImage extends ShortImage {
     }
   }
 
+  void drawTouch(World world, Touch touch) {
+    drawCircle(floor(touch.x()), floor(touch.y()), 30, color(255));
+  }
+
   void drawVehicle(World world, Vehicle vehicle) {
     int targetX = floor(vehicle.x());
     int targetY = floor(vehicle.y());
@@ -42,7 +46,13 @@ class BrbergEmergImage extends ShortImage {
         brightness(c));
 
     int minRadius = 12;
-    int radius = floor(map(rotationFactor, 0, 1, minRadius, 24));
+    int radius;
+    if (vehicle.touchRef() == null) {
+      radius = floor(map(rotationFactor, 0, 1, minRadius, 24));
+    } else {
+      radius = 40;
+      c = color(255);
+    }
 
     colorMode(RGB, 1);
 
@@ -59,6 +69,10 @@ class BrbergEmergImage extends ShortImage {
 
     _isImageDirty = true;
     popStyle();
+  }
+
+  private void drawCircle(int targetX, int targetY, int radius, color c) {
+    drawCircle(targetX, targetY, radius, c, 255);
   }
 
   private void drawCircle(int targetX, int targetY, int radius, color c, int alpha) {

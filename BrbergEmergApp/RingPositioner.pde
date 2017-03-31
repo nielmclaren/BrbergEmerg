@@ -28,7 +28,7 @@ class RingPositioner implements IPositioner {
     return this;
   }
 
-  public boolean position(IPositioned target, int index) {
+  public boolean position(IPositionable target, int index) {
     float angle = (float)index / _numPositions * 2 * PI;
     target
       .x(_world.width() / 2 + _radius * cos(angle))

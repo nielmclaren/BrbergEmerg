@@ -1,5 +1,5 @@
 
-class Vehicle implements IPositioned {
+class Vehicle implements IPositionable {
   // nextX, nextY, nextRotation are not exposed externally.
   private World _world;
   private int _id;
@@ -15,6 +15,7 @@ class Vehicle implements IPositioned {
 
   private Neighborhood _neighborhood;
   private Attractor _attractor;
+  private Touch _touch;
 
   private float _vehicleSizeSq;
 
@@ -33,6 +34,7 @@ class Vehicle implements IPositioned {
 
     _neighborhood = new Neighborhood(_world);
     _attractor = null;
+    _touch = null;
 
     _vehicleSizeSq = 20 * 20;
   }
@@ -121,6 +123,15 @@ class Vehicle implements IPositioned {
 
   Vehicle attractor(Attractor v) {
     _attractor = v;
+    return this;
+  }
+
+  Touch touchRef() {
+    return _touch;
+  }
+
+  Vehicle touch(Touch v) {
+    _touch = v;
     return this;
   }
 

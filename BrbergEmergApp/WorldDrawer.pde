@@ -21,6 +21,7 @@ class WorldDrawer {
 
   public void draw(BrbergEmergImage g, World world) {
     drawVehicles(g, world);
+    drawTouches(g, world);
   }
 
   public void drawAttractors(PGraphics g, World world) {
@@ -40,6 +41,14 @@ class WorldDrawer {
 
     for (Vehicle vehicle : vehicles) {
       g.drawVehicle(world, vehicle);
+    }
+  }
+
+  private void drawTouches(BrbergEmergImage g, World world) {
+    ArrayList<Touch> touches = world.touches();
+
+    for (Touch touch : touches) {
+      g.drawTouch(world, touch);
     }
   }
 }

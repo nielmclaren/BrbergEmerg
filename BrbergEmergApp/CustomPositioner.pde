@@ -6,7 +6,7 @@ class CustomPositioner implements IPositioner {
     _world = world;
   }
 
-  public boolean position(IPositioned target, int index) {
+  public boolean position(IPositionable target, int index) {
     int numTargets = 3;
     float angle = (float)index / numTargets * 2 * PI;
     float radius = 150;

@@ -1,4 +1,6 @@
 
+import TUIO.*;
+
 int imageWidth;
 int imageHeight;
 int numGroups;
@@ -16,14 +18,16 @@ RandomPositioner randomPositioner;
 RingPositioner ringPositioner;
 PFont paramFont;
 
+TuioProcessing tuioClient;
 FileNamer animationFolderNamer, fileNamer;
 
 void setup() {
-  size(1080, 1080, P3D);
+  noCursor();
+  fullScreen(3);
 
-  imageWidth = 1080;
+  imageWidth = 1920;
   imageHeight = 1080;
-  numGroups = 3;
+  numGroups = 1;
 
   world = new World(imageWidth, imageHeight, numGroups);
   drawer = new WorldDrawer();
@@ -44,6 +48,8 @@ void setup() {
   paramFont = loadFont("InputSansNarrow-Regular-24.vlw");
 
   reset();
+
+  tuioClient  = new TuioProcessing(this);
 }
 
 void reset() {
@@ -57,7 +63,7 @@ void resetWorld() {
   world.clearAttractors();
   world.clearVehicles();
   world.setupAttractors(dartboardAttractorPositioner, numGroups);
-  world.setupVehicles(randomPositioner, 400);
+  world.setupVehicles(randomPositioner, 40);
 }
 
 void draw() {
@@ -114,6 +120,34 @@ void keyReleased() {
       isPaused = !isPaused;
       break;
   }
+}
+
+void refresh(TuioTime t) {}
+void addTuioObject(TuioObject o) {}
+void updateTuioObject(TuioObject o) {}
+void removeTuioObject(TuioObject o) {}
+void addTuioBlob(TuioBlob b) {}
+void updateTuioBlob(TuioBlob b) {}
+void removeTuioBlob(TuioBlob b) {}
+
+void addTuioCursor(TuioCursor tcur) {
+  println("add cur "+tcur.getCursorID()+" ("+tcur.getSessionID()+ ") "
+    +tcur.getX()+" "+tcur.getY());
+  world.addTouch(tcur);
+}
+
+// called when a cursor is moved
+void updateTuioCursor (TuioCursor tcur) {
+  println("set cur "+tcur.getCursorID()+" ("+tcur.getSessionID()+ ") "
+    +tcur.getX()+" "+tcur.getY()
+    +" "+tcur.getMotionSpeed()+" "+tcur.getMotionAccel());
+  world.updateTouch(tcur);
+}
+
+// called when a cursor is removed from the scene
+void removeTuioCursor(TuioCursor tcur) {
+  println("del cur "+tcur.getCursorID()+" ("+tcur.getSessionID()+")");
+  world.removeTouch(tcur);
 }
 
 void saveAnimation(int numFrames) {
@@ -192,11 +226,15 @@ float getScaledAverageRotation(IPositioned center, float baseRotation, int maxDi
 }
 
 IPositioned getNearestTo(ArrayList<? extends IPositioned> items, IPositioned target) {
+  return getNearestTo(items, target.x(), target.y());
+}
+
+IPositioned getNearestTo(ArrayList<? extends IPositioned> items, float targetX, float targetY) {
   float nearestDist = Float.MAX_VALUE;
   IPositioned nearest = null;
 
   for (IPositioned item : items) {
-    float dist = getDistanceBetween(item, target);
+    float dist = getDistanceBetween(item, targetX, targetY);
 
     if (dist < nearestDist) {
       nearestDist = dist;
@@ -231,6 +269,10 @@ float getDistanceBetween(IPositioned a, PVector b) {
 
 float getDistanceBetween(PVector a, PVector b) {
   return getDistanceBetween(a.x, a.y, b.x, b.y);
+}
+
+float getDistanceBetween(IPositioned a, float bx, float by) {
+  return getDistanceBetween(a.x(), a.y(), bx, by);
 }
 
 float getDistanceBetween(float ax, float ay, float bx, float by) {
@@ -295,4 +337,3 @@ float normalizeAngle(float v) {
   }
   return v % (2 * PI);
 }
-

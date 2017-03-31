@@ -1,5 +1,5 @@
 
-class Attractor implements IPositioned {
+class Attractor implements IPositionable {
   private int _id;
   private float _x;
   private float _y;
