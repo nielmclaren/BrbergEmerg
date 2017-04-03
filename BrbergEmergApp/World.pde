@@ -22,6 +22,7 @@ class World {
   public MeanderImpulse meander;
   public RepulsionImpulse repulsion;
   public SeparationImpulse separation;
+  public TouchImpulse lure;
 
   World(int width, int height, int numGroups) {
     _attractors = new ArrayList<Attractor>();
@@ -41,6 +42,7 @@ class World {
     meander = new MeanderImpulse(this);
     repulsion = new RepulsionImpulse(this);
     separation = new SeparationImpulse(this);
+    lure = new TouchImpulse(this);
   }
 
   ArrayList<Attractor> attractorsRef() {
@@ -61,9 +63,17 @@ class World {
   }
 
   World addTouch(TuioCursor cursor) {
-    Vehicle vehicle = getNearestFreeVehicle(cursor.getX() * width, cursor.getY() * height);
-    Touch touch = new Touch(cursor, vehicle);
-    vehicle.touch(touch);
+    float x = cursor.getX() * width;
+    float y = cursor.getY() * height;
+    Vehicle vehicle = getNearestFreeVehicle(x, y);
+    float dist = getDistanceBetween(vehicle, x, y);
+    Touch touch;
+    if (dist < 200) {
+      touch = new Touch(cursor, vehicle);
+      vehicle.touch(touch);
+    } else {
+      touch = new Touch(cursor, null);
+    }
     _cursorIdToTouch.put(cursor.getCursorID(), touch);
     return this;
   }
@@ -88,7 +98,9 @@ class World {
 
   World removeTouch(TuioCursor cursor) {
     Touch touch = _cursorIdToTouch.get(cursor.getCursorID());
-    touch.vehicleRef().touch(null);
+    if (touch.vehicleRef() != null) {
+      touch.vehicleRef().touch(null);
+    }
     _cursorIdToTouch.remove(cursor.getCursorID());
     return this;
   }

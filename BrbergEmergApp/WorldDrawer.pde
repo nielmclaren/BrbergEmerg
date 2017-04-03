@@ -21,7 +21,6 @@ class WorldDrawer {
 
   public void draw(BrbergEmergImage g, World world) {
     drawVehicles(g, world);
-    drawTouches(g, world);
   }
 
   public void drawAttractors(PGraphics g, World world) {
@@ -44,12 +43,27 @@ class WorldDrawer {
     }
   }
 
-  private void drawTouches(BrbergEmergImage g, World world) {
+  void drawTouches(PGraphics g, World world) {
+    int radius = 50;
     ArrayList<Touch> touches = world.touches();
 
+    g.pushStyle();
+    g.ellipseMode(CENTER);
+    g.noFill();
+    g.stroke(255, 32);
+
     for (Touch touch : touches) {
-      g.drawTouch(world, touch);
+      g.strokeWeight(12);
+      g.ellipse(touch.x(), touch.y(), radius, radius);
+      g.strokeWeight(2);
+      g.ellipse(touch.x(), touch.y(), radius * 1.5, radius * 1.5);
+
+      if (touch.vehicleRef() != null) {
+        Vehicle vehicle = touch.vehicleRef();
+        g.line(touch.x(), touch.y(), vehicle.x(), vehicle.y());
+      }
     }
+    g.popStyle();
   }
 }
 

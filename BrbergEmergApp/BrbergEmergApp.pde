@@ -78,6 +78,8 @@ void draw() {
     if (showAttractors) {
       drawer.drawAttractors(g, world);
     }
+
+    drawer.drawTouches(g, world);
   }
 }
 
@@ -111,7 +113,7 @@ void keyReleased() {
       reset();
       break;
     case 'r':
-      buffer.getImageRef().save(fileNamer.next());
+      buffer.getImageRef().save(savePath(fileNamer.next()));
       break;
     case 't':
       showAttractors = !showAttractors;
