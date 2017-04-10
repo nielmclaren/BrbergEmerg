@@ -6,6 +6,8 @@ int zoomScale;
 PGraphics targetImage;
 PGraphics zoomImage;
 
+ArrayList<Line> lines;
+
 FileNamer fileNamer;
 
 void setup() {
@@ -18,25 +20,28 @@ void setup() {
   targetImage = createGraphics(imageWidth, imageHeight, P3D);
   zoomImage = createGraphics(imageWidth * zoomScale, imageHeight * zoomScale, P3D);
 
+  lines = new ArrayList<Line>();
+
   fileNamer = new FileNamer("output/export", "png");
 }
 
-void draw() {
+void reset() {
+  lines = new ArrayList<Line>();
+  for (int i = 0; i < 10; i++) {
+    lines.add(new Line(
+          random(imageWidth), random(imageHeight),
+          random(imageWidth), random(imageHeight)));
+  }
+}
 
+void draw() {
   background(128);
 
   targetImage.beginDraw();
   targetImage.background(0);
   targetImage.endDraw();
 
-  int numStrokes = 16;
-  for (int i = 0; i < numStrokes; i++) {
-    float dx = mouseX - width/2;
-    float dy = mouseY - height/2;
-    float radius = 30;
-    float angle = map(i, 0, numStrokes, 0, 2 * PI);
-    drawLines(radius, angle);
-  }
+  drawLines();
 
   updateZoomImage();
 
@@ -54,21 +59,17 @@ float rfpart(float v) {
   return 1 - fpart(v);
 }
 
-void drawLines(float radius, float angle) {
+void drawLines() {
   colorMode(HSB);
 
-  int centerX;
-  int centerY;
-
-  float r = radius * mouseX / width;
-  float a = (angle + 2 * PI * mouseY / height) % (2 * PI);
-
-  centerX = 32;
-  centerY = 32;
   targetImage.loadPixels();
-  drawLine(targetImage,
-      floor(centerX + r * cos(a)), floor(centerY + r * sin(a)),
-      floor(centerX + radius * cos(angle)), floor(centerY + radius * sin(angle)));
+
+  for (Line line : lines) {
+    drawLine(targetImage,
+        floor(line.x0), floor(line.y0),
+        floor(line.x1), floor(line.y1));
+  }
+
   targetImage.updatePixels();
 }
 
@@ -175,6 +176,9 @@ void updateZoomImage() {
 
 void keyReleased() {
   switch (key) {
+    case 'e':
+      reset();
+      break;
     case 'r':
       save(savePath(fileNamer.next()));
       break;
