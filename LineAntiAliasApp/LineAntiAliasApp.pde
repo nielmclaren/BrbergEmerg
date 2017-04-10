@@ -6,6 +6,8 @@ int zoomScale;
 PGraphics targetImage;
 PGraphics zoomImage;
 
+FileNamer fileNamer;
+
 void setup() {
   size(800, 800, P3D);
 
@@ -15,14 +17,11 @@ void setup() {
 
   targetImage = createGraphics(imageWidth, imageHeight, P3D);
   zoomImage = createGraphics(imageWidth * zoomScale, imageHeight * zoomScale, P3D);
+
+  fileNamer = new FileNamer("output/export", "png");
 }
 
 void draw() {
-  float dx = mouseX - width/2;
-  float dy = mouseY - height/2;
-  float radius = map(sqrt(dx * dx + dy * dy), 0, sqrt(width * width + height * height), 0, sqrt(32 * 32 + 32 * 32));
-  float angle = atan2(dy, dx);
-  println(radius, angle * 180/PI);
 
   background(128);
 
@@ -30,19 +29,18 @@ void draw() {
   targetImage.background(0);
   targetImage.endDraw();
 
-  targetImage.beginDraw();
-  targetImage.stroke(255);
-  targetImage.line(16, 32, floor(16 + radius * cos(angle)), floor(32 + radius * sin(angle)));
-  targetImage.endDraw();
-
-  targetImage.loadPixels();
-  drawLine(targetImage, 48, 32, floor(48 + radius * cos(angle)), floor(32 + radius * sin(angle)));
-  targetImage.updatePixels();
+  int numStrokes = 16;
+  for (int i = 0; i < numStrokes; i++) {
+    float dx = mouseX - width/2;
+    float dy = mouseY - height/2;
+    float radius = 30;
+    float angle = map(i, 0, numStrokes, 0, 2 * PI);
+    drawLines(radius, angle);
+  }
 
   updateZoomImage();
 
-  image(targetImage, 0, 0);
-  image(zoomImage, imageWidth, 0);
+  image(zoomImage, 0, 0, width, height);
 }
 
 float fpart(float v) {
@@ -54,6 +52,24 @@ float fpart(float v) {
 
 float rfpart(float v) {
   return 1 - fpart(v);
+}
+
+void drawLines(float radius, float angle) {
+  colorMode(HSB);
+
+  int centerX;
+  int centerY;
+
+  float r = radius * mouseX / width;
+  float a = (angle + 2 * PI * mouseY / height) % (2 * PI);
+
+  centerX = 32;
+  centerY = 32;
+  targetImage.loadPixels();
+  drawLine(targetImage,
+      floor(centerX + r * cos(a)), floor(centerY + r * sin(a)),
+      floor(centerX + radius * cos(angle)), floor(centerY + radius * sin(angle)));
+  targetImage.updatePixels();
 }
 
 void drawLine(PGraphics g, int x0, int y0, int x1, int y1) {
@@ -120,14 +136,12 @@ void drawLine(PGraphics g, int x0, int y0, int x1, int y1) {
 
   // main loop
   if (isSteep) {
-    assert(xpxl1 + 1 < xpxl2);
     for (float x = xpxl1 + 1; x < xpxl2; x++) {
       plot(g, floor(intery)  , x, rfpart(intery));
       plot(g, floor(intery)+1, x,  fpart(intery));
       intery = intery + gradient;
     }
   } else {
-    assert(xpxl1 + 1 < xpxl2);
     for (float x = xpxl1 + 1; x < xpxl2; x++) {
       plot(g, x, floor(intery),  rfpart(intery));
       plot(g, x, floor(intery)+1, fpart(intery));
@@ -137,14 +151,7 @@ void drawLine(PGraphics g, int x0, int y0, int x1, int y1) {
 }
 
 void plot(PGraphics g, float x, float y, float v) {
-  g.pixels[floor(y) * g.width + floor(x)] = color(v * 255);
-}
-
-void mouseReleased() {
-  targetImage.beginDraw();
-  targetImage.ellipse(mouseX % imageWidth, mouseY % imageHeight, 10, 10);
-  targetImage.endDraw();
-  updateZoomImage();
+  g.pixels[floor(y) * g.width + floor(x)] = color(map(v, 0, 1, 255 - 64, 255 + 64) % 255, 128, 255);
 }
 
 void updateZoomImage() {
@@ -164,4 +171,12 @@ void updateZoomImage() {
   }
   targetImage.updatePixels();
   zoomImage.updatePixels();
+}
+
+void keyReleased() {
+  switch (key) {
+    case 'r':
+      save(savePath(fileNamer.next()));
+      break;
+  }
 }
