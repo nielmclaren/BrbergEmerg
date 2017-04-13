@@ -11,6 +11,14 @@ void setup() {
 
 void reset() {
   partition = new Partition(0, 0, width, height, 0);
+
+  int numPartitions = 10000;
+  for (int i = 0; i < numPartitions; i++) {
+    float x = random(width);
+    float y = random(height);
+    Partition p = getLeafPartitionAt(x, y, partition);
+    p.partition(x, y);
+  }
 }
 
 void draw() {
@@ -25,7 +33,7 @@ void drawPartition(Partition p) {
       drawPartition(childPartition);
     }
   } else {
-    stroke(128);
+    noStroke();
     fill(16 + p.depth() * 8);
     rect(p.x(), p.y(), p.width(), p.height());
   }
