@@ -15,12 +15,14 @@ void setup() {
 void reset() {
   partition = new Partition(0, 0, width, height, 0);
 
+  float k = 0.2;
+  float ik = 1 - k;
   int numPartitions = 10000;
   for (int i = 0; i < numPartitions; i++) {
     float x = random(width);
     float y = random(height);
     Partition p = getLeafPartitionAt(x, y, partition);
-    p.partition(x, y);
+    p.partition(p.x() + random(k * p.width(), ik * p.width()), p.y() + random(k * p.height(), ik * p.height()));
   }
 
   targetLine = new Line(random(width), random(height), random(width), random(height));
@@ -81,10 +83,5 @@ void keyReleased() {
       save(savePath(fileNamer.next()));
       break;
   }
-}
-
-void mouseReleased() {
-  Partition p = getLeafPartitionAt(mouseX, mouseY, partition);
-  p.partition(mouseX, mouseY);
 }
 
