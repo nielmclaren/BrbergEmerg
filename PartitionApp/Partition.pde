@@ -32,6 +32,14 @@ class Partition {
     return _height;
   }
 
+  public float midX() {
+    return _x + _width/2;
+  }
+
+  public float midY() {
+    return _y + _height/2;
+  }
+
   public int depth() {
     return _depth;
   }
