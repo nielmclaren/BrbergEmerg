@@ -41,6 +41,28 @@ class Partition {
       && y >= _y && y < _y + _height;
   }
 
+  public boolean intersectsLine(float x0, float y0, float x1, float y1) {
+    return lineIntersectsLine(x0, y0, x1, y1, _x, _y, _x + _width, _y)
+      || lineIntersectsLine(x0, y0, x1, y1, _x, _y, _x, _y + _height)
+      || lineIntersectsLine(x0, y0, x1, y1, _x + _width, _y, _x + _width, _y + _height)
+      || lineIntersectsLine(x0, y0, x1, y1, _x, _y + _height, _x + _width, _y + _height);
+  }
+
+  private boolean lineIntersectsLine(
+      float ax0, float ay0, float ax1, float ay1,
+      float bx0, float by0, float bx1, float by1) {
+    ax1 -= ax0;
+    ay1 -= ay0;
+    bx1 -= bx0;
+    by1 -= by0;
+    float d = bx1 * ay1 - ax1 * by1;
+    if (d == 0) return false;
+    float id = 1 / d;
+    float s = id * ((ax0 - bx0) * ay1 - (ay0 - by0) * ax1);
+    float t = id * -(-(ax0 - bx0) * by1 + (ay0 - by0) * bx1);
+    return s >= 0 && s <= 1 && t >= 0 && t <= 1;
+  }
+
   public boolean hasChildren() {
     return _children.size() > 0;
   }
