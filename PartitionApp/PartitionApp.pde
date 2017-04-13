@@ -1,6 +1,6 @@
 
 Partition partition;
-Line targetLine;
+ArrayList<Line> lines;
 
 FileNamer fileNamer;
 
@@ -13,8 +13,14 @@ void setup() {
 }
 
 void reset() {
+  resetPartitions();
+  resetLines();
+}
+
+void resetPartitions() {
   partition = new Partition(0, 0, width, height, 0);
 
+  partition = new Partition(0, 0, width, height, 0);
   float k = 0.2;
   float ik = 1 - k;
   int numPartitions = 10000;
@@ -24,8 +30,15 @@ void reset() {
     Partition p = getLeafPartitionAt(x, y, partition);
     p.partition(p.x() + random(k * p.width(), ik * p.width()), p.y() + random(k * p.height(), ik * p.height()));
   }
+}
 
-  targetLine = new Line(random(width), random(height), random(width), random(height));
+void resetLines() {
+  lines = new ArrayList<Line>();
+
+  int numLines = 20;
+  for (int i = 0; i < numLines; i++) {
+    lines.add(new Line(random(width), random(height), random(width), random(height)));
+  }
 }
 
 void draw() {
@@ -42,18 +55,24 @@ void drawPartition(Partition p) {
     }
   } else {
     noStroke();
-    if (p.intersectsLine(targetLine.x0, targetLine.y0, targetLine.x1, targetLine.y1)) {
-      float d = distanceBetweenLineAndPoint(targetLine.x0, targetLine.y0, targetLine.x1, targetLine.y1, p.midX(), p.midY());
-      fill((255 - 64 + d * 8) % 255, 128, 255);
+    Line intersectingLine = getIntersectingLine(p, lines);
+    if (intersectingLine != null) {
+      float d = distanceBetweenLineAndPoint(intersectingLine.x0, intersectingLine.y0, intersectingLine.x1, intersectingLine.y1, p.midX(), p.midY());
+      fill((mouseX - d * mouseY / 64) % 255, 128, 255);
     } else {
       fill(32 + 2 * p.depth());
     }
     rect(p.x(), p.y(), p.width(), p.height());
   }
+}
 
-  //strokeWeight(2);
-  //stroke(32, 128, 255);
-  //line(targetLine.x0, targetLine.y0, targetLine.x1, targetLine.y1);
+Line getIntersectingLine(Partition p, ArrayList<Line> lines) {
+  for (Line line : lines) {
+    if (p.intersectsLine(line.x0, line.y0, line.x1, line.y1)) {
+      return line;
+    }
+  }
+  return null;
 }
 
 float distanceBetweenLineAndPoint(float x0, float y0, float x1, float y1, float x, float y) {
