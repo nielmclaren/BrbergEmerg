@@ -8,6 +8,7 @@ PGraphics zoomImage;
 
 ArrayList<Line> lines;
 
+PVector lineStart;
 FileNamer fileNamer;
 
 void setup() {
@@ -27,11 +28,6 @@ void setup() {
 
 void reset() {
   lines = new ArrayList<Line>();
-  for (int i = 0; i < 10; i++) {
-    lines.add(new Line(
-          random(imageWidth), random(imageHeight),
-          random(imageWidth), random(imageHeight)));
-  }
 }
 
 void draw() {
@@ -62,6 +58,7 @@ float rfpart(float v) {
 void drawLines() {
   colorMode(HSB);
 
+  targetImage.beginDraw();
   targetImage.loadPixels();
 
   for (Line line : lines) {
@@ -71,6 +68,7 @@ void drawLines() {
   }
 
   targetImage.updatePixels();
+  targetImage.endDraw();
 }
 
 void drawLine(PGraphics g, int x0, int y0, int x1, int y1) {
@@ -152,10 +150,11 @@ void drawLine(PGraphics g, int x0, int y0, int x1, int y1) {
 }
 
 void plot(PGraphics g, float x, float y, float v) {
-  g.pixels[floor(y) * g.width + floor(x)] = color(map(v, 0, 1, 255 - 64, 255 + 64) % 255, 128, 255);
+  g.pixels[floor(y) * g.width + floor(x)] = color(map(v, 0, 1, 255 - 96, 255 + 32) % 255, 128, 255);
 }
 
 void updateZoomImage() {
+  zoomImage.beginDraw();
   targetImage.loadPixels();
   zoomImage.loadPixels();
   for (int targetX = 0; targetX < imageWidth; targetX++) {
@@ -172,6 +171,7 @@ void updateZoomImage() {
   }
   targetImage.updatePixels();
   zoomImage.updatePixels();
+  zoomImage.endDraw();
 }
 
 void keyReleased() {
@@ -183,4 +183,12 @@ void keyReleased() {
       save(savePath(fileNamer.next()));
       break;
   }
+}
+
+void mousePressed() {
+  lineStart = new PVector(mouseX * imageWidth/width, mouseY * imageHeight/height);
+}
+
+void mouseReleased() {
+  lines.add(new Line(lineStart.x, lineStart.y, mouseX * imageWidth/width, mouseY * imageHeight/height));
 }
