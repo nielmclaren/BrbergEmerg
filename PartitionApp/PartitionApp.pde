@@ -1,12 +1,14 @@
 
 Partition partition;
 ArrayList<Line> lines;
+PVector lineStart;
 
 FileNamer fileNamer;
 
 void setup() {
   size(800, 800, P3D);
 
+  lineStart = new PVector();
   fileNamer = new FileNamer("output/export", "png");
 
   reset();
@@ -20,10 +22,9 @@ void reset() {
 void resetPartitions() {
   partition = new Partition(0, 0, width, height, 0);
 
-  partition = new Partition(0, 0, width, height, 0);
   float k = 0.2;
   float ik = 1 - k;
-  int numPartitions = 10000;
+  int numPartitions = 20000;
   for (int i = 0; i < numPartitions; i++) {
     float x = random(width);
     float y = random(height);
@@ -58,9 +59,9 @@ void drawPartition(Partition p) {
     Line intersectingLine = getIntersectingLine(p, lines);
     if (intersectingLine != null) {
       float d = distanceBetweenLineAndPoint(intersectingLine.x0, intersectingLine.y0, intersectingLine.x1, intersectingLine.y1, p.midX(), p.midY());
-      fill((mouseX - d * mouseY / 64) % 255, 128, 255);
+      fill((mouseX - d * mouseY / 64) % 255, 128, 192);
     } else {
-      fill(32 + 2 * p.depth());
+      fill(32 + 4 * p.depth());
     }
     rect(p.x(), p.y(), p.width(), p.height());
   }
@@ -104,3 +105,10 @@ void keyReleased() {
   }
 }
 
+void mousePressed() {
+  lineStart = new PVector(mouseX, mouseY);
+}
+
+void mouseReleased() {
+  lines.add(new Line(lineStart.x, lineStart.y, mouseX, mouseY));
+}
