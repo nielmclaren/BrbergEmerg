@@ -44,6 +44,10 @@ class Partition {
     return _depth;
   }
 
+  public float area() {
+    return _width * _height;
+  }
+
   public boolean contains(float x, float y) {
     return x >= _x && x < _x + _width
       && y >= _y && y < _y + _height;

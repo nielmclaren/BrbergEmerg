@@ -9,7 +9,7 @@ FileNamer fileNamer;
 void setup() {
   size(800, 800, P3D);
 
-  sourceImage = loadImage("muhammadali.png");
+  sourceImage = loadImage("gradient.png");
   fileNamer = new FileNamer("output/export", "png");
 
   reset();
@@ -22,22 +22,22 @@ void reset() {
 void resetPartitions() {
   partition = new Partition(0, 0, width, height, 0);
 
-  float k = 0.05;
+  float k = 0.2;
   float ik = 1 - k;
 
-  int numLinearPartitions = 1000;
-  int numAreaPartitions = 100;
-
-  for (int i = 0; i < numLinearPartitions; i++) {
-    Partition p = getRandomLeafPartition(partition);
-    p.partition(p.x() + random(k * p.width(), ik * p.width()), p.y() + random(k * p.height(), ik * p.height()));
-  }
-
-  for (int i = 0; i < numAreaPartitions; i++) {
+  int maxPartitions = 2000;
+  int numPartitions = 0;
+  while (numPartitions < maxPartitions) {
     float x = random(width);
     float y = random(height);
     Partition p = getLeafPartitionAt(x, y, partition);
-    p.partition(p.x() + random(k * p.width(), ik * p.width()), p.y() + random(k * p.height(), ik * p.height()));
+    color c = sourceImage.get(floor(p.x()), floor(p.y()));
+    if (random(pow(128, 4) + 1) > pow(abs(brightness(c) - 127), 4)) {
+      p.partition(
+          p.x() + random(k * p.width(), ik * p.width()),
+          p.y() + random(k * p.height(), ik * p.height()));
+      numPartitions++;
+    }
   }
 }
 
@@ -54,10 +54,17 @@ void drawPartition(Partition p) {
       drawPartition(childPartition);
     }
   } else {
-    noStroke();
-    color c = sourceImage.get(floor(p.midX()), floor(p.midY()));
-    fill(hue(c), saturation(c), brightness(c) - 32 + 4 * p.depth());
+    int offset = 2 * p.depth();
+    color c = color(map(p.area(), 0, 1000, 0, 255));
+    color d = color(hue(c), saturation(c), brightness(c) - 64);
+
+    noFill();
+    stroke(d);
     rect(p.x(), p.y(), p.width(), p.height());
+
+    fill(c);
+    noStroke();
+    rect(p.x() + offset, p.y() + offset, p.width() - 2 * offset, p.height() - 2 * offset);
   }
 }
 
