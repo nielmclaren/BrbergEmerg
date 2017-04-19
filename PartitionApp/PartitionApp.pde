@@ -61,21 +61,6 @@ void drawPartition(Partition p) {
   }
 }
 
-Line getIntersectingLine(Partition p, ArrayList<Line> lines) {
-  for (Line line : lines) {
-    if (p.intersectsLine(line.x0, line.y0, line.x1, line.y1)) {
-      return line;
-    }
-  }
-  return null;
-}
-
-float distanceBetweenLineAndPoint(float x0, float y0, float x1, float y1, float x, float y) {
-  float dx = x1 - x0;
-  float dy = y1 - y0;
-  return abs((y1 - y0) * x - (x1 - x0) * y + x1 * y0 - y1 * x0) / sqrt(dy * dy + dx * dx);
-}
-
 Partition getLeafPartitionAt(float x, float y, Partition p) {
   if (p.hasChildren()) {
     for (Partition childPartition : p.children()) {
@@ -86,24 +71,6 @@ Partition getLeafPartitionAt(float x, float y, Partition p) {
   }
 
   return p;
-}
-
-Partition getRandomLeafPartition(Partition p) {
-  ArrayList<Partition> leafPartitions = getLeafPartitions(p);
-  return leafPartitions.get(floor(random(leafPartitions.size())));
-}
-
-ArrayList<Partition> getLeafPartitions(Partition p) {
-  ArrayList<Partition> result = new ArrayList<Partition>();
-  if (p.hasChildren()) {
-    for (Partition childPartition : p.children()) {
-      result.addAll(getLeafPartitions(childPartition));
-    }
-  } else {
-    result.add(p);
-  }
-
-  return result;
 }
 
 void keyReleased() {
