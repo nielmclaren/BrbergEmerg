@@ -28,7 +28,7 @@ void resetPartitions() {
   for (int i = 0; i < numPartitions; i++) {
     float x = random(width);
     float y = random(height);
-    Partition p = getLeafPartitionAt(x, y, partition);
+    Partition p = getRandomLeafPartition(partition);
     p.partition(p.x() + random(k * p.width(), ik * p.width()), p.y() + random(k * p.height(), ik * p.height()));
   }
 }
@@ -78,6 +78,24 @@ Partition getLeafPartitionAt(float x, float y, Partition p) {
   }
 
   return p;
+}
+
+Partition getRandomLeafPartition(Partition p) {
+  ArrayList<Partition> leafPartitions = getLeafPartitions(p);
+  return leafPartitions.get(floor(random(leafPartitions.size())));
+}
+
+ArrayList<Partition> getLeafPartitions(Partition p) {
+  ArrayList<Partition> result = new ArrayList<Partition>();
+  if (p.hasChildren()) {
+    for (Partition childPartition : p.children()) {
+      result.addAll(getLeafPartitions(childPartition));
+    }
+  } else {
+    result.add(p);
+  }
+
+  return result;
 }
 
 void keyReleased() {
