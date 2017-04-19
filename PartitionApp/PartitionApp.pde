@@ -24,11 +24,19 @@ void resetPartitions() {
 
   float k = 0.05;
   float ik = 1 - k;
-  int numPartitions = 2000;
-  for (int i = 0; i < numPartitions; i++) {
+
+  int numLinearPartitions = 1000;
+  int numAreaPartitions = 100;
+
+  for (int i = 0; i < numLinearPartitions; i++) {
+    Partition p = getRandomLeafPartition(partition);
+    p.partition(p.x() + random(k * p.width(), ik * p.width()), p.y() + random(k * p.height(), ik * p.height()));
+  }
+
+  for (int i = 0; i < numAreaPartitions; i++) {
     float x = random(width);
     float y = random(height);
-    Partition p = getRandomLeafPartition(partition);
+    Partition p = getLeafPartitionAt(x, y, partition);
     p.partition(p.x() + random(k * p.width(), ik * p.width()), p.y() + random(k * p.height(), ik * p.height()));
   }
 }
