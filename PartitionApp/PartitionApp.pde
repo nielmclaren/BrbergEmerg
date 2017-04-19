@@ -9,7 +9,7 @@ FileNamer fileNamer;
 void setup() {
   size(800, 800, P3D);
 
-  sourceImage = loadImage("noise.png");
+  sourceImage = loadImage("muhammadali.png");
   fileNamer = new FileNamer("output/export", "png");
 
   reset();
@@ -24,7 +24,7 @@ void resetPartitions() {
 
   float k = 0.05;
   float ik = 1 - k;
-  int numPartitions = 10000;
+  int numPartitions = 2000;
   for (int i = 0; i < numPartitions; i++) {
     float x = random(width);
     float y = random(height);
@@ -47,12 +47,8 @@ void drawPartition(Partition p) {
     }
   } else {
     noStroke();
-    float b = brightness(sourceImage.get(floor(p.x()), floor(p.y())));
-    if (b > 196) {
-      fill(8 + 2 * p.depth());
-    } else {
-      fill((mouseX + b * mouseY / 64) % 255, 128, 255);
-    }
+    color c = sourceImage.get(floor(p.midX()), floor(p.midY()));
+    fill(hue(c), saturation(c), brightness(c) - 32 + 4 * p.depth());
     rect(p.x(), p.y(), p.width(), p.height());
   }
 }
