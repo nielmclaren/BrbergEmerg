@@ -1,14 +1,15 @@
 
 Partition partition;
 ArrayList<Line> lines;
-PVector lineStart;
+PImage sourceImage;
+
 
 FileNamer fileNamer;
 
 void setup() {
   size(800, 800, P3D);
 
-  lineStart = new PVector();
+  sourceImage = loadImage("noise.png");
   fileNamer = new FileNamer("output/export", "png");
 
   reset();
@@ -16,29 +17,19 @@ void setup() {
 
 void reset() {
   resetPartitions();
-  resetLines();
 }
 
 void resetPartitions() {
   partition = new Partition(0, 0, width, height, 0);
 
-  float k = 0.2;
+  float k = 0.05;
   float ik = 1 - k;
-  int numPartitions = 20000;
+  int numPartitions = 10000;
   for (int i = 0; i < numPartitions; i++) {
     float x = random(width);
     float y = random(height);
     Partition p = getLeafPartitionAt(x, y, partition);
     p.partition(p.x() + random(k * p.width(), ik * p.width()), p.y() + random(k * p.height(), ik * p.height()));
-  }
-}
-
-void resetLines() {
-  lines = new ArrayList<Line>();
-
-  int numLines = 20;
-  for (int i = 0; i < numLines; i++) {
-    lines.add(new Line(random(width), random(height), random(width), random(height)));
   }
 }
 
@@ -56,12 +47,11 @@ void drawPartition(Partition p) {
     }
   } else {
     noStroke();
-    Line intersectingLine = getIntersectingLine(p, lines);
-    if (intersectingLine != null) {
-      float d = distanceBetweenLineAndPoint(intersectingLine.x0, intersectingLine.y0, intersectingLine.x1, intersectingLine.y1, p.midX(), p.midY());
-      fill((mouseX - d * mouseY / 64) % 255, 128, 192);
+    float b = brightness(sourceImage.get(floor(p.x()), floor(p.y())));
+    if (b > 196) {
+      fill(8 + 2 * p.depth());
     } else {
-      fill(32 + 4 * p.depth());
+      fill((mouseX + b * mouseY / 64) % 255, 128, 255);
     }
     rect(p.x(), p.y(), p.width(), p.height());
   }
@@ -96,6 +86,9 @@ Partition getLeafPartitionAt(float x, float y, Partition p) {
 
 void keyReleased() {
   switch (key) {
+    case 'a':
+      saveAnimation();
+      break;
     case 'e':
       reset();
       break;
@@ -105,10 +98,12 @@ void keyReleased() {
   }
 }
 
-void mousePressed() {
-  lineStart = new PVector(mouseX, mouseY);
-}
-
-void mouseReleased() {
-  lines.add(new Line(lineStart.x, lineStart.y, mouseX, mouseY));
+void saveAnimation() {
+  FileNamer animationFolderNamer = new FileNamer("output/anim", "/");
+  FileNamer frameNamer = new FileNamer(animationFolderNamer.next() + "/frame", "png");
+  for (int i = 0; i < 30; i++) {
+    resetPartitions();
+    drawPartition(partition);
+    save(frameNamer.next());
+  }
 }
