@@ -31,8 +31,8 @@ void resetPartitions() {
     float x = random(width);
     float y = random(height);
     Partition p = getLeafPartitionAt(x, y, partition);
-    color c = sourceImage.get(floor(p.x()), floor(p.y()));
-    if (random(pow(128, 4) + 1) > pow(abs(brightness(c) - 127), 4)) {
+    color c = sourceImage.get(floor(p.midX()), floor(p.midX()));
+    if (random(1) < (cos((brightness(c) - 127) * 2 * PI / 255) + 1) / 2) {
       p.partition(
           p.x() + random(k * p.width(), ik * p.width()),
           p.y() + random(k * p.height(), ik * p.height()));
@@ -43,7 +43,7 @@ void resetPartitions() {
 
 void draw() {
   colorMode(HSB);
-  background(255);
+  background(0, 255, 255);
 
   drawPartition(partition);
 }
@@ -54,16 +54,17 @@ void drawPartition(Partition p) {
       drawPartition(childPartition);
     }
   } else {
-    int offset = 2 * p.depth();
-    color c = color(map(p.area(), 0, 1000, 0, 255));
+    int offset = 2;
+    color c = color(map(p.area(), 0, 1000, 255, 0));
+    color b = color(hue(c), saturation(c), brightness(c) + 16);
     color d = color(hue(c), saturation(c), brightness(c) - 64);
-
-    noFill();
-    stroke(d);
-    rect(p.x(), p.y(), p.width(), p.height());
 
     fill(c);
     noStroke();
+    rect(p.x(), p.y(), p.width(), p.height());
+
+    fill(b);
+    stroke(d);
     rect(p.x() + offset, p.y() + offset, p.width() - 2 * offset, p.height() - 2 * offset);
   }
 }
