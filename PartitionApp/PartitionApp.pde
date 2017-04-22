@@ -9,7 +9,7 @@ FileNamer fileNamer;
 void setup() {
   size(800, 800, P3D);
 
-  sourceImage = loadImage("gradient.png");
+  sourceImage = loadImage("zebra.png");
   fileNamer = new FileNamer("output/export", "png");
 
   reset();
@@ -25,14 +25,15 @@ void resetPartitions() {
   float k = 0.2;
   float ik = 1 - k;
 
-  int maxPartitions = 2000;
+  int maxPartitions = 1000;
   int numPartitions = 0;
   while (numPartitions < maxPartitions) {
     float x = random(width);
     float y = random(height);
     Partition p = getLeafPartitionAt(x, y, partition);
     color c = sourceImage.get(floor(p.midX()), floor(p.midX()));
-    if (random(1) < (cos((brightness(c) - 127) * 2 * PI / 255) + 1) / 2) {
+    float score = getDissimilarityScore(sourceImage, floor(p.midX()), floor(p.midY()));
+    if (random(255) < score) {
       p.partition(
           p.x() + random(k * p.width(), ik * p.width()),
           p.y() + random(k * p.height(), ik * p.height()));
@@ -55,7 +56,7 @@ void drawPartition(Partition p) {
     }
   } else {
     int offset = 2;
-    color c = color(map(p.area(), 0, 1000, 255, 0));
+    color c = sourceImage.get(floor(p.midX()), floor(p.midY()));
     color b = color(hue(c), saturation(c), brightness(c) + 16);
     color d = color(hue(c), saturation(c), brightness(c) - 64);
 
@@ -81,6 +82,26 @@ Partition getLeafPartitionAt(float x, float y, Partition p) {
   return p;
 }
 
+float getDissimilarityScore(PImage image, int targetX, int targetY) {
+  int radius = 50;
+  int radiusSq = radius * radius;
+  float sum = 0;
+  int numEntries = 0;
+
+  for (int rx = -radius; rx < radius; rx++) {
+    for (int ry = -radius; ry < radius; ry++) {
+      int x = targetX + rx;
+      int y = targetY + ry;
+      if (x >= 0 && x < image.width && y >= 0 && y < image.height && sqrt(rx * rx + ry * ry) < radiusSq) {
+        sum += brightness(image.pixels[y * image.width + x]);
+        numEntries++;
+      }
+    }
+  }
+
+  return abs(brightness(image.get(targetX, targetY)) - sum/numEntries);
+}
+
 void keyReleased() {
   switch (key) {
     case 'a':
@@ -99,6 +120,7 @@ void saveAnimation() {
   FileNamer animationFolderNamer = new FileNamer("output/anim", "/");
   FileNamer frameNamer = new FileNamer(animationFolderNamer.next() + "/frame", "png");
   for (int i = 0; i < 30; i++) {
+    background(0);
     resetPartitions();
     drawPartition(partition);
     save(frameNamer.next());
