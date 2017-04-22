@@ -91,6 +91,18 @@ class Partition {
       && y >= _y && y < _y + _height;
   }
 
+  public Partition getLeafPartitionAt(float x, float y) {
+    if (hasChildren()) {
+      for (Partition childPartition : _children) {
+        if (childPartition.contains(x, y)) {
+          return childPartition.getLeafPartitionAt(x, y);
+        }
+      }
+    }
+
+    return this;
+  }
+
   public boolean intersectsLine(float x0, float y0, float x1, float y1) {
     return lineIntersectsLine(x0, y0, x1, y1, _x, _y, _x + _width, _y)
       || lineIntersectsLine(x0, y0, x1, y1, _x, _y, _x, _y + _height)

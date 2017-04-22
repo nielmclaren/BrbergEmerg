@@ -15,6 +15,10 @@ void setup() {
   reset();
 }
 
+void clear() {
+  partition = new Partition(0, 0, width, height, 0);
+}
+
 void reset() {
   resetPartitions();
 }
@@ -30,7 +34,7 @@ void resetPartitions() {
   while (numPartitions < maxPartitions) {
     float x = random(width);
     float y = random(height);
-    Partition p = getLeafPartitionAt(x, y, partition);
+    Partition p = partition.getLeafPartitionAt(x, y);
     color c = sourceImage.get(floor(p.midX()), floor(p.midX()));
     float score = getDissimilarityScore(sourceImage, floor(p.midX()), floor(p.midY()));
     if (random(255) < score) {
@@ -67,18 +71,6 @@ void drawPartition(Partition p) {
   }
 }
 
-Partition getLeafPartitionAt(float x, float y, Partition p) {
-  if (p.hasChildren()) {
-    for (Partition childPartition : p.children()) {
-      if (childPartition.contains(x, y)) {
-        return getLeafPartitionAt(x, y, childPartition);
-      }
-    }
-  }
-
-  return p;
-}
-
 float getDissimilarityScore(PImage image, int targetX, int targetY) {
   int radius = 50;
   int radiusSq = radius * radius;
@@ -104,6 +96,9 @@ void keyReleased() {
     case 'a':
       saveAnimation();
       break;
+    case 'c':
+      clear();
+      break;
     case 'e':
       reset();
       break;
@@ -114,7 +109,7 @@ void keyReleased() {
 }
 
 void mouseReleased() {
-  Partition p = getLeafPartitionAt(mouseX, mouseY, partition);
+  Partition p = partition.getLeafPartitionAt(mouseX, mouseY);
   p.partition(mouseX, mouseY);
 }
 
