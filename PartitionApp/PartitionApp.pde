@@ -9,7 +9,7 @@ FileNamer fileNamer;
 void setup() {
   size(800, 800, P3D);
 
-  sourceImage = loadImage("zebra.png");
+  sourceImage = loadImage("painterly.png");
   fileNamer = new FileNamer("output/export", "png");
 
   reset();
@@ -44,29 +44,26 @@ void resetPartitions() {
 
 void draw() {
   colorMode(HSB);
-  background(0, 255, 255);
+  background(0);
 
   drawPartition(partition);
 }
 
 void drawPartition(Partition p) {
+  int offset = p.depth();
+  int topOffset = p.isTop() ? offset : 1;
+  int bottomOffset = p.isBottom() ? offset : 1;
+  int leftOffset = p.isLeft() ? offset : 1;
+  int rightOffset = p.isRight() ? offset : 1;
+
+  noStroke();
+  fill(sourceImage.get(floor(p.midX()), floor(p.midY())));
+  rect(p.x() + leftOffset, p.y() + topOffset, p.width() - leftOffset - rightOffset, p.height() - topOffset - bottomOffset);
+
   if (p.hasChildren()) {
     for (Partition childPartition : p.children()) {
       drawPartition(childPartition);
     }
-  } else {
-    int offset = 2;
-    color c = sourceImage.get(floor(p.midX()), floor(p.midY()));
-    color b = color(hue(c), saturation(c), brightness(c) + 16);
-    color d = color(hue(c), saturation(c), brightness(c) - 64);
-
-    fill(c);
-    noStroke();
-    rect(p.x(), p.y(), p.width(), p.height());
-
-    fill(b);
-    stroke(d);
-    rect(p.x() + offset, p.y() + offset, p.width() - 2 * offset, p.height() - 2 * offset);
   }
 }
 
@@ -114,6 +111,11 @@ void keyReleased() {
       save(savePath(fileNamer.next()));
       break;
   }
+}
+
+void mouseReleased() {
+  Partition p = getLeafPartitionAt(mouseX, mouseY, partition);
+  p.partition(mouseX, mouseY);
 }
 
 void saveAnimation() {

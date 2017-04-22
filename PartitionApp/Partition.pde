@@ -1,10 +1,17 @@
 
 class Partition {
+  public final int NONE = 0;
+  public final int TOP_LEFT = 1;
+  public final int TOP_RIGHT = 2;
+  public final int BOTTOM_RIGHT = 3;
+  public final int BOTTOM_LEFT = 4;
+
   private float _x;
   private float _y;
   private float _width;
   private float _height;
   private int _depth;
+  private int _side;
   private ArrayList<Partition> _children;
 
   Partition(float x, float y, float width, float height, int depth) {
@@ -13,6 +20,17 @@ class Partition {
     _width = width;
     _height = height;
     _depth = depth;
+    _side = NONE;
+    _children = new ArrayList<Partition>();
+  }
+
+  Partition(float x, float y, float width, float height, int depth, int side) {
+    _x = x;
+    _y = y;
+    _width = width;
+    _height = height;
+    _depth = depth;
+    _side = side;
     _children = new ArrayList<Partition>();
   }
 
@@ -42,6 +60,26 @@ class Partition {
 
   public int depth() {
     return _depth;
+  }
+
+  public int side() {
+    return _side;
+  }
+
+  public boolean isTop() {
+    return _side == TOP_LEFT || _side == TOP_RIGHT;
+  }
+
+  public boolean isBottom() {
+    return _side == BOTTOM_LEFT || _side == BOTTOM_RIGHT;
+  }
+
+  public boolean isLeft() {
+    return _side == TOP_LEFT || _side == BOTTOM_LEFT;
+  }
+
+  public boolean isRight() {
+    return _side == TOP_RIGHT || _side == BOTTOM_RIGHT;
   }
 
   public float area() {
@@ -86,9 +124,9 @@ class Partition {
   public void partition(float x, float y) {
     int d = _depth + 1;
     _children = new ArrayList<Partition>();
-    _children.add(new Partition(_x, _y, x - _x, y - _y, d));
-    _children.add(new Partition(_x, y, x - _x, _y + _height - y, d));
-    _children.add(new Partition(x, _y, _x + _width - x, y - _y, d));
-    _children.add(new Partition(x, y, _x + _width - x, _y + _height - y, d));
+    _children.add(new Partition(_x, _y, x - _x, y - _y, d, TOP_LEFT));
+    _children.add(new Partition(x, _y, _x + _width - x, y - _y, d, TOP_RIGHT));
+    _children.add(new Partition(x, y, _x + _width - x, _y + _height - y, d, BOTTOM_RIGHT));
+    _children.add(new Partition(_x, y, x - _x, _y + _height - y, d, BOTTOM_LEFT));
   }
 }
