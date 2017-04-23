@@ -1,37 +1,45 @@
 
 class Partition {
-  public final int NONE = 0;
-  public final int TOP_LEFT = 1;
-  public final int TOP_RIGHT = 2;
-  public final int BOTTOM_RIGHT = 3;
-  public final int BOTTOM_LEFT = 4;
-
+  private Partition _parent;
   private float _x;
   private float _y;
   private float _width;
   private float _height;
   private int _depth;
-  private int _side;
   private ArrayList<Partition> _children;
 
   Partition(float x, float y, float width, float height, int depth) {
+    _parent = null;
     _x = x;
     _y = y;
     _width = width;
     _height = height;
     _depth = depth;
-    _side = NONE;
     _children = new ArrayList<Partition>();
   }
 
-  Partition(float x, float y, float width, float height, int depth, int side) {
+  Partition(Partition parent, float x, float y, float width, float height, int depth) {
+    _parent = parent;
     _x = x;
     _y = y;
     _width = width;
     _height = height;
     _depth = depth;
-    _side = side;
     _children = new ArrayList<Partition>();
+  }
+
+  public Partition parent() {
+    return _parent;
+  }
+
+  public ArrayList<Partition> ancestors() {
+    ArrayList<Partition> result = new ArrayList<Partition>();
+    Partition p = _parent;
+    while (p != null) {
+      result.add(p);
+      p = p.parent();
+    }
+    return result;
   }
 
   public float x() {
@@ -60,26 +68,6 @@ class Partition {
 
   public int depth() {
     return _depth;
-  }
-
-  public int side() {
-    return _side;
-  }
-
-  public boolean isTop() {
-    return _side == TOP_LEFT || _side == TOP_RIGHT;
-  }
-
-  public boolean isBottom() {
-    return _side == BOTTOM_LEFT || _side == BOTTOM_RIGHT;
-  }
-
-  public boolean isLeft() {
-    return _side == TOP_LEFT || _side == BOTTOM_LEFT;
-  }
-
-  public boolean isRight() {
-    return _side == TOP_RIGHT || _side == BOTTOM_RIGHT;
   }
 
   public float area() {
@@ -134,11 +122,27 @@ class Partition {
   }
 
   public void partition(float x, float y) {
-    int d = _depth + 1;
     _children = new ArrayList<Partition>();
-    _children.add(new Partition(_x, _y, x - _x, y - _y, d, TOP_LEFT));
-    _children.add(new Partition(x, _y, _x + _width - x, y - _y, d, TOP_RIGHT));
-    _children.add(new Partition(x, y, _x + _width - x, _y + _height - y, d, BOTTOM_RIGHT));
-    _children.add(new Partition(_x, y, x - _x, _y + _height - y, d, BOTTOM_LEFT));
+    if (random(1) < 0.5) {
+      _children = getHorizontalPartition(x, y, _depth);
+    } else {
+      _children = getVerticalPartition(x, y, _depth);
+    }
+  }
+
+  private ArrayList<Partition> getHorizontalPartition(float x, float y, int depth) {
+    int d = depth + 1;
+    ArrayList<Partition> result = new ArrayList<Partition>();
+    result.add(new Partition(this, _x, _y, x - _x, _height, d));
+    result.add(new Partition(this, x, _y, _x + _width - x, _height, d));
+    return result;
+  }
+
+  private ArrayList<Partition> getVerticalPartition(float x, float y, int depth) {
+    int d = depth + 1;
+    ArrayList<Partition> result = new ArrayList<Partition>();
+    result.add(new Partition(this, _x, _y, _width, y - _y, d));
+    result.add(new Partition(this, _x, y, _width, _y + _height - y, d));
+    return result;
   }
 }

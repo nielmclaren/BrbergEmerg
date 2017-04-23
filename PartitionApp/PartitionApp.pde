@@ -9,7 +9,7 @@ FileNamer fileNamer;
 void setup() {
   size(800, 800, P3D);
 
-  sourceImage = loadImage("painterly.png");
+  sourceImage = loadImage("barcode.png");
   fileNamer = new FileNamer("output/export", "png");
 
   reset();
@@ -29,20 +29,15 @@ void resetPartitions() {
   float k = 0.2;
   float ik = 1 - k;
 
-  int maxPartitions = 1000;
-  int numPartitions = 0;
-  while (numPartitions < maxPartitions) {
+  int numPartitions = 4000;
+  for (int i = 0; i < numPartitions; i++) {
     float x = random(width);
     float y = random(height);
     Partition p = partition.getLeafPartitionAt(x, y);
     color c = sourceImage.get(floor(p.midX()), floor(p.midX()));
-    float score = getDissimilarityScore(sourceImage, floor(p.midX()), floor(p.midY()));
-    if (random(255) < score) {
-      p.partition(
-          p.x() + random(k * p.width(), ik * p.width()),
-          p.y() + random(k * p.height(), ik * p.height()));
-      numPartitions++;
-    }
+    p.partition(
+        p.x() + random(k * p.width(), ik * p.width()),
+        p.y() + random(k * p.height(), ik * p.height()));
   }
 }
 
@@ -54,41 +49,24 @@ void draw() {
 }
 
 void drawPartition(Partition p) {
-  int offset = p.depth();
-  int topOffset = p.isTop() ? offset : 1;
-  int bottomOffset = p.isBottom() ? offset : 1;
-  int leftOffset = p.isLeft() ? offset : 1;
-  int rightOffset = p.isRight() ? offset : 1;
+  ArrayList<Partition> path = p.ancestors();
+  path.add(0, p);
 
-  noStroke();
-  fill(sourceImage.get(floor(p.midX()), floor(p.midY())));
-  rect(p.x() + leftOffset, p.y() + topOffset, p.width() - leftOffset - rightOffset, p.height() - topOffset - bottomOffset);
+  color c = sourceImage.get(floor(p.midX()), floor(p.midY()));
+  if (brightness(c) < 32) {
+    stroke(0);
+    fill(c);
+  } else {
+    stroke(232);
+    fill(240);
+  }
+  rect(p.x(), p.y(), p.width(), p.height());
 
   if (p.hasChildren()) {
     for (Partition childPartition : p.children()) {
       drawPartition(childPartition);
     }
   }
-}
-
-float getDissimilarityScore(PImage image, int targetX, int targetY) {
-  int radius = 50;
-  int radiusSq = radius * radius;
-  float sum = 0;
-  int numEntries = 0;
-
-  for (int rx = -radius; rx < radius; rx++) {
-    for (int ry = -radius; ry < radius; ry++) {
-      int x = targetX + rx;
-      int y = targetY + ry;
-      if (x >= 0 && x < image.width && y >= 0 && y < image.height && sqrt(rx * rx + ry * ry) < radiusSq) {
-        sum += brightness(image.pixels[y * image.width + x]);
-        numEntries++;
-      }
-    }
-  }
-
-  return abs(brightness(image.get(targetX, targetY)) - sum/numEntries);
 }
 
 void keyReleased() {
