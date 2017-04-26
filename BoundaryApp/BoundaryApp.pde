@@ -2,6 +2,7 @@
 PVector point;
 float velocity;
 float rotation;
+float lookAheadDist;
 float minDist;
 
 int minX;
@@ -11,6 +12,10 @@ int maxY;
 
 boolean isTurningCw;
 boolean isTurningCcw;
+int noTurnCount;
+int turnDuration;
+
+boolean isPaused;
 
 FileNamer fileNamer;
 
@@ -18,12 +23,17 @@ void setup() {
   size(800, 800);
   background(0);
 
-  point = new PVector(width/2, height/2);
+  point = getInitialPoint();
   velocity = 3;
-  rotation = 0;
+  rotation = getInitialRotation();
+  lookAheadDist = 60;
   minDist = 60;
   isTurningCw = false;
   isTurningCcw = false;
+  noTurnCount = 0;
+  turnDuration = 20;
+
+  isPaused = false;
 
   minX = floor(0.25 * width);
   minY = floor(0.25 * height);
@@ -34,10 +44,13 @@ void setup() {
 }
 
 void draw() {
+  if (isPaused) return;
+
   int radius = 5;
   int length = 15;
 
   noFill();
+  strokeWeight(2);
   stroke(32);
   rect(minX, minY, maxX - minX, maxY - minY);
 
@@ -65,34 +78,155 @@ void draw() {
 }
 
 float steer(PVector point, float rotation) {
-  float steerAmount = 0.3;
-  float rx = getHorizontalRotationFactor(point, rotation);
-  float ry = getVerticalRotationFactor(point, rotation);
+  float rx = getLookAheadHorizontalRotationFactor(point, rotation);
+  float ry = getLookAheadVerticalRotationFactor(point, rotation);
+  float v = map(abs(rx) + abs(ry), 0, 2, 0, PI/8);
 
   if (rx == 0 && ry == 0) {
-    isTurningCw = false;
-    isTurningCcw = false;
+    if (noTurnCount > turnDuration) {
+      isTurningCw = false;
+      isTurningCcw = false;
+    }
+    noTurnCount++;
     return 0;
   } else {
+    noTurnCount = 0;
     if (isTurningCw) {
-      return -abs(steerAmount * (rx + ry));
+      return -v;
     } else if (isTurningCcw) {
-      return abs(steerAmount * (rx + ry));
+      return v;
     } else {
       float d = abs(rx) > abs(ry) ? rx : ry;
       if (d < 0) {
         isTurningCw = true;
-        return -abs(steerAmount * (rx + ry));
+        return -v;
       } else {
         isTurningCcw = true;
-        return abs(steerAmount * (rx + ry));
+        return v;
       }
     }
   }
 }
 
 // Returns a number between -1 and 1 indicating how much and in which direction
-// the left and right boundaries want to influence the boid's rotation.
+// the boid should turn based on a projected collision with the left and right boundaries.
+float getLookAheadHorizontalRotationFactor(PVector point, float rotation) {
+  float dx;
+  float dist;
+  float distanceFactor;
+  float x = point.x + lookAheadDist * cos(rotation);
+
+  if (x > maxX) {
+    // Right boundary.
+    dx = maxX - point.x;
+    dist = dx / cos(rotation);
+    distanceFactor = constrain(dist / lookAheadDist, -1, 1);
+
+    strokeWeight(4);
+    stroke(255, 255, 0, 128);
+    line(point.x, point.y, point.x + dx, point.y + dx * tan(rotation));
+
+    if (normalizeAngle(rotation) < PI) {
+      // Turning right (down).
+      if (point.y + minDist > maxY) {
+        return -distanceFactor;
+      }
+      return distanceFactor;
+    }
+
+    // Turning left (up).
+    if (point.y - minDist < minY) {
+      return distanceFactor;
+    }
+    return -distanceFactor;
+  } else if (x < minX) {
+    // Left boundary.
+    dx = point.x - minX;
+    dist = dx / cos(rotation);
+    distanceFactor = constrain(dist / lookAheadDist, -1, 1);
+
+    strokeWeight(4);
+    stroke(255, 255, 0, 128);
+    line(point.x, point.y, point.x - dx, point.y - dx * tan(rotation));
+
+    if (normalizeAngle(rotation + PI) < PI) {
+      // Turning right (up).
+      if (point.y - minDist < minY) {
+        return distanceFactor;
+      }
+      return -distanceFactor;
+    }
+
+    // Turning left (down).
+    if (point.y + minDist > maxY) {
+      return -distanceFactor;
+    }
+    return distanceFactor;
+  }
+  return 0;
+}
+
+// Returns a number between -1 and 1 indicating how much and in which direction
+// the boid should turn based on a projected collision with the top and bottom boundaries.
+float getLookAheadVerticalRotationFactor(PVector point, float rotation) {
+  float dy;
+  float dist;
+  float distanceFactor;
+  float x = point.x + lookAheadDist * cos(rotation);
+  float y = point.y + lookAheadDist * sin(rotation);
+
+  if (y > maxY) {
+    // Bottom boundary.
+    dy = maxY - point.y;
+    dist = dy / sin(rotation);
+    distanceFactor = constrain(dist / lookAheadDist, -1, 1);
+
+    strokeWeight(4);
+    stroke(255, 255, 0, 128);
+    line(point.x, point.y, point.x + dy / tan(rotation), point.y + dy);
+
+    if (normalizeAngle(rotation - PI/2) < PI) {
+      // Turning right (to screen left).
+      if (point.x - minDist < minX) {
+        return -distanceFactor;
+      }
+      return distanceFactor;
+    }
+
+    // Turning left (to screen right).
+    if (point.x + minDist > maxX) {
+      return distanceFactor;
+    }
+    return -distanceFactor;
+  } else if (y < minY) {
+    // Top boundary.
+    dy = point.y - minY;
+    dist = dy / sin(rotation);
+    distanceFactor = constrain(dist / lookAheadDist, -1, 1);
+
+    strokeWeight(4);
+    stroke(255, 255, 0, 128);
+    line(point.x, point.y, point.x - dy / tan(rotation), point.y - dy);
+
+    if (normalizeAngle(rotation + PI/2) < PI) {
+      // Turning right (to screen right).
+      if (point.x + minDist > maxX) {
+        return distanceFactor;
+      }
+      return -distanceFactor;
+    }
+
+    // Turning left (to screen left).
+    if (point.x - minDist < minX) {
+      return -distanceFactor;
+    }
+    return distanceFactor;
+  }
+  return 0;
+}
+
+// Returns a number between -1 and 1 indicating how much and in which direction
+// the boid should turn based on its distance to the left and right boundaries.
 float getHorizontalRotationFactor(PVector point, float rotation) {
   float distanceFactor;
   if (point.x + minDist > maxX) {
@@ -112,7 +246,7 @@ float getHorizontalRotationFactor(PVector point, float rotation) {
 }
 
 // Returns a number between -1 and 1 indicating how much and in which direction
-// the top and bottom boundaries want to influence the boid's rotation.
+// the boid should turn based on its distance to the top and bottom boundaries.
 float getVerticalRotationFactor(PVector point, float rotation) {
   float distanceFactor;
   if (point.y + minDist > maxY) {
@@ -140,13 +274,24 @@ float normalizeAngle(float v) {
 
 void keyReleased() {
   switch (key) {
+    case ' ':
+      isPaused = !isPaused;
+      break;
     case 'e':
       background(0);
-      point = new PVector(width/2, height/2);
-      rotation = PI/4 + random(-0.02, 0.02);
+      point = getInitialPoint();
+      rotation = getInitialRotation();
       break;
     case 'r':
       save(fileNamer.next());
       break;
   }
+}
+
+PVector getInitialPoint() {
+  return new PVector(width/2, height/2);
+}
+
+float getInitialRotation() {
+  return random(2 * PI);
 }
