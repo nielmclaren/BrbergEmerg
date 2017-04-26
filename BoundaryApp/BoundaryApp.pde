@@ -3,6 +3,12 @@ PVector point;
 float velocity;
 float rotation;
 float minDist;
+
+int minX;
+int minY;
+int maxX;
+int maxY;
+
 boolean isTurningCw;
 boolean isTurningCcw;
 
@@ -19,29 +25,36 @@ void setup() {
   isTurningCw = false;
   isTurningCcw = false;
 
+  minX = floor(0.25 * width);
+  minY = floor(0.25 * height);
+  maxX = floor(0.75 * width);
+  maxY = floor(0.75 * height);
+
   fileNamer = new FileNamer("output/export", "png");
 }
 
 void draw() {
-  int radius = 2;
-  int length = 5;
+  int radius = 5;
+  int length = 15;
 
   noFill();
   stroke(32);
-  rect(0.25 * width, 0.25 * height, 0.5 * width, 0.5 * height);
+  rect(minX, minY, maxX - minX, maxY - minY);
 
-  noStroke();
-  fill(255);
-  ellipse(point.x, point.y, radius, radius);
-
+  color c;
   if (isTurningCw) {
-    stroke(255, 0, 0);
+    c = color(255, 0, 0);
   } else if (isTurningCcw) {
-    stroke(0, 0, 255);
+    c = color(0, 0, 255);
   } else {
-    stroke(255);
+    c = color(255);
   }
 
+  noStroke();
+  fill(c);
+  ellipse(point.x, point.y, radius, radius);
+
+  stroke(c);
   strokeWeight(2);
   line(point.x, point.y, point.x - length * cos(rotation), point.y - length * sin(rotation));
 
@@ -53,71 +66,75 @@ void draw() {
 
 float steer(PVector point, float rotation) {
   float steerAmount = 0.3;
-  float dx = getDx(point, rotation) / minDist;
-  float dy = getDy(point, rotation) / minDist;
+  float rx = getHorizontalRotationFactor(point, rotation);
+  float ry = getVerticalRotationFactor(point, rotation);
 
-  if (dx == 0 && dy == 0) {
+  if (rx == 0 && ry == 0) {
     isTurningCw = false;
     isTurningCcw = false;
   } else {
     if (isTurningCw) {
-      return -abs(steerAmount * (dx + dy));
+      return -abs(steerAmount * (rx + ry));
     } else if (isTurningCcw) {
-      return abs(steerAmount * (dx + dy));
+      return abs(steerAmount * (rx + ry));
     } else {
-      float d = abs(dx) > abs(dy) ? dx : dy;
+      float d = abs(rx) > abs(ry) ? rx : ry;
       if (d < 0) {
         isTurningCw = true;
-        return -abs(steerAmount * (dx + dy));
+        return -abs(steerAmount * (rx + ry));
       } else {
         isTurningCcw = true;
-        return abs(steerAmount * (dx + dy));
+        return abs(steerAmount * (rx + ry));
       }
     }
   }
 
-  if (dx != 0 && dy != 0) {
-    if (abs(dx) > abs(dy)) {
-      return 2 * steerAmount * dy;
+  if (rx != 0 && ry != 0) {
+    if (abs(rx) > abs(ry)) {
+      return 2 * steerAmount * ry;
     } else {
-      return 2 * steerAmount * dx;
+      return 2 * steerAmount * rx;
     }
   }
-  return steerAmount * dx + steerAmount * dy;
+  return steerAmount * rx + steerAmount * ry;
 }
 
-float getDx(PVector point, float rotation) {
-  float dx;
-  if (point.x + minDist > 0.75 * width) {
-    dx = (point.x + minDist) - 0.75 * width;
+// Returns a number between -1 and 1 indicating how much and in which direction
+// the left and right boundaries want to influence the boid's rotation.
+float getHorizontalRotationFactor(PVector point, float rotation) {
+  float distanceFactor;
+  if (point.x + minDist > maxX) {
+    distanceFactor = ((point.x + minDist) - maxX) / minDist;
     if (normalizeAngle(rotation) < PI) {
-      return dx;
+      return distanceFactor;
     }
-    return -dx;
-  } else if (point.x - minDist < 0.25 * width) {
-    dx = 0.25 * width - (point.x - minDist);
+    return -distanceFactor;
+  } else if (point.x - minDist < minX) {
+    distanceFactor = (minX - (point.x - minDist)) / minDist;
     if (normalizeAngle(rotation + PI) < PI) {
-      return dx;
+      return distanceFactor;
     }
-    return -dx;
+    return -distanceFactor;
   }
   return 0;
 }
 
-float getDy(PVector point, float rotation) {
-  float dy;
-  if (point.y + minDist > 0.75 * height) {
-    dy = (point.y + minDist) - 0.75 * height;
+// Returns a number between -1 and 1 indicating how much and in which direction
+// the top and bottom boundaries want to influence the boid's rotation.
+float getVerticalRotationFactor(PVector point, float rotation) {
+  float distanceFactor;
+  if (point.y + minDist > maxY) {
+    distanceFactor = ((point.y + minDist) - maxY) / minDist;
     if (normalizeAngle(rotation - PI/2) < PI) {
-      return dy;
+      return distanceFactor;
     }
-    return -dy;
-  } else if (point.y - minDist < 0.25 * height) {
-    dy = 0.25 * height - (point.y - minDist);
+    return -distanceFactor;
+  } else if (point.y - minDist < minY) {
+    distanceFactor = (minY - (point.y - minDist)) / minDist;
     if (normalizeAngle(rotation + PI/2) < PI) {
-      return dy;
+      return distanceFactor;
     }
-    return -dy;
+    return -distanceFactor;
   }
   return 0;
 }
