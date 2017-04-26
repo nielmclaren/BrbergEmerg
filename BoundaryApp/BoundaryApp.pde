@@ -98,7 +98,7 @@ float steer() {
 
   float rx = getLookAheadHorizontalRotationFactor(point, rotation);
   float ry = getLookAheadVerticalRotationFactor(point, rotation);
-  float v = map(abs(rx) + abs(ry), 0, 2, 0, PI/16);
+  float v = map(abs(rx) + abs(ry), 0, 2, 0, PI/4);
 
   if (rx == 0 && ry == 0) {
     if (noTurnCount > turnDuration) {
