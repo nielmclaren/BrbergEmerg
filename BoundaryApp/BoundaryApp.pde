@@ -72,6 +72,7 @@ float steer(PVector point, float rotation) {
   if (rx == 0 && ry == 0) {
     isTurningCw = false;
     isTurningCcw = false;
+    return 0;
   } else {
     if (isTurningCw) {
       return -abs(steerAmount * (rx + ry));
@@ -88,15 +89,6 @@ float steer(PVector point, float rotation) {
       }
     }
   }
-
-  if (rx != 0 && ry != 0) {
-    if (abs(rx) > abs(ry)) {
-      return 2 * steerAmount * ry;
-    } else {
-      return 2 * steerAmount * rx;
-    }
-  }
-  return steerAmount * rx + steerAmount * ry;
 }
 
 // Returns a number between -1 and 1 indicating how much and in which direction
