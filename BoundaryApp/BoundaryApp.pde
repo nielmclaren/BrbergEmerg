@@ -71,16 +71,34 @@ void draw() {
   strokeWeight(2);
   line(point.x, point.y, point.x - length * cos(rotation), point.y - length * sin(rotation));
 
-  rotation += steer(point, rotation);
+  rotation = normalizeAngle(rotation + steer());
 
   point.x += velocity * cos(rotation);
   point.y += velocity * sin(rotation);
 }
 
-float steer(PVector point, float rotation) {
+float steer() {
+  int safety = 5;
+
+  if (point.x > maxX) {
+    point.x = maxX - safety;
+    return mirrorRotationHorizontally(rotation) - rotation;
+  } else if (point.x < minX) {
+    point.x = minX + safety;
+    return mirrorRotationHorizontally(rotation) - rotation;
+  }
+
+  if (point.y > maxY) {
+    point.y = maxY - safety;
+    return mirrorRotationVertically(rotation) - rotation;
+  } else if (point.y < minY) {
+    point.y = minY + safety;
+    return mirrorRotationVertically(rotation) - rotation;
+  }
+
   float rx = getLookAheadHorizontalRotationFactor(point, rotation);
   float ry = getLookAheadVerticalRotationFactor(point, rotation);
-  float v = map(abs(rx) + abs(ry), 0, 2, 0, PI/8);
+  float v = map(abs(rx) + abs(ry), 0, 2, 0, PI/16);
 
   if (rx == 0 && ry == 0) {
     if (noTurnCount > turnDuration) {
@@ -108,6 +126,17 @@ float steer(PVector point, float rotation) {
   }
 }
 
+float mirrorRotationHorizontally(float r) {
+  if (r < PI) {
+    return PI - r;
+  }
+  return 3 * PI - r;
+}
+
+float mirrorRotationVertically(float r) {
+  return 2 * PI - r;
+}
+
 // Returns a number between -1 and 1 indicating how much and in which direction
 // the boid should turn based on a projected collision with the left and right boundaries.
 float getLookAheadHorizontalRotationFactor(PVector point, float rotation) {
@@ -116,11 +145,11 @@ float getLookAheadHorizontalRotationFactor(PVector point, float rotation) {
   float distanceFactor;
   float x = point.x + lookAheadDist * cos(rotation);
 
-  if (x > maxX) {
+  if (x > maxX && cos(rotation) > 0) {
     // Right boundary.
     dx = maxX - point.x;
     dist = dx / cos(rotation);
-    distanceFactor = constrain(dist / lookAheadDist, -1, 1);
+    distanceFactor = reverseDistanceFactor(dist / lookAheadDist);
 
     strokeWeight(4);
     stroke(255, 255, 0, 128);
@@ -139,11 +168,11 @@ float getLookAheadHorizontalRotationFactor(PVector point, float rotation) {
       return distanceFactor;
     }
     return -distanceFactor;
-  } else if (x < minX) {
+  } else if (x < minX && cos(rotation) < 0) {
     // Left boundary.
     dx = point.x - minX;
     dist = dx / cos(rotation);
-    distanceFactor = constrain(dist / lookAheadDist, -1, 1);
+    distanceFactor = reverseDistanceFactor(dist / lookAheadDist);
 
     strokeWeight(4);
     stroke(255, 255, 0, 128);
@@ -175,11 +204,11 @@ float getLookAheadVerticalRotationFactor(PVector point, float rotation) {
   float x = point.x + lookAheadDist * cos(rotation);
   float y = point.y + lookAheadDist * sin(rotation);
 
-  if (y > maxY) {
+  if (y > maxY && sin(rotation) > 0) {
     // Bottom boundary.
     dy = maxY - point.y;
     dist = dy / sin(rotation);
-    distanceFactor = constrain(dist / lookAheadDist, -1, 1);
+    distanceFactor = reverseDistanceFactor(dist / lookAheadDist);
 
     strokeWeight(4);
     stroke(255, 255, 0, 128);
@@ -198,11 +227,11 @@ float getLookAheadVerticalRotationFactor(PVector point, float rotation) {
       return distanceFactor;
     }
     return -distanceFactor;
-  } else if (y < minY) {
+  } else if (y < minY && sin(rotation) < 0) {
     // Top boundary.
     dy = point.y - minY;
     dist = dy / sin(rotation);
-    distanceFactor = constrain(dist / lookAheadDist, -1, 1);
+    distanceFactor = reverseDistanceFactor(dist / lookAheadDist);
 
     strokeWeight(4);
     stroke(255, 255, 0, 128);
@@ -223,6 +252,10 @@ float getLookAheadVerticalRotationFactor(PVector point, float rotation) {
     return distanceFactor;
   }
   return 0;
+}
+
+float reverseDistanceFactor(float d) {
+  return d / abs(d) * (1 - abs(d));
 }
 
 // Returns a number between -1 and 1 indicating how much and in which direction
@@ -272,6 +305,10 @@ float normalizeAngle(float v) {
   return v % (2 * PI);
 }
 
+String deg(float v) {
+  return "" + floor(v * 180 / PI * 10) / 10;
+}
+
 void keyReleased() {
   switch (key) {
     case ' ':
@@ -289,7 +326,7 @@ void keyReleased() {
 }
 
 PVector getInitialPoint() {
-  return new PVector(width/2, height/2);
+  return new PVector(random(minX, maxX), random(minY, maxY));
 }
 
 float getInitialRotation() {
