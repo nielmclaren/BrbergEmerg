@@ -106,7 +106,11 @@ float steer() {
       isTurningCcw = false;
     }
     noTurnCount++;
-    return 0;
+
+    rx = getHorizontalRotationFactor(point, rotation);
+    ry = getVerticalRotationFactor(point, rotation);
+
+    return 0.01 * (rx + ry);
   } else {
     noTurnCount = 0;
     if (isTurningCw) {
