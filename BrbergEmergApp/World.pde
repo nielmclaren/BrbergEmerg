@@ -1,11 +1,9 @@
 
 class World {
-  public static final int ATTRACTOR_RADIUS = 200;
   public static final int NEIGHBORHOOD_RADIUS = 160;
   public static final int MIN_DISTANCE = 40;
   public static final int OUT_GROUP_MIN_DISTANCE = 80;
 
-  private ArrayList<Attractor> _attractors;
   private ArrayList<Vehicle> _vehicles;
   private HashMap<Integer, Touch> _cursorIdToTouch;
   private int _width;
@@ -23,7 +21,6 @@ class World {
   public TouchImpulse lure;
 
   World(int width, int height, int numGroups) {
-    _attractors = new ArrayList<Attractor>();
     _vehicles = new ArrayList<Vehicle>();
     _cursorIdToTouch = new HashMap<Integer, Touch>();
     _width = width;
@@ -39,15 +36,6 @@ class World {
     repulsion = new RepulsionImpulse(this);
     separation = new SeparationImpulse(this);
     lure = new TouchImpulse(this);
-  }
-
-  ArrayList<Attractor> attractorsRef() {
-    return _attractors;
-  }
-
-  World attractorsRef(ArrayList<Attractor> v) {
-    _attractors = v;
-    return this;
   }
 
   ArrayList<Vehicle> vehiclesRef() {
@@ -143,25 +131,8 @@ class World {
     return this;
   }
 
-  World clearAttractors() {
-    _attractors = new ArrayList<Attractor>();
-    return this;
-  }
-
   World clearVehicles() {
     _vehicles = new ArrayList<Vehicle>();
-    return this;
-  }
-
-  World setupAttractors(IPositioner positioner, int numAttractors) {
-    for (int i = 0; i < numAttractors; i++) {
-      Attractor attractor = new Attractor(i, 0, 0, ATTRACTOR_RADIUS);
-      if (positioner.position(attractor, i)) {
-        _attractors.add(attractor);
-      } else {
-        break;
-      }
-    }
     return this;
   }
 
@@ -169,8 +140,7 @@ class World {
     for (int i = 0; i < numVehicles; i++) {
       int groupId = floor(random(_numGroups));
       Vehicle vehicle = new Vehicle(this, i, 0, 0, random(PI))
-        .groupId(groupId)
-        .attractor(_attractors.get(groupId));
+        .groupId(groupId);
 
       if (positioner.position(vehicle, i)) {
         _vehicles.add(vehicle);

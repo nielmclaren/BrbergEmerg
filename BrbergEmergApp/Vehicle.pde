@@ -14,7 +14,6 @@ class Vehicle implements IPositionable {
   private int _groupId;
 
   private Neighborhood _neighborhood;
-  private Attractor _attractor;
   private Touch _touch;
 
   private boolean _isTurningCw;
@@ -37,7 +36,6 @@ class Vehicle implements IPositionable {
     _groupId = -1;
 
     _neighborhood = new Neighborhood(_world);
-    _attractor = null;
     _touch = null;
 
     _isTurningCw = false;
@@ -119,18 +117,6 @@ class Vehicle implements IPositionable {
 
   Vehicle neighborhoodRef(Neighborhood v) {
     _neighborhood = v;
-    return this;
-  }
-
-  Attractor attractor() {
-    if (_attractor == null) {
-      return null;
-    }
-    return _attractor.clone();
-  }
-
-  Vehicle attractor(Attractor v) {
-    _attractor = v;
     return this;
   }
 

@@ -9,11 +9,9 @@ World world;
 WorldDrawer drawer;
 BrbergEmergImage buffer;
 boolean isPaused;
-boolean showAttractors;
 
 CenteredPositioner centeredPositioner;
 CustomPositioner customPositioner;
-DartboardAttractorPositioner dartboardAttractorPositioner;
 RandomPositioner randomPositioner;
 RingPositioner ringPositioner;
 PFont paramFont;
@@ -33,15 +31,12 @@ void setup() {
   drawer = new WorldDrawer();
   buffer = new BrbergEmergImage(imageWidth, imageHeight, ARGB);
   isPaused = false;
-  showAttractors = true;
 
   animationFolderNamer = new FileNamer("output/anim", "/");
   fileNamer = new FileNamer("output/export", "png");
 
   centeredPositioner = new CenteredPositioner(world);
   customPositioner = new CustomPositioner(world);
-  dartboardAttractorPositioner = new DartboardAttractorPositioner(world)
-    .rect(imageWidth * 0.15, imageWidth * 0.85, imageHeight * 0.15, imageHeight * 0.85);
   randomPositioner = new RandomPositioner(world);
   ringPositioner = new RingPositioner(world)
     .numPositions(numGroups);
@@ -60,9 +55,7 @@ void reset() {
 
 void resetWorld() {
   world.age(0);
-  world.clearAttractors();
   world.clearVehicles();
-  world.setupAttractors(dartboardAttractorPositioner, numGroups);
   world.setupVehicles(randomPositioner, 40);
 }
 
@@ -74,10 +67,6 @@ void draw() {
     drawer.draw(buffer, world);
 
     image(buffer.getImageRef(), 0, 0);
-
-    if (showAttractors) {
-      drawer.drawAttractors(g, world);
-    }
 
     drawer.drawTouches(g, world);
   }
@@ -114,9 +103,6 @@ void keyReleased() {
       break;
     case 'r':
       buffer.getImageRef().save(savePath(fileNamer.next()));
-      break;
-    case 't':
-      showAttractors = !showAttractors;
       break;
     case ' ':
       isPaused = !isPaused;
