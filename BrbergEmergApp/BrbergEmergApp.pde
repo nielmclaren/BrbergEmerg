@@ -29,7 +29,8 @@ void setup() {
   numVehicles = 400;
   numGroups = 5;
 
-  world = new World(imageWidth, imageHeight, numGroups);
+  JSONObject worldJson = loadJSONObject("data/world.json");
+  world = new World(worldJson);
   drawer = new WorldDrawer();
   buffer = new BrbergEmergImage(imageWidth, imageHeight, ARGB);
   isPaused = false;
@@ -43,8 +44,6 @@ void setup() {
   ringPositioner = new RingPositioner(world)
     .numPositions(numGroups);
   paramFont = loadFont("InputSansNarrow-Regular-24.vlw");
-
-  reset();
 
   tuioClient  = new TuioProcessing(this);
 }
@@ -106,6 +105,9 @@ void keyReleased() {
     case 'r':
       buffer.getImageRef().save(savePath(fileNamer.next()));
       break;
+    case 'w':
+      writeWorld();
+      break;
     case ' ':
       isPaused = !isPaused;
       break;
@@ -154,6 +156,11 @@ void saveAnimation(int numFrames) {
   }
 
   isPaused = false;
+}
+
+void writeWorld() {
+  JSONObject worldJson = world.toJson();
+  saveJSONObject(worldJson, "data/world.json");
 }
 
 ///

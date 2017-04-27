@@ -29,6 +29,15 @@ class World {
     _numGroups = numGroups;
     _age = 0;
 
+    initImpulses();
+  }
+
+  World(JSONObject worldJson) {
+    updateFromJson(worldJson);
+    initImpulses();
+  }
+
+  private void initImpulses() {
     alignment = new AlignmentImpulse(this);
     boundary = new BoundaryImpulse(this);
     cohesion = new CohesionImpulse(this);
@@ -149,15 +158,6 @@ class World {
     return this;
   }
 
-  private boolean hasVehicleCollision(Vehicle vehicle) {
-    for (Vehicle v : _vehicles) {
-      if (vehicle.isColliding(v)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   private Neighborhood getNeighborhood(ArrayList<Vehicle> vehicles, Vehicle vehicle) {
     ArrayList<Vehicle> neighborhoodVehicles = new ArrayList<Vehicle>();
     for (Vehicle v : _vehicles) {
@@ -207,5 +207,40 @@ class World {
     for (Vehicle vehicle : _vehicles) {
       vehicle.step();
     }
+  }
+
+  private World updateFromJson(JSONObject json) {
+    _vehicles = new ArrayList<Vehicle>();
+
+    JSONArray vehiclesJson = json.getJSONArray("vehicles");
+    for (int i = 0; i < vehiclesJson.size(); i++) {
+      _vehicles.add(new Vehicle(this, vehiclesJson.getJSONObject(i)));
+    }
+
+    _cursorIdToTouch = new HashMap<Integer, Touch>();
+
+    _width = json.getInt("width");
+    _height = json.getInt("height");
+    _center = new PVector(_width/2, _height/2);
+    _numGroups = json.getInt("numGroups");
+    _age = json.getLong("age");
+    return this;
+  }
+
+  JSONObject toJson() {
+    JSONArray vehiclesJson = new JSONArray();
+    ArrayList<Vehicle> vehicles = world.vehiclesRef();
+    for (int i = 0; i < vehicles.size(); i++) {
+      Vehicle v = vehicles.get(i);
+      vehiclesJson.setJSONObject(i, v.toJson());
+    }
+
+    JSONObject result = new JSONObject();
+    result.setJSONArray("vehicles", vehiclesJson);
+    result.setInt("width", _width);
+    result.setInt("height", _height);
+    result.setInt("numGroups", _numGroups);
+    result.setLong("age", _age);
+    return result;
   }
 }

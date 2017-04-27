@@ -45,6 +45,14 @@ class Vehicle implements IPositionable {
     _vehicleSizeSq = 20 * 20;
   }
 
+  Vehicle(World world, JSONObject vehicleJson) {
+    _world = world;
+
+    updateFromJson(vehicleJson);
+
+    _vehicleSizeSq = 20 * 20;
+  }
+
   World world() {
     return _world;
   }
@@ -201,5 +209,43 @@ class Vehicle implements IPositionable {
     float dx = _x - x;
     float dy = _y - y;
     return dx * dx + dy * dy < _vehicleSizeSq / 4;
+  }
+
+  private Vehicle updateFromJson(JSONObject json) {
+    _id = json.getInt("id");
+    _x = json.getFloat("x");
+    _y = json.getFloat("y");
+    _nextX = json.getFloat("nextX");
+    _nextY = json.getFloat("nextY");
+    _velocity = json.getFloat("velocity");
+    _rotation = json.getFloat("rotation");
+    _nextRotation = json.getFloat("nextRotation");
+
+    _groupId = json.getInt("groupId");
+
+    _isTurningCw = json.getBoolean("isTurningCw");
+    _isTurningCcw = json.getBoolean("isTurningCcw");
+    _numStepsSinceLastTurn = json.getInt("numStepsSinceLastTurn");
+    return this;
+  }
+
+  JSONObject toJson() {
+    JSONObject result = new JSONObject();
+    result.setInt("id", _id);
+    result.setFloat("x", _x);
+    result.setFloat("y", _y);
+    result.setFloat("nextX", _nextX);
+    result.setFloat("nextY", _nextY);
+    result.setFloat("velocity", _velocity);
+    result.setFloat("rotation", _rotation);
+    result.setFloat("nextRotation", _nextRotation);
+
+    result.setInt("groupId", _groupId);
+
+    result.setBoolean("isTurningCw", _isTurningCw);
+    result.setBoolean("isTurningCcw", _isTurningCcw);
+    result.setInt("numStepsSinceLastTurn", _numStepsSinceLastTurn);
+
+    return result;
   }
 }
