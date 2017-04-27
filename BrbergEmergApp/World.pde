@@ -1,8 +1,8 @@
 
 class World {
-  public static final int NEIGHBORHOOD_RADIUS = 160;
-  public static final int MIN_DISTANCE = 40;
-  public static final int OUT_GROUP_MIN_DISTANCE = 80;
+  public static final int NEIGHBORHOOD_RADIUS = 150;
+  public static final int MIN_DISTANCE = 10;
+  public static final int OUT_GROUP_MIN_DISTANCE = 40;
 
   private ArrayList<Vehicle> _vehicles;
   private HashMap<Integer, Touch> _cursorIdToTouch;
@@ -101,6 +101,10 @@ class World {
   World vehiclesRef(ArrayList<Vehicle> v) {
     _vehicles = v;
     return this;
+  }
+
+  int numVehicles() {
+    return _vehicles.size();
   }
 
   int width() {

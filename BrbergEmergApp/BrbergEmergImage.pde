@@ -5,7 +5,7 @@ class BrbergEmergImage extends ShortImage {
   BrbergEmergImage(int w, int h, int format) {
     super(w, h, format);
 
-    resetColors();
+    vehicleColors = new ColorManager().getVehicleColors();
   }
 
   void clear() {
@@ -25,21 +25,9 @@ class BrbergEmergImage extends ShortImage {
       rotationFactor = 0;
     }
 
-    color c = vehicleColors[vehicle.groupId()];
-    float h = (hue(c)
-        - constrain(map(rotationFactor, 0, 1, 0, 32), 0, 32)
-        //- constrain(map(world.age(), 0, 10000, 32, 0), 0, 32)
-        ) % 255;
-    while (h < 0) {
-      h += 255;
-    }
-
     pushStyle();
-    colorMode(HSB);
-    c = color(
-        h,
-        saturation(c),
-        brightness(c));
+
+    color c = vehicleColors[vehicle.groupId()];
 
     int minRadius = 12;
     int radius;
@@ -50,16 +38,15 @@ class BrbergEmergImage extends ShortImage {
       c = color(255);
     }
 
-    colorMode(RGB, 1);
-
-    int alpha = floor(0
-        + constrain(map(rotationFactor, 0, 1, 32, 128), 32, 128)
-        + constrain(map(world.age(), 0, 100000, 0, 64), 0, 64)
-        ) % 255;
+    float alpha = (0
+        + constrain(map(rotationFactor, 0, 1, 0.125, 0.5), 0.125, 0.5)
+        + constrain(map(world.age(), 0, 100000, 0, 0.25), 0, 0.25)
+        ) % 1;
     while (alpha < 0) {
-      alpha += 255;
+      alpha += 1;
     }
 
+    colorMode(RGB, 1);
     drawCircleFalloff(targetX, targetY, radius, c, floor(alpha));
     drawCircle(targetX, targetY, 2, c, alpha);
 
@@ -71,7 +58,7 @@ class BrbergEmergImage extends ShortImage {
     drawCircle(targetX, targetY, radius, c, 255);
   }
 
-  private void drawCircle(int targetX, int targetY, int radius, color c, int alpha) {
+  private void drawCircle(int targetX, int targetY, int radius, color c, float alpha) {
     float radiusSquared = radius * radius;
     for (int x = -radius; x <= radius; x++) {
       for (int y = -radius; y <= radius; y++) {
@@ -83,13 +70,13 @@ class BrbergEmergImage extends ShortImage {
         if (rSquared < radiusSquared) {
           float error = radius - sqrt(rSquared);
           int pixelIndex = (targetY + y) * _width + (targetX + x);
-          setColor(pixelIndex, c, error * alpha/255);
+          setColor(pixelIndex, c, error * alpha);
         }
       }
     }
   }
 
-  private void drawCircleFalloff(int targetX, int targetY, int radius, color c, int alpha) {
+  private void drawCircleFalloff(int targetX, int targetY, int radius, color c, float alpha) {
     float falloff = 0.88;
     float radiusSquared = radius * radius;
     for (int x = -radius; x <= radius; x++) {
@@ -105,43 +92,9 @@ class BrbergEmergImage extends ShortImage {
           v = constrain(v, 0, 1);
 
           int pixelIndex = (targetY + y) * _width + (targetX + x);
-          setColor(pixelIndex, c, v * 0.2 * alpha/255);
+          setColor(pixelIndex, c, v * 0.2 * alpha);
         }
       }
-    }
-  }
-
-  void resetColors() {
-    vehicleColors = getVehicleColors();
-  }
-
-  private Integer[] getVehicleColors() {
-    colorMode(RGB);
-
-    ArrayList<Integer> colors = new ArrayList<Integer>();
-    colors.add(#6afe4d);
-    colors.add(#4dfec2);
-    colors.add(#ad4dfe);
-    colors.add(#f84dfe);
-    colors.add(#4e7fbb);
-    colors.add(#4d9afe);
-    colors.add(#a2d8ea);
-    colors.add(#00b83c);
-
-    Integer[] result = new Integer[colors.size()];
-    colors.toArray(result);
-    shuffleArray(result);
-    return result;
-  }
-
-  // Implementing Fisher-Yates shuffle
-  private void shuffleArray(Integer[] ar) {
-    for (int i = ar.length - 1; i > 0; i--) {
-      int index = floor(random(i + 1));
-      // Simple swap
-      int a = ar[index];
-      ar[index] = ar[i];
-      ar[i] = a;
     }
   }
 }

@@ -1,26 +1,48 @@
 
 class WorldDrawer {
-  private color[] vehicleColors;
+  private Integer[] vehicleColors;
 
   WorldDrawer() {
-    vehicleColors = new color[8];
-    vehicleColors[0] = color(246, 124, 40);
-    vehicleColors[1] = color(250, 73, 59);
-    vehicleColors[2] = color(0, 154, 217);
-    vehicleColors[3] = color(160, 90, 178);
-    vehicleColors[4] = color(44, 74, 93);
-    vehicleColors[5] = color(0, 188, 157);
-    vehicleColors[6] = color(0, 203, 119);
-    vehicleColors[7] = color(252, 194, 44);
+    vehicleColors = new ColorManager().getVehicleColors();
+  }
+
+  public void draw(PGraphics g, World world) {
+    drawVehicles(g, world);
   }
 
   public void draw(BrbergEmergImage g, World world) {
     drawVehicles(g, world);
   }
 
+  private void drawVehicles(PGraphics g, World world) {
+    ArrayList<Vehicle> vehicles = world.vehiclesRef();
+    for (Vehicle vehicle : vehicles) {
+      drawVehicle(g, world, vehicle);
+    }
+  }
+
+  private void drawVehicle(PGraphics g, World world, Vehicle vehicle) {
+    color c = vehicleColors[vehicle.groupId()];
+    int radius = 3;
+    float x = vehicle.x();
+    float y = vehicle.y();
+    float rotation = vehicle.rotation();
+    int len = 4;
+
+    g.pushStyle();
+    g.colorMode(RGB);
+    g.fill(c);
+    g.noStroke();
+    g.ellipse(x, y, radius, radius);
+    g.noFill();
+    g.stroke(c);
+    g.line(x, y, x - len * cos(rotation), y - len * sin(rotation));
+
+    g.popStyle();
+  }
+
   private void drawVehicles(BrbergEmergImage g, World world) {
     ArrayList<Vehicle> vehicles = world.vehiclesRef();
-
     for (Vehicle vehicle : vehicles) {
       g.drawVehicle(world, vehicle);
     }

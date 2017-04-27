@@ -3,18 +3,18 @@ import TUIO.*;
 
 int imageWidth;
 int imageHeight;
-int numVehicles;
-int numGroups;
+float imageScale;
 
 World world;
 WorldDrawer drawer;
 BrbergEmergImage buffer;
 boolean isPaused;
+boolean isHighQualityMode;
 
 CenteredPositioner centeredPositioner;
 CustomPositioner customPositioner;
+GroupPositioner groupPositioner;
 RandomPositioner randomPositioner;
-RingPositioner ringPositioner;
 PFont paramFont;
 
 TuioProcessing tuioClient;
@@ -23,26 +23,26 @@ FileNamer animationFolderNamer, fileNamer;
 void setup() {
   noCursor();
   fullScreen();
+  frameRate(60);
 
   imageWidth = 1920;
   imageHeight = 1080;
-  numVehicles = 400;
-  numGroups = 5;
+  imageScale = min((float)width / imageWidth, (float)height / imageHeight);
 
   JSONObject worldJson = loadJSONObject("data/world.json");
   world = new World(worldJson);
   drawer = new WorldDrawer();
   buffer = new BrbergEmergImage(imageWidth, imageHeight, ARGB);
   isPaused = false;
+  isHighQualityMode = false;
 
   animationFolderNamer = new FileNamer("output/anim", "/");
   fileNamer = new FileNamer("output/export", "png");
 
   centeredPositioner = new CenteredPositioner(world);
   customPositioner = new CustomPositioner(world);
+  groupPositioner = new GroupPositioner(world);
   randomPositioner = new RandomPositioner(world);
-  ringPositioner = new RingPositioner(world)
-    .numPositions(numGroups);
   paramFont = loadFont("InputSansNarrow-Regular-24.vlw");
 
   tuioClient  = new TuioProcessing(this);
@@ -51,29 +51,49 @@ void setup() {
 void reset() {
   resetWorld();
   buffer.clear();
-  buffer.resetColors();
 }
 
 void resetWorld() {
+  int numVehicles = world.numVehicles();
+
   world.age(0);
   world.clearVehicles();
-  world.setupVehicles(randomPositioner, numVehicles);
+  world.setupVehicles(groupPositioner, numVehicles);
 }
 
 void draw() {
   if (!isPaused) {
     world.step();
 
-    buffer.fade(0.001);
-    drawer.draw(buffer, world);
+    if (isHighQualityMode) {
+      buffer.fade(0.001);
+      drawer.draw(buffer, world);
 
-    image(buffer.getImageRef(), 0, 0);
+      image(buffer.getImageRef(), 0, 0);
+    } else {
+      pushMatrix();
+      scale(imageScale);
+      translate(
+          (width - imageWidth * imageScale) / 2,
+          (height - imageHeight * imageScale) / 2);
+
+      background(0);
+
+      noFill();
+      stroke(64);
+      strokeWeight(4);
+      rect(0, 0, imageWidth, imageHeight);
+
+      drawer.draw(g, world);
+      popMatrix();
+    }
 
     drawer.drawTouches(g, world);
   }
 }
 
 void clear() {
+  background(0);
   buffer.clear();
 }
 
@@ -101,6 +121,9 @@ void keyReleased() {
     case 'e':
       clear();
       reset();
+      break;
+    case 'f':
+      isHighQualityMode = !isHighQualityMode;
       break;
     case 'r':
       buffer.getImageRef().save(savePath(fileNamer.next()));
