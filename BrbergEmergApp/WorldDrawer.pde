@@ -3,7 +3,7 @@ class WorldDrawer {
   private Integer[] vehicleColors;
 
   WorldDrawer() {
-    vehicleColors = new ColorManager().getVehicleColors();
+    vehicleColors = ColorManager.getVehicleColors();
   }
 
   public void draw(PGraphics g, World world) {

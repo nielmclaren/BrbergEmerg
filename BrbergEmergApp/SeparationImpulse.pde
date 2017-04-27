@@ -35,7 +35,7 @@ class SeparationImpulse extends Impulse {
       PVector averagePos = getAveragePosition(tooCloseVehicles);
       float tooCloseDirection = getAngleTo(vehicle, averagePos);
       float result = getScaledRotationDeltaToward(vehicle, tooCloseDirection, -_factor, _maxDelta);
-      vehicle.nextRotation(vehicle.nextRotation() + result);
+      vehicle.nextRotate(result);
     }
   }
 }

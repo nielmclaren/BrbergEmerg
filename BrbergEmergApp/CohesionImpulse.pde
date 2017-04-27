@@ -36,7 +36,7 @@ class CohesionImpulse extends Impulse {
       PVector averagePos = getAveragePosition(groupVehicles);
       float neighborsDirection = getAngleTo(vehicle, averagePos);
       float result = getScaledRotationDeltaToward(vehicle, neighborsDirection, _factor, _maxDelta);
-      vehicle.nextRotation(vehicle.nextRotation() + result);
+      vehicle.nextRotate(result);
     }
   }
 }

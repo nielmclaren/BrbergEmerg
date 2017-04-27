@@ -111,6 +111,11 @@ class Vehicle implements IPositionable {
     return this;
   }
 
+  Vehicle rotate(float v) {
+    _rotation = normalizeAngle(_rotation + v);
+    return this;
+  }
+
   float nextRotation() {
     return _nextRotation;
   }
@@ -118,6 +123,11 @@ class Vehicle implements IPositionable {
   Vehicle nextRotation(float v) {
     v = normalizeAngle(v);
     _nextRotation = v;
+    return this;
+  }
+
+  Vehicle nextRotate(float v) {
+    _nextRotation = normalizeAngle(_nextRotation + v);
     return this;
   }
 

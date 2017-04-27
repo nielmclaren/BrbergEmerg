@@ -5,7 +5,7 @@ class BrbergEmergImage extends ShortImage {
   BrbergEmergImage(int w, int h, int format) {
     super(w, h, format);
 
-    vehicleColors = new ColorManager().getVehicleColors();
+    vehicleColors = ColorManager.getVehicleColors();
   }
 
   void clear() {

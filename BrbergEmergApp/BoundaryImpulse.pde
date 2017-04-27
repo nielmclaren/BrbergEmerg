@@ -53,21 +53,21 @@ class BoundaryImpulse extends Impulse {
       rx = getHorizontalRotationFactor(vehicle);
       ry = getVerticalRotationFactor(vehicle);
 
-      vehicle.nextRotation(rotation + 0.03 * (rx + ry));
+      vehicle.nextRotate(0.03 * (rx + ry));
     } else {
       vehicle.resetNumStepsSinceLastTurn();
       if (vehicle.isTurningCw()) {
-        vehicle.nextRotation(rotation - v);
+        vehicle.nextRotate(-v);
       } else if (vehicle.isTurningCcw()) {
-        vehicle.nextRotation(rotation + v);
+        vehicle.nextRotate(v);
       } else {
         float d = abs(rx) > abs(ry) ? rx : ry;
         if (d < 0) {
           vehicle.isTurningCw(true);
-          vehicle.nextRotation(rotation - v);
+          vehicle.nextRotate(-v);
         } else {
           vehicle.isTurningCcw(true);
-          vehicle.nextRotation(rotation + v);
+          vehicle.nextRotate(v);
         }
       }
     }

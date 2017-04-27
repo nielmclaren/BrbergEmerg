@@ -32,6 +32,6 @@ class MeanderImpulse extends Impulse {
   }
 
   void step(Vehicle vehicle) {
-    vehicle.nextRotation(vehicle.nextRotation() + (noise(_seed + _world.age() + vehicle.groupId() * 1000) * _noiseScale - 0.5) * _maxDelta * 2 * PI);
+    vehicle.nextRotate((noise(_seed + _world.age() + vehicle.groupId() * 1000) * _noiseScale - 0.5) * _maxDelta * 2 * PI);
   }
 }

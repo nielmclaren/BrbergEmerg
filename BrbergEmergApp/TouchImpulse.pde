@@ -32,7 +32,7 @@ class TouchImpulse extends Impulse {
   void step(Vehicle vehicle) {
     if (vehicle.touchRef() != null) {
       float result = getRotationDeltaToward(vehicle, vehicle.touchRef());
-      vehicle.nextRotation(vehicle.nextRotation() + result);
+      vehicle.nextRotate(result);
     }
   }
 

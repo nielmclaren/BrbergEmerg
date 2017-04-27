@@ -35,7 +35,7 @@ class AlignmentImpulse extends Impulse {
     if (groupVehicles.size() > 0) {
       float neighborhoodRotation = getAverageRotation(groupVehicles);
       float result = getScaledRotationDeltaToward(vehicle, neighborhoodRotation, _factor, _maxDelta);
-      vehicle.nextRotation(vehicle.nextRotation() + result);
+      vehicle.nextRotate(result);
     }
   }
 }

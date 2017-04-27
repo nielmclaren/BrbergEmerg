@@ -1,8 +1,6 @@
 
-class ColorManager {
-  ColorManager() {}
-
-  public Integer[] getVehicleColors() {
+static class ColorManager {
+  static public Integer[] getVehicleColors() {
     ArrayList<Integer> colors = new ArrayList<Integer>();
     colors.add(#b82e2e);
     colors.add(#ff9900);
