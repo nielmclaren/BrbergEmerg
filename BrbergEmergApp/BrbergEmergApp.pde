@@ -3,6 +3,7 @@ import TUIO.*;
 
 int imageWidth;
 int imageHeight;
+int numVehicles;
 int numGroups;
 
 World world;
@@ -21,11 +22,12 @@ FileNamer animationFolderNamer, fileNamer;
 
 void setup() {
   noCursor();
-  fullScreen(3);
+  fullScreen();
 
   imageWidth = 1920;
   imageHeight = 1080;
-  numGroups = 1;
+  numVehicles = 400;
+  numGroups = 5;
 
   world = new World(imageWidth, imageHeight, numGroups);
   drawer = new WorldDrawer();
@@ -56,7 +58,7 @@ void reset() {
 void resetWorld() {
   world.age(0);
   world.clearVehicles();
-  world.setupVehicles(randomPositioner, 40);
+  world.setupVehicles(randomPositioner, numVehicles);
 }
 
 void draw() {

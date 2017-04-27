@@ -14,10 +14,6 @@ class WorldDrawer {
     vehicleColors[7] = color(252, 194, 44);
   }
 
-  public void drawInitial(PGraphics g, World world) {
-    g.background(0);
-  }
-
   public void draw(BrbergEmergImage g, World world) {
     drawVehicles(g, world);
   }

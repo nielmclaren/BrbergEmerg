@@ -14,10 +14,6 @@ class BrbergEmergImage extends ShortImage {
     }
   }
 
-  void drawTouch(World world, Touch touch) {
-    drawCircle(floor(touch.x()), floor(touch.y()), 30, color(255));
-  }
-
   void drawVehicle(World world, Vehicle vehicle) {
     int targetX = floor(vehicle.x());
     int targetY = floor(vehicle.y());
