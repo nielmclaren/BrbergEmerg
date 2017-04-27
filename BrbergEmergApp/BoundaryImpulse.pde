@@ -106,10 +106,6 @@ class BoundaryImpulse extends Impulse {
       dist = dx / cos(rotation);
       distanceFactor = reverseDistanceFactor(dist / _lookAheadDist);
 
-      strokeWeight(4);
-      stroke(255, 255, 0, 128);
-      line(x, y, x + dx, y + dx * tan(rotation));
-
       if (normalizeAngle(rotation) < PI) {
         // Turning right (down).
         if (y + _minDist > maxY) {
@@ -128,10 +124,6 @@ class BoundaryImpulse extends Impulse {
       dx = x - minX;
       dist = dx / cos(rotation);
       distanceFactor = reverseDistanceFactor(dist / _lookAheadDist);
-
-      strokeWeight(4);
-      stroke(255, 255, 0, 128);
-      line(x, y, x - dx, y - dx * tan(rotation));
 
       if (normalizeAngle(rotation + PI) < PI) {
         // Turning right (up).
@@ -172,10 +164,6 @@ class BoundaryImpulse extends Impulse {
       dist = dy / sin(rotation);
       distanceFactor = reverseDistanceFactor(dist / _lookAheadDist);
 
-      strokeWeight(4);
-      stroke(255, 255, 0, 128);
-      line(x, y, x + dy / tan(rotation), y + dy);
-
       if (normalizeAngle(rotation - PI/2) < PI) {
         // Turning right (to screen left).
         if (x - _minDist < minX) {
@@ -194,10 +182,6 @@ class BoundaryImpulse extends Impulse {
       dy = y - minY;
       dist = dy / sin(rotation);
       distanceFactor = reverseDistanceFactor(dist / _lookAheadDist);
-
-      strokeWeight(4);
-      stroke(255, 255, 0, 128);
-      line(x, y, x - dy / tan(rotation), y - dy);
 
       if (normalizeAngle(rotation + PI/2) < PI) {
         // Turning right (to screen right).
