@@ -16,23 +16,10 @@ class WorldDrawer {
 
   public void drawInitial(PGraphics g, World world) {
     g.background(0);
-    drawAttractors(g, world);
   }
 
   public void draw(BrbergEmergImage g, World world) {
     drawVehicles(g, world);
-  }
-
-  public void drawAttractors(PGraphics g, World world) {
-    ArrayList<Attractor> attractors = world.attractorsRef();
-    for (Attractor attractor : attractors) {
-      g.colorMode(RGB);
-      g.stroke(32);
-      g.strokeWeight(8);
-      g.noFill();
-      g.ellipseMode(RADIUS);
-      g.ellipse(attractor.x(), attractor.y(), attractor.radius(), attractor.radius());
-    }
   }
 
   private void drawVehicles(BrbergEmergImage g, World world) {
