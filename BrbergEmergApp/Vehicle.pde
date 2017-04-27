@@ -17,6 +17,10 @@ class Vehicle implements IPositionable {
   private Attractor _attractor;
   private Touch _touch;
 
+  private boolean _isTurningCw;
+  private boolean _isTurningCcw;
+  private int _numStepsSinceLastTurn;
+
   private float _vehicleSizeSq;
 
   Vehicle(World world, int id, float x, float y, float rotation) {
@@ -35,6 +39,10 @@ class Vehicle implements IPositionable {
     _neighborhood = new Neighborhood(_world);
     _attractor = null;
     _touch = null;
+
+    _isTurningCw = false;
+    _isTurningCcw = false;
+    _numStepsSinceLastTurn = 0;
 
     _vehicleSizeSq = 20 * 20;
   }
@@ -135,13 +143,45 @@ class Vehicle implements IPositionable {
     return this;
   }
 
+  boolean isTurningCw() {
+    return _isTurningCw;
+  }
+
+  Vehicle isTurningCw(boolean v) {
+    _isTurningCw = v;
+    return this;
+  }
+
+  boolean isTurningCcw() {
+    return _isTurningCcw;
+  }
+
+  Vehicle isTurningCcw(boolean v) {
+    _isTurningCcw = v;
+    return this;
+  }
+
+  int numStepsSinceLastTurn() {
+    return _numStepsSinceLastTurn;
+  }
+
+  Vehicle incrementNumStepsSinceLastTurn() {
+    _numStepsSinceLastTurn++;
+    return this;
+  }
+
+  Vehicle resetNumStepsSinceLastTurn() {
+    _numStepsSinceLastTurn = 0;
+    return this;
+  }
+
   Vehicle prep() {
     float rotationDelta = 0;
 
+    // Should just let the steer function modify the vehicle directly.
     if (_touch == null) {
       rotationDelta += _world.alignment.steer(this);
-      rotationDelta += _world.inverseAttraction.steer(this);
-      //rotationDelta += _world.centering.steer(this);
+      rotationDelta += _world.boundary.steer(this);
       rotationDelta += _world.cohesion.steer(this);
       rotationDelta += _world.meander.steer(this);
       rotationDelta += _world.repulsion.steer(this);

@@ -15,9 +15,7 @@ class World {
   private long _age;
 
   public AlignmentImpulse alignment;
-  public AttractorImpulse attraction;
-  public InverseAttractorImpulse inverseAttraction;
-  public CenteringImpulse centering;
+  public BoundaryImpulse boundary;
   public CohesionImpulse cohesion;
   public MeanderImpulse meander;
   public RepulsionImpulse repulsion;
@@ -35,9 +33,7 @@ class World {
     _age = 0;
 
     alignment = new AlignmentImpulse(this);
-    attraction = new AttractorImpulse(this).isSingleAttractor(false);
-    inverseAttraction = new InverseAttractorImpulse(this).isSingleAttractor(true);
-    centering = new CenteringImpulse(this);
+    boundary = new BoundaryImpulse(this);
     cohesion = new CohesionImpulse(this);
     meander = new MeanderImpulse(this);
     repulsion = new RepulsionImpulse(this);
