@@ -29,18 +29,14 @@ class CohesionImpulse extends Impulse {
     return this;
   }
 
-  float steer(Vehicle vehicle) {
+  void step(Vehicle vehicle) {
     Neighborhood neighborhood = vehicle.neighborhoodRef();
     ArrayList<Vehicle> groupVehicles = neighborhood.inGroupVehicles(vehicle.groupId());
     if (groupVehicles.size() > 0) {
       PVector averagePos = getAveragePosition(groupVehicles);
       float neighborsDirection = getAngleTo(vehicle, averagePos);
-      return getScaledRotationDeltaToward(vehicle, neighborsDirection, _factor, _maxDelta);
+      float result = getScaledRotationDeltaToward(vehicle, neighborsDirection, _factor, _maxDelta);
+      vehicle.nextRotation(vehicle.nextRotation() + result);
     }
-    return 0;
-  }
-
-  float accelerate(Vehicle vehicle) {
-    return vehicle.velocity();
   }
 }

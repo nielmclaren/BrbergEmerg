@@ -105,7 +105,18 @@ class Vehicle implements IPositionable {
   }
 
   Vehicle rotation(float v) {
+    v = normalizeAngle(v);
     _rotation = v;
+    _nextRotation = v;
+    return this;
+  }
+
+  float nextRotation() {
+    return _nextRotation;
+  }
+
+  Vehicle nextRotation(float v) {
+    v = normalizeAngle(v);
     _nextRotation = v;
     return this;
   }
@@ -170,21 +181,16 @@ class Vehicle implements IPositionable {
   }
 
   Vehicle prep() {
-    float rotationDelta = 0;
-
-    // Should just let the steer function modify the vehicle directly.
     if (_touch == null) {
-      rotationDelta += _world.alignment.steer(this);
-      rotationDelta += _world.boundary.steer(this);
-      rotationDelta += _world.cohesion.steer(this);
-      rotationDelta += _world.meander.steer(this);
-      rotationDelta += _world.repulsion.steer(this);
-      rotationDelta += _world.separation.steer(this);
+      _world.alignment.step(this);
+      _world.boundary.step(this);
+      _world.cohesion.step(this);
+      //_world.meander.step(this);
+      _world.repulsion.step(this);
+      _world.separation.step(this);
     } else {
-      rotationDelta += _world.lure.steer(this);
+      _world.lure.step(this);
     }
-
-    _nextRotation = normalizeAngle(_rotation + rotationDelta);
 
     _nextX += _velocity * cos(_nextRotation);
     _nextY += _velocity * sin(_nextRotation);

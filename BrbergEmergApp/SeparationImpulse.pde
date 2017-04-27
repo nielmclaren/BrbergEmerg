@@ -29,17 +29,13 @@ class SeparationImpulse extends Impulse {
     return this;
   }
 
-  float steer(Vehicle vehicle) {
+  void step(Vehicle vehicle) {
     ArrayList<Vehicle> tooCloseVehicles = vehicle.neighborhoodRef().getVehiclesWithin(vehicle, World.MIN_DISTANCE);
     if (tooCloseVehicles.size() > 0) {
       PVector averagePos = getAveragePosition(tooCloseVehicles);
       float tooCloseDirection = getAngleTo(vehicle, averagePos);
-      return getScaledRotationDeltaToward(vehicle, tooCloseDirection, -_factor, _maxDelta);
+      float result = getScaledRotationDeltaToward(vehicle, tooCloseDirection, -_factor, _maxDelta);
+      vehicle.nextRotation(vehicle.nextRotation() + result);
     }
-    return 0;
-  }
-
-  float accelerate(Vehicle vehicle) {
-    return vehicle.velocity();
   }
 }

@@ -29,19 +29,15 @@ class TouchImpulse extends Impulse {
     return this;
   }
 
-  float steer(Vehicle vehicle) {
+  void step(Vehicle vehicle) {
     if (vehicle.touchRef() != null) {
-      return getRotationDeltaToward(vehicle, vehicle.touchRef());
+      float result = getRotationDeltaToward(vehicle, vehicle.touchRef());
+      vehicle.nextRotation(vehicle.nextRotation() + result);
     }
-    return 0;
   }
 
   private float getRotationDeltaToward(Vehicle vehicle, Touch touch) {
     float touchAngle = getAngleTo(vehicle, touch);
     return getScaledRotationDeltaToward(vehicle, touchAngle, _factor, _maxDelta);
-  }
-
-  float accelerate(Vehicle vehicle) {
-    return vehicle.velocity();
   }
 }

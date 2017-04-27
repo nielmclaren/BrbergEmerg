@@ -13,11 +13,11 @@ class BoundaryImpulse extends Impulse {
     _numTurnSteps = 20;
   }
 
-  float steer(Vehicle vehicle) {
+  void step(Vehicle vehicle) {
     int safety = 5;
     float x = vehicle.x();
     float y = vehicle.y();
-    float rotation = vehicle.rotation();
+    float rotation = vehicle.nextRotation();
     float minX = 0;
     float maxX = _world.width();
     float minY = 0;
@@ -25,18 +25,18 @@ class BoundaryImpulse extends Impulse {
 
     if (x > maxX) {
       x = maxX - safety;
-      return mirrorRotationHorizontally(rotation) - rotation;
+      vehicle.nextRotation(mirrorRotationHorizontally(rotation));
     } else if (x < minX) {
       vehicle.x(minX + safety);
-      return mirrorRotationHorizontally(rotation) - rotation;
+      vehicle.nextRotation(mirrorRotationHorizontally(rotation));
     }
 
     if (y > maxY) {
       y = maxY - safety;
-      return mirrorRotationVertically(rotation) - rotation;
+      vehicle.nextRotation(mirrorRotationVertically(rotation));
     } else if (y < minY) {
       vehicle.y(minY + safety);
-      return mirrorRotationVertically(rotation) - rotation;
+      vehicle.nextRotation(mirrorRotationVertically(rotation));
     }
 
     float rx = getLookAheadHorizontalRotationFactor(vehicle);
@@ -53,21 +53,21 @@ class BoundaryImpulse extends Impulse {
       rx = getHorizontalRotationFactor(vehicle);
       ry = getVerticalRotationFactor(vehicle);
 
-      return 0.03 * (rx + ry);
+      vehicle.nextRotation(rotation + 0.03 * (rx + ry));
     } else {
       vehicle.resetNumStepsSinceLastTurn();
       if (vehicle.isTurningCw()) {
-        return -v;
+        vehicle.nextRotation(rotation - v);
       } else if (vehicle.isTurningCcw()) {
-        return v;
+        vehicle.nextRotation(rotation + v);
       } else {
         float d = abs(rx) > abs(ry) ? rx : ry;
         if (d < 0) {
           vehicle.isTurningCw(true);
-          return -v;
+          vehicle.nextRotation(rotation - v);
         } else {
           vehicle.isTurningCcw(true);
-          return v;
+          vehicle.nextRotation(rotation + v);
         }
       }
     }
@@ -92,7 +92,7 @@ class BoundaryImpulse extends Impulse {
     float distanceFactor;
     float x = vehicle.x();
     float y = vehicle.y();
-    float rotation = vehicle.rotation();
+    float rotation = vehicle.nextRotation();
     float nextX = x + _lookAheadDist * cos(rotation);
     float nextY = y + _lookAheadDist * sin(rotation);
     float minX = 0;
@@ -150,7 +150,7 @@ class BoundaryImpulse extends Impulse {
     float distanceFactor;
     float x = vehicle.x();
     float y = vehicle.y();
-    float rotation = vehicle.rotation();
+    float rotation = vehicle.nextRotation();
     float nextX = x + _lookAheadDist * cos(rotation);
     float nextY = y + _lookAheadDist * sin(rotation);
     float minX = 0;
@@ -209,7 +209,7 @@ class BoundaryImpulse extends Impulse {
   private float getHorizontalRotationFactor(Vehicle vehicle) {
     float distanceFactor;
     float x = vehicle.x();
-    float rotation = vehicle.rotation();
+    float rotation = vehicle.nextRotation();
     float minX = 0;
     float maxX = _world.width();
     float minY = 0;
@@ -236,7 +236,7 @@ class BoundaryImpulse extends Impulse {
   private float getVerticalRotationFactor(Vehicle vehicle) {
     float distanceFactor;
     float y = vehicle.y();
-    float rotation = vehicle.rotation();
+    float rotation = vehicle.nextRotation();
     float minX = 0;
     float maxX = _world.width();
     float minY = 0;

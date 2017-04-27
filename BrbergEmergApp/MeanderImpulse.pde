@@ -31,11 +31,7 @@ class MeanderImpulse extends Impulse {
     return this;
   }
 
-  float steer(Vehicle vehicle) {
-    return (noise(_seed + _world.age() + vehicle.groupId() * 1000) * _noiseScale - 0.5) * _maxDelta * 2 * PI;
-  }
-
-  float accelerate(Vehicle vehicle) {
-    return vehicle.velocity();
+  void step(Vehicle vehicle) {
+    vehicle.nextRotation(vehicle.nextRotation() + (noise(_seed + _world.age() + vehicle.groupId() * 1000) * _noiseScale - 0.5) * _maxDelta * 2 * PI);
   }
 }

@@ -15,20 +15,11 @@ class Impulse {
     return this;
   }
 
-  float steer(Vehicle vehicle) {
-    return 0;
-  }
-
-  float accelerate(Vehicle vehicle) {
-    return vehicle.velocity();
-  }
-
-  Impulse step() {
-    return this;
+  void step(Vehicle vehicle) {
   }
 
   protected float getScaledRotationDeltaToward(Vehicle vehicle, float target, float factor, float maxDelta) {
-    float current = vehicle.rotation();
+    float current = vehicle.nextRotation();
     float velocity = vehicle.velocity();
     return getRotationDeltaToward(current, target, factor * velocity, maxDelta * velocity);
   }
