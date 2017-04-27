@@ -58,7 +58,7 @@ void resetWorld() {
 
   world.age(0);
   world.clearVehicles();
-  world.setupVehicles(groupPositioner, numVehicles);
+  world.setupVehicles(randomPositioner, numVehicles);
 }
 
 void draw() {

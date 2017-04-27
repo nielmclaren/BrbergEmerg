@@ -53,7 +53,7 @@ class BoundaryImpulse extends Impulse {
       rx = getHorizontalRotationFactor(vehicle);
       ry = getVerticalRotationFactor(vehicle);
 
-      return 0.01 * (rx + ry);
+      return 0.03 * (rx + ry);
     } else {
       vehicle.resetNumStepsSinceLastTurn();
       if (vehicle.isTurningCw()) {

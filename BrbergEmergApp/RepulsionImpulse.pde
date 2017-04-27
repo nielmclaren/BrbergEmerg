@@ -7,8 +7,8 @@ class RepulsionImpulse extends Impulse {
   RepulsionImpulse(World world) {
     super(world);
 
-    _factor = 0.2;
-    _maxDelta = 0.032;
+    _factor = 0.01;
+    _maxDelta = 0.015;
   }
 
   float factor() {
