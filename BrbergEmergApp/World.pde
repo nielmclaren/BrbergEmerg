@@ -12,6 +12,8 @@ class World {
   private int _numGroups;
   private long _age;
 
+  private Partition _partition;
+
   public AlignmentImpulse alignment;
   public BoundaryImpulse boundary;
   public CohesionImpulse cohesion;
@@ -28,6 +30,8 @@ class World {
     _center = new PVector(_width/2, _height/2);
     _numGroups = numGroups;
     _age = 0;
+
+    _partition = new Partition(_width, _height, NEIGHBORHOOD_RADIUS);
 
     initImpulses();
   }
@@ -49,6 +53,15 @@ class World {
 
   ArrayList<Vehicle> vehiclesRef() {
     return _vehicles;
+  }
+
+  World vehiclesRef(ArrayList<Vehicle> v) {
+    _vehicles = v;
+    return this;
+  }
+
+  int numVehicles() {
+    return _vehicles.size();
   }
 
   ArrayList<Touch> touches() {
@@ -96,15 +109,6 @@ class World {
     }
     _cursorIdToTouch.remove(cursor.getCursorID());
     return this;
-  }
-
-  World vehiclesRef(ArrayList<Vehicle> v) {
-    _vehicles = v;
-    return this;
-  }
-
-  int numVehicles() {
-    return _vehicles.size();
   }
 
   int width() {
@@ -162,21 +166,6 @@ class World {
     return this;
   }
 
-  private Neighborhood getNeighborhood(ArrayList<Vehicle> vehicles, Vehicle vehicle) {
-    ArrayList<Vehicle> neighborhoodVehicles = new ArrayList<Vehicle>();
-    for (Vehicle v : _vehicles) {
-      if (vehicle != v && areNeighbors(vehicle, v)) {
-        neighborhoodVehicles.add(v);
-      }
-    }
-    return new Neighborhood(this)
-      .vehiclesRef(neighborhoodVehicles);
-  }
-
-  private boolean areNeighbors(Vehicle a, Vehicle b) {
-    return getDistanceBetween(a, b) < NEIGHBORHOOD_RADIUS;
-  }
-
   World step(int numSteps) {
     for (int i = 0; i < numSteps; i++) {
       step();
@@ -185,6 +174,7 @@ class World {
   }
 
   World step() {
+    updatePartition();
     calculateNeighborhoods();
     prepVehicles();
     stepVehicles();
@@ -194,10 +184,16 @@ class World {
     return this;
   }
 
+  private void updatePartition() {
+    _partition.update(_vehicles);
+  }
+
   private void calculateNeighborhoods() {
-    for (Vehicle vehicle : _vehicles) {
-      Neighborhood neighborhood = getNeighborhood(_vehicles, vehicle);
-      vehicle.neighborhoodRef(neighborhood);
+    for (Vehicle v : _vehicles) {
+      v.neighborhoodRef()
+        .inGroupNeighborsRef(_partition.getInGroupVehiclesWithin(v.x(), v.y(), NEIGHBORHOOD_RADIUS, v.groupId(), v))
+        .inGroupTooCloseRef(_partition.getInGroupVehiclesWithin(v.x(), v.y(), MIN_DISTANCE, v.groupId(), v))
+        .outGroupTooCloseRef(_partition.getOutGroupVehiclesWithin(v.x(), v.y(), OUT_GROUP_MIN_DISTANCE, v.groupId(), v));
     }
   }
 
@@ -228,6 +224,9 @@ class World {
     _center = new PVector(_width/2, _height/2);
     _numGroups = json.getInt("numGroups");
     _age = json.getLong("age");
+
+    _partition = new Partition(_width, _height, NEIGHBORHOOD_RADIUS);
+
     return this;
   }
 

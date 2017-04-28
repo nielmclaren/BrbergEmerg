@@ -30,7 +30,7 @@ class SeparationImpulse extends Impulse {
   }
 
   void step(Vehicle vehicle) {
-    ArrayList<Vehicle> tooCloseVehicles = vehicle.neighborhoodRef().getVehiclesWithin(vehicle, World.MIN_DISTANCE);
+    ArrayList<Vehicle> tooCloseVehicles = vehicle.neighborhoodRef().inGroupTooCloseRef();
     if (tooCloseVehicles.size() > 0) {
       PVector averagePos = getAveragePosition(tooCloseVehicles);
       float tooCloseDirection = getAngleTo(vehicle, averagePos);

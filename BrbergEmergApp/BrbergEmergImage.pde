@@ -18,11 +18,14 @@ class BrbergEmergImage extends ShortImage {
     int targetX = floor(vehicle.x());
     int targetY = floor(vehicle.y());
 
-    float groupRotation = getScaledAverageRotation(vehicle, vehicle.rotation(), World.NEIGHBORHOOD_RADIUS,
-        vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()));
-    float rotationFactor = abs(getSignedAngleBetween(vehicle.rotation(), groupRotation)) / PI;
-    if (vehicle.neighborhoodRef().inGroupVehicles(vehicle.groupId()).size() <= 0) {
+    ArrayList<Vehicle> inGroupVehicles = vehicle.neighborhoodRef().inGroupNeighborsRef();
+
+    float rotationFactor;
+    if (inGroupVehicles.size() <= 0) {
       rotationFactor = 0;
+    } else {
+      float groupRotation = getScaledAverageRotation(vehicle, vehicle.rotation(), World.NEIGHBORHOOD_RADIUS, inGroupVehicles);
+      rotationFactor = abs(getSignedAngleBetween(vehicle.rotation(), groupRotation)) / PI;
     }
 
     pushStyle();

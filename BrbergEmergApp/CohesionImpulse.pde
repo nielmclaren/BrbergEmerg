@@ -30,8 +30,7 @@ class CohesionImpulse extends Impulse {
   }
 
   void step(Vehicle vehicle) {
-    Neighborhood neighborhood = vehicle.neighborhoodRef();
-    ArrayList<Vehicle> groupVehicles = neighborhood.inGroupVehicles(vehicle.groupId());
+    ArrayList<Vehicle> groupVehicles = vehicle.neighborhoodRef().inGroupNeighborsRef();
     if (groupVehicles.size() > 0) {
       PVector averagePos = getAveragePosition(groupVehicles);
       float neighborsDirection = getAngleTo(vehicle, averagePos);

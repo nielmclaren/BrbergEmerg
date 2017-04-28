@@ -1,67 +1,39 @@
 
 class Neighborhood {
-  private World _world;
-  private ArrayList<Vehicle> _vehicles;
-  private HashMap<Integer, ArrayList<Vehicle>> _inGroupVehicles;
-  private HashMap<Integer, ArrayList<Vehicle>> _outGroupVehicles;
+  private ArrayList<Vehicle> _inGroupNeighbors;
+  private ArrayList<Vehicle> _inGroupTooClose;
+  private ArrayList<Vehicle> _outGroupTooClose;
 
-  Neighborhood(World world) {
-    _world = world;
-    _vehicles = new ArrayList<Vehicle>();
-    _inGroupVehicles = new HashMap<Integer, ArrayList<Vehicle>>();
-    _outGroupVehicles = new HashMap<Integer, ArrayList<Vehicle>>();
+  Neighborhood() {
+    _inGroupNeighbors = new ArrayList<Vehicle>();
+    _inGroupTooClose = new ArrayList<Vehicle>();
+    _outGroupTooClose = new ArrayList<Vehicle>();
   }
 
-  ArrayList<Vehicle> vehiclesRef() {
-    return _vehicles;
+  ArrayList<Vehicle> inGroupNeighborsRef() {
+    return _inGroupNeighbors;
   }
 
-  Neighborhood vehiclesRef(ArrayList<Vehicle> v) {
-    _vehicles = v;
-
-    _inGroupVehicles = new HashMap<Integer, ArrayList<Vehicle>>();
-    for (Vehicle vehicle : _vehicles) {
-      if (_inGroupVehicles.containsKey(vehicle.groupId())) {
-        _inGroupVehicles.get(vehicle.groupId()).add(vehicle);
-      } else {
-        ArrayList<Vehicle> vehicles = new ArrayList<Vehicle>();
-        vehicles.add(vehicle);
-        _inGroupVehicles.put(vehicle.groupId(), vehicles);
-      }
-    }
-
-    _outGroupVehicles = new HashMap<Integer, ArrayList<Vehicle>>();
-    for (int i = 0; i < _world.numGroups(); i++) {
-      _outGroupVehicles.put(i, new ArrayList<Vehicle>());
-    }
-    for (Vehicle vehicle : _vehicles) {
-      for (int i = 0; i < _world.numGroups(); i++) {
-        if (i != vehicle.groupId()) {
-          _outGroupVehicles.get(i).add(vehicle);
-        }
-      }
-    }
-
+  Neighborhood inGroupNeighborsRef(ArrayList<Vehicle> v) {
+    _inGroupNeighbors = v;
     return this;
   }
 
-  ArrayList<Vehicle> inGroupVehicles(int groupId) {
-    ArrayList<Vehicle> vehicles = _inGroupVehicles.get(groupId);
-    if (vehicles == null) {
-      return new ArrayList<Vehicle>();
-    }
-    return vehicles;
+  ArrayList<Vehicle> inGroupTooCloseRef() {
+    return _inGroupTooClose;
   }
 
-  ArrayList<Vehicle> outGroupVehicles(int groupId) {
-    ArrayList<Vehicle> vehicles = _outGroupVehicles.get(groupId);
-    if (vehicles == null) {
-      return new ArrayList<Vehicle>();
-    }
-    return vehicles;
+  Neighborhood inGroupTooCloseRef(ArrayList<Vehicle> v) {
+    _inGroupTooClose = v;
+    return this;
   }
 
-  ArrayList<Vehicle> getVehiclesWithin(Vehicle vehicle, float distance) {
-    return (ArrayList<Vehicle>)getItemsWithin(_vehicles, vehicle, distance);
+  ArrayList<Vehicle> outGroupTooCloseRef() {
+    return _outGroupTooClose;
+  }
+
+  Neighborhood outGroupTooCloseRef(ArrayList<Vehicle> v) {
+    _outGroupTooClose = v;
+    return this;
   }
 }

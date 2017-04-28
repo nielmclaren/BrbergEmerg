@@ -30,7 +30,7 @@ class RepulsionImpulse extends Impulse {
   }
 
   void step(Vehicle vehicle) {
-    ArrayList<Vehicle> tooCloseVehicles = (ArrayList<Vehicle>)getItemsWithin(vehicle.neighborhoodRef().outGroupVehicles(vehicle.groupId()), vehicle, World.OUT_GROUP_MIN_DISTANCE);
+    ArrayList<Vehicle> tooCloseVehicles = vehicle.neighborhoodRef().outGroupTooCloseRef();
     if (tooCloseVehicles.size() > 0) {
       PVector averagePos = getAveragePosition(tooCloseVehicles);
       float tooCloseDirection = getAngleTo(vehicle, averagePos);

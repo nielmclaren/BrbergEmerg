@@ -13,13 +13,12 @@ class Vehicle implements IPositionable {
 
   private int _groupId;
 
-  private Neighborhood _neighborhood;
-  private Touch _touch;
-
   private boolean _isTurningCw;
   private boolean _isTurningCcw;
   private int _numStepsSinceLastTurn;
 
+  private Neighborhood _neighborhood;
+  private Touch _touch;
   private float _vehicleSizeSq;
 
   Vehicle(World world, int id, float x, float y, float rotation) {
@@ -35,13 +34,12 @@ class Vehicle implements IPositionable {
 
     _groupId = -1;
 
-    _neighborhood = new Neighborhood(_world);
-    _touch = null;
-
     _isTurningCw = false;
     _isTurningCcw = false;
     _numStepsSinceLastTurn = 0;
 
+    _neighborhood = new Neighborhood();
+    _touch = null;
     _vehicleSizeSq = 20 * 20;
   }
 
@@ -50,6 +48,8 @@ class Vehicle implements IPositionable {
 
     updateFromJson(vehicleJson);
 
+    _neighborhood = new Neighborhood();
+    _touch = null;
     _vehicleSizeSq = 20 * 20;
   }
 
@@ -140,24 +140,6 @@ class Vehicle implements IPositionable {
     return this;
   }
 
-  Neighborhood neighborhoodRef() {
-    return _neighborhood;
-  }
-
-  Vehicle neighborhoodRef(Neighborhood v) {
-    _neighborhood = v;
-    return this;
-  }
-
-  Touch touchRef() {
-    return _touch;
-  }
-
-  Vehicle touch(Touch v) {
-    _touch = v;
-    return this;
-  }
-
   boolean isTurningCw() {
     return _isTurningCw;
   }
@@ -187,6 +169,24 @@ class Vehicle implements IPositionable {
 
   Vehicle resetNumStepsSinceLastTurn() {
     _numStepsSinceLastTurn = 0;
+    return this;
+  }
+
+  Neighborhood neighborhoodRef() {
+    return _neighborhood;
+  }
+
+  Vehicle neighborhoodRef(Neighborhood v) {
+    _neighborhood = v;
+    return this;
+  }
+
+  Touch touchRef() {
+    return _touch;
+  }
+
+  Vehicle touch(Touch v) {
+    _touch = v;
     return this;
   }
 

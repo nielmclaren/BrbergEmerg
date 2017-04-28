@@ -49,47 +49,56 @@ void setup() {
 }
 
 void reset() {
-  resetWorld();
-  buffer.clear();
-}
-
-void resetWorld() {
   int numVehicles = world.numVehicles();
 
   world.age(0);
   world.clearVehicles();
   world.setupVehicles(randomPositioner, numVehicles);
+
+  buffer.clear();
 }
 
 void draw() {
   if (!isPaused) {
-    world.step();
+    step();
+  }
+}
 
-    if (isHighQualityMode) {
-      buffer.fade(0.001);
-      drawer.draw(buffer, world);
+void step() {
+  world.step();
 
-      image(buffer.getImageRef(), 0, 0);
-    } else {
-      pushMatrix();
-      scale(imageScale);
-      translate(
-          (width - imageWidth * imageScale) / 2,
-          (height - imageHeight * imageScale) / 2);
+  if (isHighQualityMode) {
+    buffer.fade(0.001);
+    drawer.draw(buffer, world);
 
-      background(0);
+    image(buffer.getImageRef(), 0, 0);
+  } else {
+    pushMatrix();
+    scale(imageScale);
+    translate(
+        (width - imageWidth * imageScale) / 2,
+        (height - imageHeight * imageScale) / 2);
 
-      noFill();
-      stroke(64);
-      strokeWeight(4);
-      rect(0, 0, imageWidth, imageHeight);
+    background(0);
 
-      drawer.draw(g, world);
-      popMatrix();
+    noFill();
+    stroke(64);
+    strokeWeight(4);
+    rect(0, 0, imageWidth, imageHeight);
+
+    strokeWeight(1);
+    for (int x = 0; x < imageWidth; x += World.OUT_GROUP_MIN_DISTANCE) {
+      line(x, 0, x, imageHeight);
+    }
+    for (int y = 0; y < imageHeight; y += World.OUT_GROUP_MIN_DISTANCE) {
+      line(0, y, imageWidth, y);
     }
 
-    drawer.drawTouches(g, world);
+    drawer.draw(g, world);
+    popMatrix();
   }
+
+  drawer.drawTouches(g, world);
 }
 
 void clear() {
@@ -121,6 +130,7 @@ void keyReleased() {
     case 'e':
       clear();
       reset();
+      step();
       break;
     case 'f':
       isHighQualityMode = !isHighQualityMode;

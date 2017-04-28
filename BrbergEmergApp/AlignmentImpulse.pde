@@ -30,8 +30,7 @@ class AlignmentImpulse extends Impulse {
   }
 
   void step(Vehicle vehicle) {
-    Neighborhood neighborhood = vehicle.neighborhoodRef();
-    ArrayList<Vehicle> groupVehicles = neighborhood.inGroupVehicles(vehicle.groupId());
+    ArrayList<Vehicle> groupVehicles = vehicle.neighborhoodRef().inGroupNeighborsRef();
     if (groupVehicles.size() > 0) {
       float neighborhoodRotation = getAverageRotation(groupVehicles);
       float result = getScaledRotationDeltaToward(vehicle, neighborhoodRotation, _factor, _maxDelta);
