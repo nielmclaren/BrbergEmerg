@@ -8,8 +8,8 @@ class BoundaryImpulse extends Impulse {
   BoundaryImpulse(World world) {
     super(world);
 
-    _lookAheadDist = 60;
-    _minDist = 60;
+    _lookAheadDist = 200;
+    _minDist = 100;
     _numTurnSteps = 20;
   }
 
