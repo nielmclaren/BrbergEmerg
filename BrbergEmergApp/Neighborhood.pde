@@ -64,41 +64,4 @@ class Neighborhood {
   ArrayList<Vehicle> getVehiclesWithin(Vehicle vehicle, float distance) {
     return (ArrayList<Vehicle>)getItemsWithin(_vehicles, vehicle, distance);
   }
-
-  GroupStats getGroupStats() {
-    HashMap<Integer, Integer> groupCounts = getGroupCounts();
-
-    GroupStats stats = new GroupStats()
-      .groupIds(new ArrayList(groupCounts.keySet()))
-      .biggestGroupId(getBiggestGroupId(groupCounts));
-    return stats;
-  }
-
-  private HashMap<Integer, Integer> getGroupCounts() {
-    HashMap<Integer, Integer> result = new HashMap<Integer, Integer>();
-    for (Vehicle vehicle : _vehicles) {
-      int groupId = vehicle.groupId();
-      Integer count = result.get(groupId);
-      if (count == null) {
-        result.put(groupId, 1);
-      } else {
-        result.put(groupId, count + 1);
-      }
-    }
-    return result;
-  }
-
-  private int getBiggestGroupId(HashMap<Integer, Integer> groupCounts) {
-    int biggestGroupId = -1;
-    int biggestGroupCount = 0;
-    for (HashMap.Entry<Integer, Integer> entry : groupCounts.entrySet()) {
-      int groupId = entry.getKey();
-      int count = entry.getValue();
-      if (count > biggestGroupCount) {
-        biggestGroupCount = count;
-        biggestGroupId = groupId;
-      }
-    }
-    return biggestGroupId;
-  }
 }
