@@ -53,23 +53,32 @@ class WorldDrawer {
   }
 
   void drawTouches(PGraphics g, World world) {
-    int radius = 50;
+    int radius = 25;
+    int outerRadius = 32;
     ArrayList<Touch> touches = world.touches();
 
     g.pushStyle();
-    g.ellipseMode(CENTER);
-    g.noFill();
-    g.stroke(255, 32);
+    g.ellipseMode(RADIUS);
 
     for (Touch touch : touches) {
-      g.strokeWeight(12);
+      g.noFill();
+      g.stroke(255, 12);
+      g.strokeWeight(8);
+      g.ellipse(touch.x(), touch.y(), outerRadius, outerRadius);
+
+      g.fill(255, 8);
+      g.noStroke();
       g.ellipse(touch.x(), touch.y(), radius, radius);
-      g.strokeWeight(2);
-      g.ellipse(touch.x(), touch.y(), radius * 1.5, radius * 1.5);
 
       if (touch.vehicleRef() != null) {
         Vehicle vehicle = touch.vehicleRef();
-        g.line(touch.x(), touch.y(), vehicle.x(), vehicle.y());
+        PVector touchPosition = new PVector(touch.x(), touch.y());
+        PVector diff = PVector.sub(touchPosition, vehicle.position());
+        diff.setMag(diff.mag() - radius - 1);
+
+        g.stroke(255, 8);
+        g.strokeWeight(2);
+        g.line(vehicle.x(), vehicle.y(), vehicle.x() + diff.x, vehicle.y() + diff.y);
       }
     }
     g.popStyle();

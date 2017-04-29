@@ -1,6 +1,5 @@
 
 class Vehicle implements IPositionable {
-  // nextX, nextY, nextRotation are not exposed externally.
   private World _world;
   private int _id;
   private PVector _position;

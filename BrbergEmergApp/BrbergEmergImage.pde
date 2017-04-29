@@ -32,7 +32,6 @@ class BrbergEmergImage extends ShortImage {
       radius = floor(map(alignmentFactor, 0, 1, minRadius, 24));
     } else {
       radius = 40;
-      c = color(255);
     }
 
     float alpha = map(alignmentFactor, 0, 1, 0.125, 0.5);
