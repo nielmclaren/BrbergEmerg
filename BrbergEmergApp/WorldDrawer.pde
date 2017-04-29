@@ -33,11 +33,6 @@ class WorldDrawer {
     g.pushStyle();
     g.colorMode(RGB);
 
-    g.noFill();
-    g.stroke(64);
-    g.strokeWeight(1);
-    g.ellipse(x, y, World.NEIGHBORHOOD_RADIUS, World.NEIGHBORHOOD_RADIUS);
-
     g.fill(c);
     g.noStroke();
     g.ellipse(x, y, radius, radius);

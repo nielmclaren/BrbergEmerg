@@ -78,11 +78,6 @@ void step() {
 
     background(0);
 
-    noFill();
-    stroke(64);
-    strokeWeight(4);
-    rect(0, 0, imageWidth, imageHeight);
-
     drawer.draw(g, world);
     popMatrix();
   }
