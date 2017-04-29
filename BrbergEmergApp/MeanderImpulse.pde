@@ -1,25 +1,14 @@
 
 // Steer about in a semi-random way.
 class MeanderImpulse extends Impulse {
-  private float _maxDelta;
   private float _noiseScale;
   private float _seed;
 
   MeanderImpulse(World world) {
     super(world);
 
-    _maxDelta = 0.005;
-    _noiseScale = 0.06;
-    _seed = random(1000);
-  }
-
-  float maxDelta() {
-    return _maxDelta;
-  }
-
-  MeanderImpulse maxDelta(float v) {
-    _maxDelta = v;
-    return this;
+    _noiseScale = 0.1;
+    _seed = random(1000000);
   }
 
   float noiseScale() {
@@ -32,6 +21,14 @@ class MeanderImpulse extends Impulse {
   }
 
   void step(Vehicle vehicle) {
-    vehicle.nextRotate((noise(_seed + _world.age() + vehicle.groupId() * 1000) * _noiseScale - 0.5) * _maxDelta * 2 * PI);
+    float n = noise((_seed + _world.age() + vehicle.id() * 1000000) * _noiseScale) * 2 - 1;
+    PVector desired = vehicle.velocity().copy().rotate(n * 2 * PI);
+    desired.setMag(World.MAX_SPEED);
+
+    PVector steer = PVector.sub(desired, vehicle.velocity());
+    steer.limit(World.MAX_FORCE);
+    steer.mult(0.8);
+
+    vehicle.accelerate(steer);
   }
 }

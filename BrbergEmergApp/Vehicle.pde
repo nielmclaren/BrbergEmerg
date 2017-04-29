@@ -3,13 +3,9 @@ class Vehicle implements IPositionable {
   // nextX, nextY, nextRotation are not exposed externally.
   private World _world;
   private int _id;
-  private float _x;
-  private float _y;
-  private float _nextX;
-  private float _nextY;
-  private float _velocity;
-  private float _rotation;
-  private float _nextRotation;
+  private PVector _position;
+  private PVector _velocity;
+  private PVector _acceleration;
 
   private int _groupId;
 
@@ -19,18 +15,14 @@ class Vehicle implements IPositionable {
 
   private Neighborhood _neighborhood;
   private Touch _touch;
-  private float _vehicleSizeSq;
+  private float _maxSpeed;
 
-  Vehicle(World world, int id, float x, float y, float rotation) {
+  Vehicle(World world, int id) {
     _world = world;
     _id = id;
-    _x = x;
-    _y = y;
-    _nextX = x;
-    _nextY = y;
-    _velocity = 1;
-    _rotation = rotation;
-    _nextRotation = rotation;
+    _position = new PVector();
+    _velocity = new PVector();
+    _acceleration = new PVector();
 
     _groupId = -1;
 
@@ -40,17 +32,20 @@ class Vehicle implements IPositionable {
 
     _neighborhood = new Neighborhood();
     _touch = null;
-    _vehicleSizeSq = 20 * 20;
+    _maxSpeed = 3;
   }
 
   Vehicle(World world, JSONObject vehicleJson) {
     _world = world;
+    _position = new PVector();
+    _velocity = new PVector();
+    _acceleration = new PVector();
 
     updateFromJson(vehicleJson);
 
     _neighborhood = new Neighborhood();
     _touch = null;
-    _vehicleSizeSq = 20 * 20;
+    _maxSpeed = 3;
   }
 
   World world() {
@@ -72,62 +67,37 @@ class Vehicle implements IPositionable {
   }
 
   float x() {
-    return _x;
+    return _position.x;
   }
 
   Vehicle x(float v) {
-    _x = v;
-    _nextX = v;
+    _position.x = v;
     return this;
   }
 
   float y() {
-    return _y;
+    return _position.y;
   }
 
   Vehicle y(float v) {
-    _y = v;
-    _nextY = v;
+    _position.y = v;
     return this;
   }
 
-  float velocity() {
+  PVector position() {
+    return _position;
+  }
+
+  PVector velocity() {
     return _velocity;
   }
 
-  Vehicle velocity(float v) {
-    _velocity = v;
-    return this;
+  PVector acceleration() {
+    return _acceleration;
   }
 
-  float rotation() {
-    return _rotation;
-  }
-
-  Vehicle rotation(float v) {
-    v = normalizeAngle(v);
-    _rotation = v;
-    _nextRotation = v;
-    return this;
-  }
-
-  Vehicle rotate(float v) {
-    _rotation = normalizeAngle(_rotation + v);
-    return this;
-  }
-
-  float nextRotation() {
-    return _nextRotation;
-  }
-
-  Vehicle nextRotation(float v) {
-    v = normalizeAngle(v);
-    _nextRotation = v;
-    return this;
-  }
-
-  Vehicle nextRotate(float v) {
-    _nextRotation = normalizeAngle(_nextRotation + v);
+  Vehicle accelerate(PVector force) {
+    _acceleration.add(force);
     return this;
   }
 
@@ -190,52 +160,34 @@ class Vehicle implements IPositionable {
     return this;
   }
 
-  Vehicle prep() {
+  Vehicle step() {
     if (_touch == null) {
       _world.alignment.step(this);
       _world.boundary.step(this);
       _world.cohesion.step(this);
-      //_world.meander.step(this);
+      _world.meander.step(this);
       _world.repulsion.step(this);
       _world.separation.step(this);
     } else {
       _world.lure.step(this);
     }
 
-    _nextX += _velocity * cos(_nextRotation);
-    _nextY += _velocity * sin(_nextRotation);
+    _velocity.add(_acceleration);
+    _velocity.limit(World.MAX_SPEED);
+    _position.add(_velocity);
+    _acceleration.mult(0);
 
     return this;
-  }
-
-  Vehicle step() {
-    _x = _nextX;
-    _y = _nextY;
-    _rotation = _nextRotation;
-    return this;
-  }
-
-  boolean isColliding(Vehicle v) {
-    float dx = _x - v.x();
-    float dy = _y - v.y();
-    return dx * dx + dy * dy < _vehicleSizeSq;
-  }
-
-  boolean isColliding(int x, int y) {
-    float dx = _x - x;
-    float dy = _y - y;
-    return dx * dx + dy * dy < _vehicleSizeSq / 4;
   }
 
   private Vehicle updateFromJson(JSONObject json) {
     _id = json.getInt("id");
-    _x = json.getFloat("x");
-    _y = json.getFloat("y");
-    _nextX = json.getFloat("nextX");
-    _nextY = json.getFloat("nextY");
-    _velocity = json.getFloat("velocity");
-    _rotation = json.getFloat("rotation");
-    _nextRotation = json.getFloat("nextRotation");
+    _position.x = json.getFloat("x");
+    _position.y = json.getFloat("y");
+    _velocity.x = json.getFloat("vx");
+    _velocity.y = json.getFloat("vy");
+    _acceleration.x = json.getFloat("ax");
+    _acceleration.y = json.getFloat("ay");
 
     _groupId = json.getInt("groupId");
 
@@ -248,13 +200,12 @@ class Vehicle implements IPositionable {
   JSONObject toJson() {
     JSONObject result = new JSONObject();
     result.setInt("id", _id);
-    result.setFloat("x", _x);
-    result.setFloat("y", _y);
-    result.setFloat("nextX", _nextX);
-    result.setFloat("nextY", _nextY);
-    result.setFloat("velocity", _velocity);
-    result.setFloat("rotation", _rotation);
-    result.setFloat("nextRotation", _nextRotation);
+    result.setFloat("x", _position.x);
+    result.setFloat("y", _position.y);
+    result.setFloat("vx", _velocity.x);
+    result.setFloat("vy", _velocity.y);
+    result.setFloat("ax", _acceleration.x);
+    result.setFloat("ay", _acceleration.y);
 
     result.setInt("groupId", _groupId);
 

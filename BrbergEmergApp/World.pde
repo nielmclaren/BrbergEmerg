@@ -1,8 +1,10 @@
 
 class World {
-  public static final int NEIGHBORHOOD_RADIUS = 150;
-  public static final int MIN_DISTANCE = 10;
-  public static final int OUT_GROUP_MIN_DISTANCE = 40;
+  public static final int NEIGHBORHOOD_RADIUS = 50;
+  public static final int MIN_DISTANCE = 25;
+  public static final int OUT_GROUP_MIN_DISTANCE = 25;
+  public static final float MAX_SPEED = 3;
+  public static final float MAX_FORCE = 0.03;
 
   private ArrayList<Vehicle> _vehicles;
   private HashMap<Integer, Touch> _cursorIdToTouch;
@@ -156,7 +158,7 @@ class World {
   World setupVehicles(IPositioner positioner, int numVehicles) {
     for (int i = 0; i < numVehicles; i++) {
       int groupId = floor(random(_numGroups));
-      Vehicle vehicle = new Vehicle(this, i, 0, 0, random(PI))
+      Vehicle vehicle = new Vehicle(this, i)
         .groupId(groupId);
 
       if (positioner.position(vehicle, i)) {
@@ -176,7 +178,6 @@ class World {
   World step() {
     updatePartition();
     calculateNeighborhoods();
-    prepVehicles();
     stepVehicles();
 
     _age++;
@@ -197,16 +198,41 @@ class World {
     }
   }
 
-  private void prepVehicles() {
-    for (Vehicle vehicle : _vehicles) {
-      vehicle.prep();
-    }
-  }
-
   private void stepVehicles() {
     for (Vehicle vehicle : _vehicles) {
       vehicle.step();
+      stepBounds(vehicle);
     }
+  }
+
+  private void stepBounds(Vehicle vehicle) {
+    int safety = 2;
+    float x = vehicle.position().x;
+    float y = vehicle.position().y;
+
+    if (x > _width) {
+      vehicle.x(_width - safety);
+      bounceHorizontally(vehicle);
+    } else if (x < 0) {
+      vehicle.x(safety);
+      bounceHorizontally(vehicle);
+    }
+
+    if (y > _height) {
+      vehicle.y(_height - safety);
+      bounceVertically(vehicle);
+    } else if (y < 0) {
+      vehicle.y(safety);
+      bounceVertically(vehicle);
+    }
+  }
+
+  private void bounceHorizontally(Vehicle vehicle) {
+    vehicle.velocity().x = -vehicle.velocity().x;
+  }
+
+  private void bounceVertically(Vehicle vehicle) {
+    vehicle.velocity().y = -vehicle.velocity().y;
   }
 
   private World updateFromJson(JSONObject json) {

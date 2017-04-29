@@ -23,20 +23,29 @@ class WorldDrawer {
 
   private void drawVehicle(PGraphics g, World world, Vehicle vehicle) {
     color c = vehicleColors[vehicle.groupId()];
-    int radius = 3;
+    int radius = 5;
+    int length = 8;
     float x = vehicle.x();
     float y = vehicle.y();
-    float rotation = vehicle.rotation();
-    int len = 4;
+    PVector dir = vehicle.velocity().copy();
+    dir.mult(length);
 
     g.pushStyle();
     g.colorMode(RGB);
+
+    g.noFill();
+    g.stroke(64);
+    g.strokeWeight(1);
+    g.ellipse(x, y, World.NEIGHBORHOOD_RADIUS, World.NEIGHBORHOOD_RADIUS);
+
     g.fill(c);
     g.noStroke();
     g.ellipse(x, y, radius, radius);
+
     g.noFill();
     g.stroke(c);
-    g.line(x, y, x - len * cos(rotation), y - len * sin(rotation));
+    g.strokeWeight(2);
+    g.line(x, y, x - dir.x, y - dir.y);
 
     g.popStyle();
   }

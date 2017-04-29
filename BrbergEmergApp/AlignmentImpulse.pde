@@ -1,41 +1,32 @@
 
 // Steer toward the average direction that nearby vehicles are going.
 class AlignmentImpulse extends Impulse {
-  private float _factor;
-  private float _maxDelta;
-
   AlignmentImpulse(World world) {
     super(world);
-
-    _factor = 0.02;
-    _maxDelta = 0.04;
-  }
-
-  float factor() {
-    return _factor;
-  }
-
-  AlignmentImpulse factor(float v) {
-    _factor = v;
-    return this;
-  }
-
-  float maxDelta() {
-    return _maxDelta;
-  }
-
-  AlignmentImpulse maxDelta(float v) {
-    _maxDelta = v;
-    return this;
   }
 
   void step(Vehicle vehicle) {
     ArrayList<Vehicle> groupVehicles = vehicle.neighborhoodRef().inGroupNeighborsRef();
-    if (groupVehicles.size() > 0) {
-      float neighborhoodRotation = getAverageRotation(groupVehicles);
-      float result = getScaledRotationDeltaToward(vehicle, neighborhoodRotation, _factor, _maxDelta);
-      vehicle.nextRotate(result);
+    if (groupVehicles.size() <= 0) return;
+
+    PVector averageVelocity = getAverageVelocity(groupVehicles);
+    averageVelocity.setMag(World.MAX_SPEED);
+
+    PVector steer = PVector.sub(averageVelocity, vehicle.velocity());
+    steer.limit(World.MAX_FORCE);
+
+    vehicle.accelerate(steer);
+  }
+
+  private PVector getAverageVelocity(ArrayList<Vehicle> vehicles) {
+    PVector sum = new PVector();
+    for (Vehicle v : vehicles) {
+      sum.add(v.velocity());
     }
+    if (vehicles.size() > 0) {
+      sum.div(vehicles.size());
+    }
+    return sum;
   }
 }
 

@@ -15,46 +15,61 @@ class BrbergEmergImage extends ShortImage {
   }
 
   void drawVehicle(World world, Vehicle vehicle) {
-    int targetX = floor(vehicle.x());
-    int targetY = floor(vehicle.y());
+    int targetX = floor(vehicle.position().x);
+    int targetY = floor(vehicle.position().y);
 
     ArrayList<Vehicle> inGroupVehicles = vehicle.neighborhoodRef().inGroupNeighborsRef();
-
-    float rotationFactor;
-    if (inGroupVehicles.size() <= 0) {
-      rotationFactor = 0;
-    } else {
-      float groupRotation = getScaledAverageRotation(vehicle, vehicle.rotation(), World.NEIGHBORHOOD_RADIUS, inGroupVehicles);
-      rotationFactor = abs(getSignedAngleBetween(vehicle.rotation(), groupRotation)) / PI;
-    }
+    float alignmentFactor = getAlignmentFactor(vehicle, inGroupVehicles);
 
     pushStyle();
+    colorMode(RGB, 1);
 
     color c = vehicleColors[vehicle.groupId()];
 
     int minRadius = 12;
     int radius;
     if (vehicle.touchRef() == null) {
-      radius = floor(map(rotationFactor, 0, 1, minRadius, 24));
+      radius = floor(map(alignmentFactor, 0, 1, minRadius, 24));
     } else {
       radius = 40;
       c = color(255);
     }
 
-    float alpha = (0
-        + constrain(map(rotationFactor, 0, 1, 0.125, 0.5), 0.125, 0.5)
-        + constrain(map(world.age(), 0, 100000, 0, 0.25), 0, 0.25)
-        ) % 1;
-    while (alpha < 0) {
-      alpha += 1;
-    }
-
-    colorMode(RGB, 1);
-    drawCircleFalloff(targetX, targetY, radius, c, floor(alpha));
+    float alpha = map(alignmentFactor, 0, 1, 0.125, 0.5);
+    drawCircleFalloff(targetX, targetY, radius, c, alpha);
     drawCircle(targetX, targetY, 2, c, alpha);
 
     _isImageDirty = true;
     popStyle();
+  }
+
+  private float getAlignmentFactor(Vehicle vehicle, ArrayList<Vehicle> vehicles) {
+    if (vehicles.size() <= 0) {
+      return 0;
+    }
+
+    PVector dir = vehicle.velocity().copy();
+    dir.normalize();
+    PVector groupDir = getWeightedAverageVelocity(vehicle, vehicles);
+    groupDir.normalize();
+
+    return PVector.sub(dir, groupDir).mag() / 2;
+  }
+
+  private PVector getWeightedAverageVelocity(Vehicle vehicle, ArrayList<Vehicle> vehicles) {
+    PVector sum = vehicle.velocity().copy();
+    for (Vehicle v : vehicles) {
+      float dist = PVector.dist(v.position(), vehicle.position());
+      PVector weightedVelocity = v.velocity().copy();
+      weightedVelocity.mult(1 - dist / World.NEIGHBORHOOD_RADIUS);
+
+      sum.add(weightedVelocity);
+    }
+    if (vehicles.size() > 0) {
+      sum.div(vehicles.size() + 1);
+    }
+
+    return sum;
   }
 
   private void drawCircle(int targetX, int targetY, int radius, color c) {

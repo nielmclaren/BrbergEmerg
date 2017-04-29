@@ -49,11 +49,8 @@ void setup() {
 }
 
 void reset() {
-  int numVehicles = world.numVehicles();
-
-  world.age(0);
-  world.clearVehicles();
-  world.setupVehicles(randomPositioner, numVehicles);
+  JSONObject worldJson = loadJSONObject("data/world.json");
+  world.updateFromJson(worldJson);
 
   buffer.clear();
 }
@@ -85,14 +82,6 @@ void step() {
     stroke(64);
     strokeWeight(4);
     rect(0, 0, imageWidth, imageHeight);
-
-    strokeWeight(1);
-    for (int x = 0; x < imageWidth; x += World.OUT_GROUP_MIN_DISTANCE) {
-      line(x, 0, x, imageHeight);
-    }
-    for (int y = 0; y < imageHeight; y += World.OUT_GROUP_MIN_DISTANCE) {
-      line(0, y, imageWidth, y);
-    }
 
     drawer.draw(g, world);
     popMatrix();
@@ -214,45 +203,6 @@ PVector getAveragePosition(ArrayList<? extends IPositioned> items) {
   }
   result.div(items.size());
   return result;
-}
-
-float getAverageRotation(ArrayList<Vehicle> vehicles) {
-  if (vehicles.size() <= 0) {
-    return 0;
-  }
-
-  PVector sum = new PVector();
-  for (Vehicle vehicle : vehicles) {
-    float r = vehicle.rotation();
-    sum.add(cos(r), sin(r));
-  }
-
-  return normalizeAngle(atan2(sum.y, sum.x));
-}
-
-float getScaledAverageRotation(IPositioned center, float baseRotation, int maxDistance, ArrayList<Vehicle> vehicles) {
-  if (vehicles.size() <= 0) {
-    return 0;
-  }
-
-  int maxDistanceSquared = maxDistance * maxDistance;
-  float x = center.x();
-  float y = center.y();
-
-  PVector sum = new PVector(cos(baseRotation), sin(baseRotation));
-  for (Vehicle vehicle : vehicles) {
-    float dx = vehicle.x() - x;
-    float dy = vehicle.y() - y;
-    float dSquared = dx * dx + dy * dy;
-    if (dSquared < maxDistanceSquared) {
-      float d = sqrt(dSquared);
-      float k = 1 - d / maxDistance;
-      float r = vehicle.rotation();
-      sum.add(k * cos(r), k * sin(r));
-    }
-  }
-
-  return normalizeAngle(atan2(sum.y, sum.x));
 }
 
 IPositioned getNearestTo(ArrayList<? extends IPositioned> items, IPositioned target) {

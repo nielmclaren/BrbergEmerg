@@ -18,9 +18,12 @@ class Impulse {
   void step(Vehicle vehicle) {
   }
 
-  protected float getScaledRotationDeltaToward(Vehicle vehicle, float target, float factor, float maxDelta) {
-    float current = vehicle.nextRotation();
-    float velocity = vehicle.velocity();
-    return getRotationDeltaToward(current, target, factor * velocity, maxDelta * velocity);
+  protected void seek(Vehicle vehicle, PVector target) {
+    PVector desired = PVector.sub(target, vehicle.position());
+    desired.setMag(World.MAX_SPEED);
+
+    PVector steer = PVector.sub(desired, vehicle.velocity());
+    steer.limit(World.MAX_FORCE);
+    vehicle.accelerate(steer);
   }
 }
