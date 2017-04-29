@@ -36,8 +36,8 @@ class BrbergEmergImage extends ShortImage {
     }
 
     float alpha = map(alignmentFactor, 0, 1, 0.125, 0.5);
-    drawCircleFalloff(targetX, targetY, radius, c, alpha);
-    drawCircle(targetX, targetY, 2, c, alpha);
+    drawCircleFalloff(targetX, targetY, radius, c, 0.8 * alpha);
+    drawPixel(targetX, targetY, c, alpha);
 
     _isImageDirty = true;
     popStyle();
@@ -114,5 +114,10 @@ class BrbergEmergImage extends ShortImage {
         }
       }
     }
+  }
+
+  private void drawPixel(int x, int y, color c, float alpha) {
+    int pixelIndex = y * _width + x;
+    setColor(pixelIndex, c, alpha);
   }
 }

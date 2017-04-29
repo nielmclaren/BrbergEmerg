@@ -21,6 +21,7 @@ TuioProcessing tuioClient;
 FileNamer animationFolderNamer, fileNamer;
 
 void setup() {
+  background(0);
   noCursor();
   fullScreen();
   frameRate(60);
@@ -33,8 +34,9 @@ void setup() {
   world = new World(worldJson);
   drawer = new WorldDrawer();
   buffer = new BrbergEmergImage(imageWidth, imageHeight, ARGB);
+  buffer.clear();
   isPaused = false;
-  isHighQualityMode = false;
+  isHighQualityMode = true;
 
   animationFolderNamer = new FileNamer("output/anim", "/");
   fileNamer = new FileNamer("output/export", "png");
