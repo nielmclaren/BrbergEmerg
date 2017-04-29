@@ -141,23 +141,18 @@ void addTuioBlob(TuioBlob b) {}
 void updateTuioBlob(TuioBlob b) {}
 void removeTuioBlob(TuioBlob b) {}
 
+// Called when a cursor is added.
 void addTuioCursor(TuioCursor tcur) {
-  println("add cur "+tcur.getCursorID()+" ("+tcur.getSessionID()+ ") "
-    +tcur.getX()+" "+tcur.getY());
   world.addTouch(tcur);
 }
 
-// called when a cursor is moved
+// Called when a cursor is moved.
 void updateTuioCursor (TuioCursor tcur) {
-  println("set cur "+tcur.getCursorID()+" ("+tcur.getSessionID()+ ") "
-    +tcur.getX()+" "+tcur.getY()
-    +" "+tcur.getMotionSpeed()+" "+tcur.getMotionAccel());
   world.updateTouch(tcur);
 }
 
-// called when a cursor is removed from the scene
+// Called when a cursor is removed.
 void removeTuioCursor(TuioCursor tcur) {
-  println("del cur "+tcur.getCursorID()+" ("+tcur.getSessionID()+")");
   world.removeTouch(tcur);
 }
 
