@@ -35,48 +35,44 @@ void resetPartitions() {
       new PVector(width, height),
       new PVector(0, height),
       0);
-/*
+  
   float j = 0.4;
   float ij = 1 - j;
   float k = 0.4;
   float ik = 1 - k;
 
-  int numPartitions = 1;
+  int numPartitions = 1000;
   for (int i = 0; i < numPartitions; i++) {
     float x = random(width);
     float y = random(height);
     QuadPartition p = partition.getLeafPartitionAt(x, y);
-    color c = sourceImage.get(floor(p.midX()), floor(p.midX()));
     p.partition(p.midX(), p.midY());
   }
-*/
 }
 
 void draw() {
   colorMode(HSB);
+  blendMode(ADD);
   background(0);
 
   drawPartition(partition);
 }
 
 void drawPartition(QuadPartition p) {
-  ArrayList<QuadPartition> path = p.ancestors();
-  path.add(0, p);
-
-  color c = sourceImage.get(floor(p.midX()), floor(p.midY()));
-  stroke(255);
-  fill(c);
-
-  quad(
-      p.topLeftRef().x, p.topLeftRef().y,
-      p.topRightRef().x, p.topRightRef().y,
-      p.bottomRightRef().x, p.bottomRightRef().y,
-      p.bottomLeftRef().x, p.bottomLeftRef().y);
-
   if (p.hasChildren()) {
     for (QuadPartition childPartition : p.children()) {
       drawPartition(childPartition);
     }
+  } else {
+    color c = sourceImage.get(floor(p.midX()), floor(p.midY()));
+    fill(hue(c), saturation(c), brightness(c), 128);
+    noStroke();
+
+    quad(
+        p.topLeftRef().x, p.topLeftRef().y,
+        p.topRightRef().x, p.topRightRef().y,
+        p.bottomRightRef().x, p.bottomRightRef().y,
+        p.bottomLeftRef().x, p.bottomLeftRef().y);
   }
 }
 

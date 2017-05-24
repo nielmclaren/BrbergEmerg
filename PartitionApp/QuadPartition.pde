@@ -76,8 +76,9 @@ class QuadPartition {
     float pointArea = getTriangleArea(_topLeft, _topRight, p)
       + getTriangleArea(_topRight, _bottomRight, p)
       + getTriangleArea(_bottomRight, _bottomLeft, p)
-      + getTriangleArea(_bottomRight, _topRight, p);
-    return pointArea <= area();
+      + getTriangleArea(_bottomLeft, _topLeft, p);
+    float error = 1;
+    return pointArea <= area() + 1;
   }
 
   public float area() {
@@ -90,9 +91,10 @@ class QuadPartition {
     float s1 = p1.dist(p2);
     float s2 = p2.dist(p0);
     float p = (s0 + s1 + s2) / 2;
+    
     return sqrt(p * (p - s0) * (p - s1) * (p - s2));
   }
-
+  
   public QuadPartition getLeafPartitionAt(float x, float y) {
     if (hasChildren()) {
       for (QuadPartition childPartition : _children) {
