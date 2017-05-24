@@ -1,5 +1,5 @@
 
-Partition partition;
+QuadPartition partition;
 ArrayList<Line> lines;
 PImage sourceImage;
 
@@ -9,14 +9,19 @@ FileNamer fileNamer;
 void setup() {
   size(800, 800, P3D);
 
-  sourceImage = loadImage("barcode.png");
+  sourceImage = loadImage("thormanby.jpg");
   fileNamer = new FileNamer("output/export", "png");
 
   reset();
 }
 
 void clear() {
-  partition = new Partition(0, 0, width, height, 0);
+  partition = new QuadPartition(
+      new PVector(0, 0),
+      new PVector(width, 0),
+      new PVector(width, height),
+      new PVector(0, height),
+      0);
 }
 
 void reset() {
@@ -24,21 +29,27 @@ void reset() {
 }
 
 void resetPartitions() {
-  partition = new Partition(0, 0, width, height, 0);
-
-  float k = 0.2;
+  partition = new QuadPartition(
+      new PVector(0, 0),
+      new PVector(width, 0),
+      new PVector(width, height),
+      new PVector(0, height),
+      0);
+/*
+  float j = 0.4;
+  float ij = 1 - j;
+  float k = 0.4;
   float ik = 1 - k;
 
-  int numPartitions = 4000;
+  int numPartitions = 1;
   for (int i = 0; i < numPartitions; i++) {
     float x = random(width);
     float y = random(height);
-    Partition p = partition.getLeafPartitionAt(x, y);
+    QuadPartition p = partition.getLeafPartitionAt(x, y);
     color c = sourceImage.get(floor(p.midX()), floor(p.midX()));
-    p.partition(
-        p.x() + random(k * p.width(), ik * p.width()),
-        p.y() + random(k * p.height(), ik * p.height()));
+    p.partition(p.midX(), p.midY());
   }
+*/
 }
 
 void draw() {
@@ -48,22 +59,22 @@ void draw() {
   drawPartition(partition);
 }
 
-void drawPartition(Partition p) {
-  ArrayList<Partition> path = p.ancestors();
+void drawPartition(QuadPartition p) {
+  ArrayList<QuadPartition> path = p.ancestors();
   path.add(0, p);
 
   color c = sourceImage.get(floor(p.midX()), floor(p.midY()));
-  if (brightness(c) < 32) {
-    stroke(0);
-    fill(c);
-  } else {
-    stroke(232);
-    fill(240);
-  }
-  rect(p.x(), p.y(), p.width(), p.height());
+  stroke(255);
+  fill(c);
+
+  quad(
+      p.topLeftRef().x, p.topLeftRef().y,
+      p.topRightRef().x, p.topRightRef().y,
+      p.bottomRightRef().x, p.bottomRightRef().y,
+      p.bottomLeftRef().x, p.bottomLeftRef().y);
 
   if (p.hasChildren()) {
-    for (Partition childPartition : p.children()) {
+    for (QuadPartition childPartition : p.children()) {
       drawPartition(childPartition);
     }
   }
@@ -87,7 +98,7 @@ void keyReleased() {
 }
 
 void mouseReleased() {
-  Partition p = partition.getLeafPartitionAt(mouseX, mouseY);
+  QuadPartition p = partition.getLeafPartitionAt(mouseX, mouseY);
   p.partition(mouseX, mouseY);
 }
 
