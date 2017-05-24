@@ -1,4 +1,7 @@
 
+import java.util.Iterator;
+import java.util.Map;
+
 class World {
   public static final int NEIGHBORHOOD_RADIUS = 50;
   public static final int MIN_DISTANCE = 25;
@@ -105,11 +108,14 @@ class World {
   }
 
   World removeTouch(TuioCursor cursor) {
-    Touch touch = _cursorIdToTouch.get(cursor.getCursorID());
-    if (touch.vehicleRef() != null) {
-      touch.vehicleRef().touch(null);
+    int id = cursor.getCursorID();
+    Touch touch = _cursorIdToTouch.get(id);
+    if (touch != null) {
+      if (touch.vehicleRef() != null) {
+        touch.vehicleRef().touch(null);
+      }
+      _cursorIdToTouch.remove(id);
     }
-    _cursorIdToTouch.remove(cursor.getCursorID());
     return this;
   }
 
@@ -179,6 +185,8 @@ class World {
     updatePartition();
     calculateNeighborhoods();
     stepVehicles();
+    stepTouches();
+    validateTouches();
 
     _age++;
 
@@ -233,6 +241,26 @@ class World {
 
   private void bounceVertically(Vehicle vehicle) {
     vehicle.velocity().y = -vehicle.velocity().y;
+  }
+
+  private void stepTouches() {
+    for(Iterator<Map.Entry<Integer, Touch>> iterator = _cursorIdToTouch.entrySet().iterator(); iterator.hasNext(); ) {
+      Map.Entry<Integer, Touch> entry = iterator.next();
+      Touch touch = entry.getValue();
+      touch.step();
+    }
+  }
+
+  private void validateTouches() {
+    for(Iterator<Map.Entry<Integer, Touch>> iterator = _cursorIdToTouch.entrySet().iterator(); iterator.hasNext(); ) {
+      Map.Entry<Integer, Touch> entry = iterator.next();
+      int cursorId = entry.getKey();
+      Touch touch = entry.getValue();
+      if (!touch.isValid()) {
+        touch.vehicleRef().touch(null);
+        iterator.remove();
+      }
+    }
   }
 
   private World updateFromJson(JSONObject json) {

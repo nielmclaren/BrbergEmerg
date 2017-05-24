@@ -160,7 +160,7 @@ class Vehicle implements IPositionable {
   }
 
   Vehicle step() {
-    if (_touch == null) {
+    if (_touch == null || !_touch.isValid()) {
       _world.alignment.step(this);
       _world.boundary.step(this);
       _world.cohesion.step(this);
@@ -175,6 +175,17 @@ class Vehicle implements IPositionable {
     _velocity.limit(World.MAX_SPEED);
     _position.add(_velocity);
     _acceleration.mult(0);
+
+    if (Float.isNaN(_position.x) || Float.isNaN(_position.y)) {
+      _position = new PVector(random(_world.width()), random(_world.height()));
+    }
+    if (Float.isNaN(_velocity.x) || Float.isNaN(_velocity.y)) {
+      _velocity = new PVector(World.MAX_SPEED, 0);
+      _velocity.rotate(random(2 * PI));
+    }
+    if (Float.isNaN(_acceleration.x) || Float.isNaN(_acceleration.y)) {
+      _acceleration = new PVector();
+    }
 
     return this;
   }
