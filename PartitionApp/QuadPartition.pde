@@ -124,9 +124,9 @@ class QuadPartition {
     return _children;
   }
 
-  public void partition(float x, float y) {
+  public boolean partition(float x, float y) {
     int d = _depth + 1;
-    float k = 0.02;
+    float k = 0.5;
 
     int maxTries = 100;
     _children = new ArrayList<QuadPartition>();
@@ -136,7 +136,7 @@ class QuadPartition {
       top.add(_topLeft);
 
       PVector right = PVector.sub(_bottomRight, _topRight);
-      right.mult(random(0.5 - k * 0.5, 0.5 + k * 0.5));
+      right.mult(0.5);
       right.add(_topRight);
 
       PVector bottom = PVector.sub(_bottomLeft, _bottomRight);
@@ -144,13 +144,13 @@ class QuadPartition {
       bottom.add(_bottomRight);
 
       PVector left = PVector.sub(_topLeft, _bottomLeft);
-      left.mult(random(0.5 - k * 0.5, 0.5 + k * 0.5));
+      left.mult(0.5);
       left.add(_bottomLeft);
 
       float w = (top.x + bottom.x) / 2;
       float h = (left.y + bottom.y) / 2;
 
-      PVector center = new PVector(random(x - k * w/2, x + k * w/2), random(y - k * h/2, y + k * h/2));
+      PVector center = new PVector(random(x - k * w/2, x + k * w/2), y);
 
       QuadPartition topLeftQuad = new QuadPartition(_topLeft, top, center, left, d);
       QuadPartition topRightQuad = new QuadPartition(top, _topRight, right, center, d);
@@ -162,8 +162,9 @@ class QuadPartition {
         _children.add(topRightQuad);
         _children.add(bottomRightQuad);
         _children.add(bottomLeftQuad);
-        break;
+        return true;
       }
     }
+    return false;
   }
 }
