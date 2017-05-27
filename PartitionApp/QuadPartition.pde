@@ -70,6 +70,15 @@ class QuadPartition {
     return _depth;
   }
 
+  public boolean isConvex() {
+    ArrayList<PVector> points = new ArrayList<PVector>();
+    points.add(_topLeft);
+    points.add(_topRight);
+    points.add(_bottomRight);
+    points.add(_bottomLeft);
+    return ConvexHull.isConvex(points);
+  }
+
   public boolean contains(float x, float y) {
     // FIXME: Only works for convex quadrilaterals!
     PVector p = new PVector(x, y);
@@ -91,10 +100,10 @@ class QuadPartition {
     float s1 = p1.dist(p2);
     float s2 = p2.dist(p0);
     float p = (s0 + s1 + s2) / 2;
-    
+
     return sqrt(p * (p - s0) * (p - s1) * (p - s2));
   }
-  
+
   public QuadPartition getLeafPartitionAt(float x, float y) {
     if (hasChildren()) {
       for (QuadPartition childPartition : _children) {
@@ -106,29 +115,7 @@ class QuadPartition {
 
     return this;
   }
-/*
-  public boolean intersectsLine(float x0, float y0, float x1, float y1) {
-    return lineIntersectsLine(x0, y0, x1, y1, _x, _y, _x + _width, _y)
-      || lineIntersectsLine(x0, y0, x1, y1, _x, _y, _x, _y + _height)
-      || lineIntersectsLine(x0, y0, x1, y1, _x + _width, _y, _x + _width, _y + _height)
-      || lineIntersectsLine(x0, y0, x1, y1, _x, _y + _height, _x + _width, _y + _height);
-  }
 
-  private boolean lineIntersectsLine(
-      float ax0, float ay0, float ax1, float ay1,
-      float bx0, float by0, float bx1, float by1) {
-    ax1 -= ax0;
-    ay1 -= ay0;
-    bx1 -= bx0;
-    by1 -= by0;
-    float d = bx1 * ay1 - ax1 * by1;
-    if (d == 0) return false;
-    float id = 1 / d;
-    float s = id * ((ax0 - bx0) * ay1 - (ay0 - by0) * ax1);
-    float t = id * -(-(ax0 - bx0) * by1 + (ay0 - by0) * bx1);
-    return s >= 0 && s <= 1 && t >= 0 && t <= 1;
-  }
-*/
   public boolean hasChildren() {
     return _children.size() > 0;
   }
@@ -138,29 +125,45 @@ class QuadPartition {
   }
 
   public void partition(float x, float y) {
-    PVector center = new PVector(x, y);
-
-    PVector top = PVector.sub(_topRight, _topLeft);
-    top.mult(random(1));
-    top.add(_topLeft);
-
-    PVector right = PVector.sub(_bottomRight, _topRight);
-    right.mult(random(1));
-    right.add(_topRight);
-
-    PVector bottom = PVector.sub(_bottomLeft, _bottomRight);
-    bottom.mult(random(1));
-    bottom.add(_bottomRight);
-
-    PVector left = PVector.sub(_topLeft, _bottomLeft);
-    left.mult(random(1));
-    left.add(_bottomLeft);
-
     int d = _depth + 1;
+    float k = 0.02;
 
-    _children.add(new QuadPartition(_topLeft, top, center, left, d));
-    _children.add(new QuadPartition(top, _topRight, right, center, d));
-    _children.add(new QuadPartition(center, right, _bottomRight, bottom, d));
-    _children.add(new QuadPartition(left, center, bottom, _bottomLeft, d));
+    int maxTries = 100;
+    _children = new ArrayList<QuadPartition>();
+    for (int i = 0; i < maxTries; i++) {
+      PVector top = PVector.sub(_topRight, _topLeft);
+      top.mult(random(0.5 - k * 0.5, 0.5 + k * 0.5));
+      top.add(_topLeft);
+
+      PVector right = PVector.sub(_bottomRight, _topRight);
+      right.mult(random(0.5 - k * 0.5, 0.5 + k * 0.5));
+      right.add(_topRight);
+
+      PVector bottom = PVector.sub(_bottomLeft, _bottomRight);
+      bottom.mult(random(0.5 - k * 0.5, 0.5 + k * 0.5));
+      bottom.add(_bottomRight);
+
+      PVector left = PVector.sub(_topLeft, _bottomLeft);
+      left.mult(random(0.5 - k * 0.5, 0.5 + k * 0.5));
+      left.add(_bottomLeft);
+
+      float w = (top.x + bottom.x) / 2;
+      float h = (left.y + bottom.y) / 2;
+
+      PVector center = new PVector(random(x - k * w/2, x + k * w/2), random(y - k * h/2, y + k * h/2));
+
+      QuadPartition topLeftQuad = new QuadPartition(_topLeft, top, center, left, d);
+      QuadPartition topRightQuad = new QuadPartition(top, _topRight, right, center, d);
+      QuadPartition bottomRightQuad = new QuadPartition(center, right, _bottomRight, bottom, d);
+      QuadPartition bottomLeftQuad = new QuadPartition(left, center, bottom, _bottomLeft, d);
+
+      if (topLeftQuad.isConvex() && topRightQuad.isConvex() && bottomRightQuad.isConvex() && bottomLeftQuad.isConvex()) {
+        _children.add(topLeftQuad);
+        _children.add(topRightQuad);
+        _children.add(bottomRightQuad);
+        _children.add(bottomLeftQuad);
+        break;
+      }
+    }
   }
 }

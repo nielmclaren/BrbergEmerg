@@ -41,7 +41,7 @@ void resetPartitions() {
   float k = 0.4;
   float ik = 1 - k;
 
-  int numPartitions = 1000;
+  int numPartitions = 10000;
   for (int i = 0; i < numPartitions; i++) {
     float x = random(width);
     float y = random(height);
@@ -52,7 +52,6 @@ void resetPartitions() {
 
 void draw() {
   colorMode(HSB);
-  blendMode(ADD);
   background(0);
 
   drawPartition(partition);
@@ -65,7 +64,9 @@ void drawPartition(QuadPartition p) {
     }
   } else {
     color c = sourceImage.get(floor(p.midX()), floor(p.midY()));
-    fill(hue(c), saturation(c), brightness(c), 128);
+    if (p.isConvex()) {
+      fill(c);
+    }
     noStroke();
 
     quad(

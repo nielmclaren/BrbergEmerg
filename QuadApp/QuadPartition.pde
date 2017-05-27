@@ -70,6 +70,101 @@ class QuadPartition {
     return _depth;
   }
 
+  public boolean isConvex() {
+    PVector[] vertices = { _topLeft, _topRight, _bottomRight, _bottomLeft };
+    
+    PVector[] sides = new PVector[4];
+    for (int i = 0; i < vertices.length; i++) {
+      int j = i + 1 == vertices.length ? 0 : i + 1;
+      sides[i] = PVector.sub(vertices[j], vertices[i]);
+    }
+    
+    float[] angles = new float[4];
+    for (int i = 0; i < sides.length; i++) {
+      int h = i - 1 < 0 ? sides.length - 1 : i - 1;
+      angles[i] = PVector.angleBetween(PVector.mult(sides[i], -1), sides[h]);
+    }
+
+    println(_topLeft, _topRight, _bottomRight, _bottomLeft);
+    printAngles(angles);
+
+pushStyle();
+    fill(255);
+    for (int i = 0; i < angles.length; i++) {
+      text(deg(angles[i]), vertices[i].x, vertices[i].y);
+    }
+popStyle();
+
+    if (allAcute(angles)) {
+      return false;
+    }
+
+    if (numAnglesGreaterThan(angles, PI) < 2) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private ArrayList<PVector> getConvexHull(ArrayList<PVector> points) {
+    PVector start = getLeftmost(points);
+    PVector prevPoint = start;
+    PVector candidate = null;
+    for (PVector point : points) {
+      if (point == prevPoint) return;
+      if (candidate == null || PVector.sub(point, prevPoint).heading() < PVector.sub(candidate, prevPoint).heading()) {
+        candidate = prevPoint;
+      }
+    }
+  }
+
+  private PVector getLeftmost(ArrayList<PVector> points) {
+    PVector result = null;
+    for (PVector point : points) {
+      if (result == null || point.x < result.x) {
+        result = point;
+      }
+    }
+    return result;
+  }
+
+  private void printAngles(float[] angles) {
+    println("---");
+    for (float a : angles) {
+      println(deg(a), deg(normalizeAngle(-a)));
+    }
+  }
+
+  private boolean allAcute(float[] angles) {
+    for (float a : angles) {
+      if (a >= PI/2) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private int numAnglesGreaterThan(float[] angles, float testAngle) {
+    int result = 0;
+    for (float angle : angles) {
+      if (angle > testAngle) {
+        result++;
+      }
+    }
+    return result;
+  }
+
+  private float normalizeAngle(float a) {
+    while (a < 0) {
+      a += 2 * PI;
+    }
+    return a % (2 * PI);
+  }
+
+  private String deg(float a) {
+    return "" + floor(a * 180 / PI);
+  }
+
   public boolean contains(float x, float y) {
     // FIXME: Only works for convex quadrilaterals!
     PVector p = new PVector(x, y);
