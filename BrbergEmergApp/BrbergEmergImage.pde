@@ -34,7 +34,7 @@ class BrbergEmergImage extends ShortImage {
       radius = 40;
     }
 
-    float alpha = map(alignmentFactor, 0, 1, 0.125, 0.5);
+    float alpha = map(alignmentFactor, 0, 1, 0.25, 0.75);
     drawCircleFalloff(targetX, targetY, radius, c, 0.8 * alpha);
     drawPixel(targetX, targetY, c, alpha);
 

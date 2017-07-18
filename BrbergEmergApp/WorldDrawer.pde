@@ -62,11 +62,11 @@ class WorldDrawer {
 
     for (Touch touch : touches) {
       g.noFill();
-      g.stroke(255, 12);
+      g.stroke(255, 48);
       g.strokeWeight(8);
       g.ellipse(touch.x(), touch.y(), outerRadius, outerRadius);
 
-      g.fill(255, 8);
+      g.fill(255, 32);
       g.noStroke();
       g.ellipse(touch.x(), touch.y(), radius, radius);
 
@@ -76,7 +76,7 @@ class WorldDrawer {
         PVector diff = PVector.sub(touchPosition, vehicle.position());
         diff.setMag(diff.mag() - radius - 1);
 
-        g.stroke(255, 8);
+        g.stroke(255, 32);
         g.strokeWeight(2);
         g.line(vehicle.x(), vehicle.y(), vehicle.x() + diff.x, vehicle.y() + diff.y);
       }
