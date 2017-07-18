@@ -1,5 +1,5 @@
 
-Partition partition;
+QuadPartition partition;
 ArrayList<Line> lines;
 PImage sourceImage;
 
@@ -9,14 +9,19 @@ FileNamer fileNamer;
 void setup() {
   size(800, 800, P3D);
 
-  sourceImage = loadImage("barcode.png");
+  sourceImage = loadImage("thormanby.jpg");
   fileNamer = new FileNamer("output/export", "png");
 
   reset();
 }
 
 void clear() {
-  partition = new Partition(0, 0, width, height, 0);
+  partition = new QuadPartition(
+      new PVector(0, 0),
+      new PVector(width, 0),
+      new PVector(width, height),
+      new PVector(0, height),
+      0);
 }
 
 void reset() {
@@ -24,21 +29,31 @@ void reset() {
 }
 
 void resetPartitions() {
-  partition = new Partition(0, 0, width, height, 0);
+  println("Working...");
+  partition = new QuadPartition(
+      new PVector(0, 0),
+      new PVector(width, 0),
+      new PVector(width, height),
+      new PVector(0, height),
+      0);
 
-  float k = 0.2;
+  float j = 0.4;
+  float ij = 1 - j;
+  float k = 0.4;
   float ik = 1 - k;
 
-  int numPartitions = 4000;
-  for (int i = 0; i < numPartitions; i++) {
+  int numPartitions = 0;
+  int maxPartitions = 1000;
+  while (numPartitions < maxPartitions) {
     float x = random(width);
     float y = random(height);
-    Partition p = partition.getLeafPartitionAt(x, y);
-    color c = sourceImage.get(floor(p.midX()), floor(p.midX()));
-    p.partition(
-        p.x() + random(k * p.width(), ik * p.width()),
-        p.y() + random(k * p.height(), ik * p.height()));
+    QuadPartition p = partition.getLeafPartitionAt(x, y);
+    float score = getDissimilarityScore(sourceImage, floor(p.midX()), floor(p.midY()));
+    if (random(255) < score && p.partition(p.midX(), p.midY())) {
+      numPartitions++;
+    }
   }
+  println("Done.");
 }
 
 void draw() {
@@ -48,25 +63,61 @@ void draw() {
   drawPartition(partition);
 }
 
-void drawPartition(Partition p) {
-  ArrayList<Partition> path = p.ancestors();
-  path.add(0, p);
-
+void drawPartition(QuadPartition p) {
   color c = sourceImage.get(floor(p.midX()), floor(p.midY()));
-  if (brightness(c) < 32) {
-    stroke(0);
-    fill(c);
-  } else {
-    stroke(232);
-    fill(240);
-  }
-  rect(p.x(), p.y(), p.width(), p.height());
+  fill(hue(c), saturation(c), brightness(c) + 64, 64);
+  noStroke();
+
+  PVector topLeft = p.topLeftRef().copy();
+  PVector topRight = p.topRightRef().copy();
+  PVector bottomLeft = p.bottomLeftRef().copy();
+  PVector bottomRight = p.bottomRightRef().copy();
+
+  PVector center = new PVector();
+  center.add(topLeft);
+  center.add(topRight);
+  center.add(bottomLeft);
+  center.add(bottomRight);
+  center.mult(0.25);
+
+  float k = map(p.depth(), 0, 6, 0.1, 0);
+  float ik = 1 - k;
+  topLeft = PVector.add(PVector.mult(topLeft, ik), PVector.mult(center, k));
+  topRight = PVector.add(PVector.mult(topRight, ik), PVector.mult(center, k));
+  bottomLeft = PVector.add(PVector.mult(bottomLeft, ik), PVector.mult(center, k));
+  bottomRight = PVector.add(PVector.mult(bottomRight, ik), PVector.mult(center, k));
+
+  quad(
+      topLeft.x, topLeft.y,
+      topRight.x, topRight.y,
+      bottomRight.x, bottomRight.y,
+      bottomLeft.x, bottomLeft.y);
 
   if (p.hasChildren()) {
-    for (Partition childPartition : p.children()) {
+    for (QuadPartition childPartition : p.children()) {
       drawPartition(childPartition);
     }
   }
+}
+
+float getDissimilarityScore(PImage image, int targetX, int targetY) {
+  int radius = 50;
+  int radiusSq = radius * radius;
+  float sum = 0;
+  int numEntries = 0;
+
+  for (int rx = -radius; rx < radius; rx++) {
+    for (int ry = -radius; ry < radius; ry++) {
+      int x = targetX + rx;
+      int y = targetY + ry;
+      if (x >= 0 && x < image.width && y >= 0 && y < image.height && sqrt(rx * rx + ry * ry) < radiusSq) {
+        sum += brightness(image.pixels[y * image.width + x]);
+        numEntries++;
+      }
+    }
+  }
+
+  return abs(brightness(image.get(targetX, targetY)) - sum/numEntries);
 }
 
 void keyReleased() {
@@ -87,7 +138,7 @@ void keyReleased() {
 }
 
 void mouseReleased() {
-  Partition p = partition.getLeafPartitionAt(mouseX, mouseY);
+  QuadPartition p = partition.getLeafPartitionAt(mouseX, mouseY);
   p.partition(mouseX, mouseY);
 }
 

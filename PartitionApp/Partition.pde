@@ -123,7 +123,7 @@ class Partition {
 
   public void partition(float x, float y) {
     _children = new ArrayList<Partition>();
-    if (random(1) < 0.5) {
+    if (random(1) < 0.25) {
       _children = getHorizontalPartition(x, y, _depth);
     } else {
       _children = getVerticalPartition(x, y, _depth);
